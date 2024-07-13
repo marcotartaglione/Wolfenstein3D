@@ -5,7 +5,7 @@ file(GLOB SOURCES *.c)
 file(GLOB HEADERS *.h)
 
 file(GLOB ICON resources/icon/app.o)
-file(GLOB RESOURCE resources/icon/app.rc)
+file(GLOB RESOURCE resources/Resources.rc)
 
 file(GLOB STB_IMAGE vendor/stb/*)
 

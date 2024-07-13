@@ -36,4 +36,4 @@ $RECYCLE.BIN/
 .LSOverride
 
 # Icon must not be ignored
-!resources/icon/app.ico
+!resources/icon/icon.ico
