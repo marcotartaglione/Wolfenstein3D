@@ -1,0 +1,39 @@
+# Build output
+/cmake-build-debug/
+/cmake-build-release/
+
+# IDE - CLion specific
+/.idea/
+*.iml
+
+# Binary files
+*.exe
+*.dll
+*.so
+*.o
+*.a
+
+# Backup & temporary files
+*~
+*.swp
+*.tmp
+
+# Log files
+*.log
+
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin
+$RECYCLE.BIN/
+
+# macOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must not be ignored
+!resources/icon/app.ico
