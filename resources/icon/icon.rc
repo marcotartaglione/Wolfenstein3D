@@ -1,0 +1,3 @@
+#include "../Resources.h"
+
+WOLFEINSTEIN3D_ICON1    ICON    DISCARDABLE     "icon.ico"
