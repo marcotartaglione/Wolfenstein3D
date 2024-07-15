@@ -21,7 +21,7 @@ add_custom_command(
 file(GLOB ICON ${CMAKE_CURRENT_BINARY_DIR}/icon.o)
 file(GLOB RESOURCE resources/icon/icon.rc)
 
-file(GLOB STB_IMAGE vendor/stb/*)
+file(GLOB STB_IMAGE TRT_Engine/vendor/stb/*)
 
 add_executable(Wolfenstein3D WIN32 ${ICON} ${SOURCES} ${HEADERS} ${STB_IMAGE} ${RESOURCE})
 
