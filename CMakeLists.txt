@@ -29,3 +29,7 @@ find_library(WINMM_LIB NAMES winmm)
 target_link_libraries(Wolfenstein3D ${WINMM_LIB} TRT_ENGINE)
 
 set_target_properties(Wolfenstein3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
+
+add_custom_command(TARGET Wolfenstein3D POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:Wolfenstein3D>/assets)
