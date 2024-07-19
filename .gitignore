@@ -37,3 +37,4 @@ $RECYCLE.BIN/
 
 # Icon must not be ignored
 !resources/icon/icon.ico
+/CMakeFiles/
