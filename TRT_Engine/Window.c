@@ -151,7 +151,7 @@ void startWindow(char* title, Vec2 size, Vec2 position) {
     }
 }
 
-void runWindow(void (*loop)()) {
+void runWindow(void (*loop)(), void (*close)()) {
     MSG msg;
     while (TRUE) {
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -163,7 +163,7 @@ void runWindow(void (*loop)()) {
         loop();
         redraw();
     }
-
+    close();
 }
 
 void clearFrame() {

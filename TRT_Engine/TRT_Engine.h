@@ -29,7 +29,7 @@ typedef struct Vec3 {
 //
 void setupWindow(HINSTANCE hInstance, char* className);
 void startWindow(char* title, Vec2 size, Vec2 position);
-void runWindow(void (*loop)());
+void runWindow(void (*loop)(), void (*close)());
 void clearFrame();
 
 void setWindowUpScaling(uint32_t upScaling);
