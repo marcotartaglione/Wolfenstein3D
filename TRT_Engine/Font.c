@@ -2,8 +2,8 @@
 
 static int32_t fontBackgroundColor = -1;
 
-static Image* symbols[MAX_SYMBOLS];
-char* allSymbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{};':,.<>?/|\\\"";
+static Image *symbols[MAX_SYMBOLS];
+char *allSymbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{};':,.<>?/|\\\"";
 static uint32_t allSymbolsLen = 0;
 
 int32_t symbolIndex(char symbol) {
@@ -15,8 +15,8 @@ int32_t symbolIndex(char symbol) {
     return -1;
 }
 
-char* symbolToFilename(char symbol) {
-    char* filename = malloc(64);
+char *symbolToFilename(char symbol) {
+    char *filename = malloc(64);
 
     if (symbol >= 'A' && symbol <= 'Z') {
         sprintf(filename, "upper_%c.png", symbol + 32);
@@ -128,84 +128,114 @@ char* symbolToFilename(char symbol) {
     return filename;
 }
 
-void loadSymbols(char* directory) {
+void loadSymbols(char *directory) {
     if (!allSymbolsLen)
         allSymbolsLen = MIN(MAX_SYMBOLS, strlen(allSymbols));
 
-    for (int bold = 0; bold <= 1; ++bold) {
-        for (int i = 0; i < allSymbolsLen; ++i) {
-            char path[512];
-            char* filename = symbolToFilename(allSymbols[i]);
+    for (int i = 0; i < allSymbolsLen; ++i) {
+        char path[512];
+        char *filename = symbolToFilename(allSymbols[i]);
 
-            if (bold)
-                sprintf(path, "%sbold_%s", directory, filename);
-            else
-                sprintf(path, "%s%s", directory, filename);
+        sprintf(path, "%s%s", directory, filename);
 
 
-            symbols[i + allSymbolsLen * bold] = getImage(path);
-            free(filename);
-        }
+        symbols[i] = getImage(path);
+        free(filename);
     }
 }
 
-Image** phraseToImages(char* phrase, uint8_t bold) {
-    uint32_t len = strlen(phrase);
-    Image** images = malloc(len * sizeof(Image*));
+void drawText(char *text, Vec2 position, uint32_t height, uint32_t color, TextAlignment horizontalAlignment, TextAlignment verticalAlignment) {
+    uint32_t pixelOffsetFromSideBorder = 0;
+    uint32_t pixelOffsetFromTopBorder = 0;
+    uint32_t currentPixelOffsetFromSideBorder = 0;
+    uint32_t lastLetterWidth = -1;
 
-    static int32_t notFoundIndex = -1;
-    if (notFoundIndex == -1)
-        notFoundIndex = symbolIndex('?');
-
-    for (uint32_t i = 0; i < len; ++i) {
-        int32_t index = symbolIndex(phrase[i]);
-        if (index == -1)
-            index = notFoundIndex;
-
-        images[i] = symbols[index + allSymbolsLen * bold];
-    }
-
-    return images;
-}
-
-void drawText(char* text, Vec2 position, uint32_t height, uint32_t color, uint8_t bold, TextHorizontalAlignment horizontalAlignment) {
-    uint32_t offsetFromStart = 0;
-    uint32_t pixelOffsetFromBorder = 0;
-
-    if (horizontalAlignment != TEXT_H_ALIGN_NONE) {
+    if (horizontalAlignment != TEXT_ALIGN_NONE || verticalAlignment != TEXT_ALIGN_NONE) {
         for (uint32_t i = 0; i < strlen(text); ++i) {
-            pixelOffsetFromBorder += symbols[symbolIndex(text[i]) + allSymbolsLen * bold]->width;
+            if (text[i] == ' ') {
+                if (lastLetterWidth == -1)
+                    continue;
+
+                currentPixelOffsetFromSideBorder += lastLetterWidth;
+            } else if (text[i] == '\n') {
+                pixelOffsetFromTopBorder += height + 1;
+                pixelOffsetFromSideBorder = MAX(pixelOffsetFromSideBorder, currentPixelOffsetFromSideBorder);
+                currentPixelOffsetFromSideBorder = 0;
+            } else {
+                lastLetterWidth = symbols[symbolIndex(text[i])]->width;
+                currentPixelOffsetFromSideBorder += lastLetterWidth;
+            }
         }
     }
+    pixelOffsetFromSideBorder = MAX(pixelOffsetFromSideBorder, currentPixelOffsetFromSideBorder);
+
+    uint32_t xOffsetFromStart = 0;
+    uint32_t yOffsetFromStart = 0;
+    lastLetterWidth = -1;
+
+    float fontHeightRatio;
 
     for (uint32_t i = 0; i < strlen(text); ++i) {
-        Image* symbol = symbols[symbolIndex(text[i]) + allSymbolsLen * bold];
+        if (text[i] == '\n') {
+            yOffsetFromStart -= height + 1;
+            xOffsetFromStart = 0;
+            continue;
+        }
+        if (text[i] == ' ') {
+            if (lastLetterWidth == -1)
+                continue;
 
-        float fontHeightRatio = (float) height / (float) symbol->height;
-        for (uint32_t x = 0; x < symbol->width; ++x) {
+            xOffsetFromStart += 22 * fontHeightRatio;
+            continue;
+        }
+
+        Image *symbol = symbols[symbolIndex(text[i])];
+
+        fontHeightRatio = (float) height / (float) symbol->height;
+        lastLetterWidth = symbol->width;
+
+        for (uint32_t x = 0; x < lastLetterWidth; ++x) {
             for (uint32_t y = 0; y < symbol->height; ++y) {
-                uint32_t textureIndex = (y * symbol->width + x) * 3;
+                uint32_t textureIndex = (y * lastLetterWidth + x) * 3;
 
                 uint32_t r = symbol->data[textureIndex + 0] << 16;
                 uint32_t g = symbol->data[textureIndex + 1] << 8;
                 uint32_t b = symbol->data[textureIndex + 2];
 
                 uint32_t pixelX;
-                uint32_t pixelY = (position.y + y * fontHeightRatio);
+                uint32_t pixelY;
 
                 switch (horizontalAlignment) {
-                    case TEXT_H_ALIGN_LEFT:
-                        pixelX = offsetFromStart + x * fontHeightRatio;
+                    case TEXT_ALIGN_LEFT:
+                        pixelX = xOffsetFromStart + x * fontHeightRatio;
                         break;
-                    case TEXT_H_ALIGN_CENTER:
-                        pixelX = getWindowSize().x / 2 - pixelOffsetFromBorder / 2 + offsetFromStart + x * fontHeightRatio;
+                    case TEXT_ALIGN_CENTER:
+                        pixelX = getWindowSize().x / 2 - pixelOffsetFromSideBorder / 2 + xOffsetFromStart +
+                                 x * fontHeightRatio;
                         break;
-                    case TEXT_H_ALIGN_RIGHT:
-                        pixelX = getWindowSize().x - pixelOffsetFromBorder + offsetFromStart + x * fontHeightRatio;
+                    case TEXT_ALIGN_RIGHT:
+                        pixelX = getWindowSize().x - pixelOffsetFromSideBorder + xOffsetFromStart + x * fontHeightRatio;
                         break;
                     default:
-                    case TEXT_H_ALIGN_NONE:
-                        pixelX = position.x + offsetFromStart + x * fontHeightRatio;
+                    case TEXT_ALIGN_NONE:
+                        pixelX = position.x + xOffsetFromStart + x * fontHeightRatio;
+                        break;
+                }
+
+                switch (verticalAlignment) {
+                    case TEXT_ALIGN_LEFT:
+                        pixelY = yOffsetFromStart + y * fontHeightRatio;
+                        break;
+                    case TEXT_ALIGN_CENTER:
+                        pixelY = getWindowSize().y / 2 - pixelOffsetFromTopBorder / 2 + yOffsetFromStart +
+                                 y * fontHeightRatio;
+                        break;
+                    case TEXT_ALIGN_RIGHT:
+                        pixelY = getWindowSize().y - pixelOffsetFromTopBorder + yOffsetFromStart + y * fontHeightRatio;
+                        break;
+                    default:
+                    case TEXT_ALIGN_NONE:
+                        pixelY = position.y + yOffsetFromStart + y * fontHeightRatio;
                         break;
                 }
 
@@ -220,7 +250,7 @@ void drawText(char* text, Vec2 position, uint32_t height, uint32_t color, uint8_
                 setWindowPixel(pixelX, pixelY, color);
             }
         }
-        offsetFromStart += symbol->width;
+        xOffsetFromStart += symbol->width * fontHeightRatio;
     }
 }
 

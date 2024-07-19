@@ -6,6 +6,7 @@
 #define WOLFENSTEIN3D_TRT_ENGINE_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <Windows.h>
 #include "vendor/stb/stb_image.h"
 
@@ -46,16 +47,15 @@ Image* getImage(char* path);
 //
 #define MAX_SYMBOLS 256
 void loadSymbols(char* directory);
-Image** phraseToImages(char* phrase, uint8_t bold);
 
 typedef enum {
-    TEXT_H_ALIGN_NONE,
-    TEXT_H_ALIGN_LEFT,
-    TEXT_H_ALIGN_RIGHT,
-    TEXT_H_ALIGN_CENTER
-} TextHorizontalAlignment;
+    TEXT_ALIGN_NONE,
+    TEXT_ALIGN_LEFT,
+    TEXT_ALIGN_RIGHT,
+    TEXT_ALIGN_CENTER
+} TextAlignment;
 
-void drawText(char* text, Vec2 position, uint32_t height, uint32_t color, uint8_t bold, TextHorizontalAlignment horizontalAlignment);
+void drawText(char* text, Vec2 position, uint32_t height, uint32_t color, TextAlignment horizontalAlignment, TextAlignment verticalAlignment);
 
 void setFontBackgroundColor(uint32_t color);
 
