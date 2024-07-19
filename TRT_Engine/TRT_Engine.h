@@ -45,9 +45,19 @@ Image* getImage(char* path);
 // Font management
 //
 #define MAX_SYMBOLS 256
-
 void loadSymbols(char* directory);
 Image** phraseToImages(char* phrase, uint8_t bold);
+
+typedef enum {
+    TEXT_H_ALIGN_NONE,
+    TEXT_H_ALIGN_LEFT,
+    TEXT_H_ALIGN_RIGHT,
+    TEXT_H_ALIGN_CENTER
+} TextHorizontalAlignment;
+
+void drawText(char* text, Vec2 position, uint32_t height, uint32_t color, uint8_t bold, TextHorizontalAlignment horizontalAlignment);
+
+void setFontBackgroundColor(uint32_t color);
 
 //
 // Math
