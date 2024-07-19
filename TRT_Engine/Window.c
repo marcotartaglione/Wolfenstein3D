@@ -6,6 +6,13 @@
 //
 static WNDCLASS windowClass;
 static HWND windowHandle;
+static uint32_t windowUpScaling = 1;
+
+static struct Frame {
+    uint32_t width;
+    uint32_t height;
+    uint32_t *pixels;
+} frame;
 
 //
 // GDI structures
@@ -100,6 +107,9 @@ static void interpretateSize(Vec2 *size) {
         size->x = screenWidth / ABS(size->x);
     if (size->y < 0)
         size->y = screenHeight / ABS(size->y);
+
+    size->x *= windowUpScaling;
+    size->y *= windowUpScaling;
 }
 
 static void interpretatePosition(Vec2 *position, Vec2 size) {
@@ -124,7 +134,7 @@ void startWindow(char* title, Vec2 size, Vec2 position) {
             0,
             windowClass.lpszClassName,
             title,
-            WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+            WS_POPUP | WS_VISIBLE,
             position.x,
             position.y,
             size.x,
@@ -139,7 +149,9 @@ void startWindow(char* title, Vec2 size, Vec2 position) {
         MessageBox(NULL, "Window Creation Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
         exit(-1);
     }
+}
 
+void runWindow(void (*loop)()) {
     MSG msg;
     while (TRUE) {
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -151,8 +163,31 @@ void startWindow(char* title, Vec2 size, Vec2 position) {
         loop();
         redraw();
     }
+
 }
 
 void clearFrame() {
     memset(frame.pixels, 0, frame.width * frame.height * sizeof(uint32_t));
+}
+
+void setWindowUpScaling(uint32_t upScaling) {
+    if (upScaling == 0)
+        exit(-1);
+
+    windowUpScaling = upScaling;
+}
+
+void setWindowPixel(uint32_t x, uint32_t y, uint32_t color) {
+    if (x >= frame.width / windowUpScaling || y >= frame.height / windowUpScaling)
+        return;
+
+    for (uint32_t i = 0; i < windowUpScaling; ++i) {
+        for (uint32_t j = 0; j < windowUpScaling; ++j) {
+            frame.pixels[(y * windowUpScaling + i) * frame.width + x * windowUpScaling + j] = color;
+        }
+    }
+}
+
+Vec2 getWindowSize() {
+    return (Vec2) {frame.width / windowUpScaling, frame.height / windowUpScaling};
 }
