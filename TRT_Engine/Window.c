@@ -183,6 +183,9 @@ void setWindowPixel(uint32_t x, uint32_t y, uint32_t color) {
 
     for (uint32_t i = 0; i < windowUpScaling; ++i) {
         for (uint32_t j = 0; j < windowUpScaling; ++j) {
+            if ((y * windowUpScaling + i) * frame.width + x * windowUpScaling + j >= frame.width * frame.height)
+                return;
+
             frame.pixels[(y * windowUpScaling + i) * frame.width + x * windowUpScaling + j] = color;
         }
     }
