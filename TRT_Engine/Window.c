@@ -15,11 +15,21 @@ static struct Frame {
 } frame;
 
 //
+// External functions
+//
+void (*keyCallback)(uint32_t key) = NULL;
+void (*mouseCallback)(Click, uint32_t, uint32_t) = NULL;
+
+//
 // GDI structures
 //
 static BITMAPINFO frameBitmapInfo;          // pixel format details
 static HBITMAP frameBitmap = 0;              // bitmap info + array data
 static HDC frameDeviceContext = 0;          // pointer to bitmap handle
+
+void TRT_message(char *text) {
+    MessageBoxA(NULL, text, text, MB_OK);
+}
 
 static LRESULT CALLBACK WindowProcessMessage(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch (message) {
@@ -59,6 +69,27 @@ static LRESULT CALLBACK WindowProcessMessage(HWND hwnd, UINT message, WPARAM wPa
             break;
         }
 
+        case WM_KEYDOWN: {
+            if (keyCallback != NULL)
+                keyCallback(wParam);
+
+            break;
+        }
+
+        case WM_LBUTTONDOWN: {
+            if (mouseCallback != NULL)
+                mouseCallback(CLICK_LEFT, LOWORD(lParam), HIWORD(lParam));
+
+            break;
+        }
+
+        case WM_RBUTTONDOWN: {
+            if (mouseCallback != NULL)
+                mouseCallback(CLICK_RIGHT, LOWORD(lParam), HIWORD(lParam));
+
+            break;
+        }
+
         default: {
             return DefWindowProc(hwnd, message, wParam, lParam);
         }
@@ -89,7 +120,7 @@ static void setupFrame() {
     frameDeviceContext = CreateCompatibleDC(0);
 }
 
-void setupWindow(HINSTANCE hInstance, char* className) {
+void TRT_setupWindow(HINSTANCE hInstance, char* className) {
     setupWindowClass(hInstance, className);
     setupFrame();
 }
@@ -126,7 +157,7 @@ static void interpretatePosition(Vec2 *position, Vec2 size) {
         position->y = screenHeight / ABS(position->y) - size.y / 2;
 }
 
-void startWindow(char* title, Vec2 size, Vec2 position) {
+void TRT_startWindow(char* title, Vec2 size, Vec2 position) {
     interpretateSize(&size);
     interpretatePosition(&position, size);
 
@@ -151,7 +182,33 @@ void startWindow(char* title, Vec2 size, Vec2 position) {
     }
 }
 
-void runWindow(void (*loop)(), void (*close)()) {
+static LARGE_INTEGER frequency;
+static LARGE_INTEGER lastTime;
+static LARGE_INTEGER currentTime;
+
+static uint8_t windowTargetFps;
+
+static void initTimer() {
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&lastTime);
+}
+
+static void waitForNextFrame() {
+    while (true) {
+        QueryPerformanceCounter(&currentTime);
+        LONGLONG elapsedTime = currentTime.QuadPart - lastTime.QuadPart;
+        if ((elapsedTime * 1000 / frequency.QuadPart) >= windowTargetFps) {
+            lastTime = currentTime;
+            break;
+        }
+    }
+}
+
+void TRT_runWindow(uint8_t targetFPS, void (*loop)(), void (*close)()) {
+    windowTargetFps = targetFPS;
+
+    initTimer();
+
     MSG msg;
     while (TRUE) {
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
@@ -162,22 +219,25 @@ void runWindow(void (*loop)(), void (*close)()) {
 
         loop();
         redraw();
+
+        waitForNextFrame();
     }
+    TRT_clearFrame();
     close();
 }
 
-void clearFrame() {
+void TRT_clearFrame() {
     memset(frame.pixels, 0, frame.width * frame.height * sizeof(uint32_t));
 }
 
-void setWindowUpScaling(uint32_t upScaling) {
+void TRT_setWindowUpScaling(uint32_t upScaling) {
     if (upScaling == 0)
         exit(-1);
 
     windowUpScaling = upScaling;
 }
 
-void setWindowPixel(uint32_t x, uint32_t y, uint32_t color) {
+void TRT_setWindowPixel(uint32_t x, uint32_t y, uint32_t color) {
     if (x >= frame.width / windowUpScaling || y >= frame.height / windowUpScaling)
         return;
 
@@ -191,6 +251,27 @@ void setWindowPixel(uint32_t x, uint32_t y, uint32_t color) {
     }
 }
 
-Vec2 getWindowSize() {
+uint32_t TRT_getWindowPixel(uint32_t x, uint32_t y) {
+    return frame.pixels[y * windowUpScaling * frame.width + x * windowUpScaling];
+}
+
+void TRT_setKeyCallback(void (*keyCallbackFunction)(uint32_t)) {
+    keyCallback = keyCallbackFunction;
+}
+
+void TRT_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, uint32_t)) {
+    mouseCallback = mouseCallbackFunction;
+}
+
+Vec2 TRT_getWindowSize() {
     return (Vec2) {frame.width / windowUpScaling, frame.height / windowUpScaling};
+}
+
+long long TRT_getTime() {
+    LARGE_INTEGER frequency, start;
+
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&start);
+
+    return (start.QuadPart * 1000) / frequency.QuadPart;
 }

@@ -128,7 +128,7 @@ char *symbolToFilename(char symbol) {
     return filename;
 }
 
-void loadSymbols(char *directory) {
+void TRT_loadSymbols(char *directory) {
     if (!allSymbolsLen)
         allSymbolsLen = MIN(MAX_SYMBOLS, strlen(allSymbols));
 
@@ -138,7 +138,7 @@ void loadSymbols(char *directory) {
 
         sprintf(path, "%s%s", directory, filename);
 
-        symbols[i] = getImage(path);
+        symbols[i] = TRT_getImage(path);
         free(filename);
     }
 }
@@ -190,8 +190,8 @@ float getFontHeightRatio(Vec2 lines[], uint32_t nLines, uint32_t height) {
     return heightRatio;
 }
 
-void drawText(char *text, Vec2 position, uint32_t height, uint32_t color, TextAlignment horizontalAlignment,
-              TextAlignment verticalAlignment) {
+void TRT_drawText(char *text, Vec2 position, uint32_t height, uint32_t color, TextAlignment horizontalAlignment,
+                  TextAlignment verticalAlignment) {
     uint32_t lastSymbolWidth = -1;
     uint32_t offsetWidthFromStart = 0;
 
@@ -206,10 +206,10 @@ void drawText(char *text, Vec2 position, uint32_t height, uint32_t color, TextAl
             position.y = 0;
             break;
         case TEXT_ALIGN_CENTER:
-            position.y = (int32_t) ((float) getWindowSize().y / 2 + (float) linesSizes[0].y * fontHeightRatio / 2);
+            position.y = (int32_t) ((float) TRT_getWindowSize().y / 2 + (float) linesSizes[0].y * fontHeightRatio / 2);
             break;
         case TEXT_ALIGN_END:
-            position.y = (int32_t) ((float) getWindowSize().y + (float) linesSizes[0].y * fontHeightRatio);
+            position.y = (int32_t) ((float) TRT_getWindowSize().y + (float) linesSizes[0].y * fontHeightRatio);
             break;
         default:
         case TEXT_ALIGN_NONE:
@@ -226,10 +226,10 @@ void drawText(char *text, Vec2 position, uint32_t height, uint32_t color, TextAl
                     position.x = 0;
                     break;
                 case TEXT_ALIGN_CENTER:
-                    position.x = (int32_t) ((float) getWindowSize().x / 2 - (float) linesSizes[lineNumber].x * fontHeightRatio / 2);
+                    position.x = (int32_t) ((float) TRT_getWindowSize().x / 2 - (float) linesSizes[lineNumber].x * fontHeightRatio / 2);
                     break;
                 case TEXT_ALIGN_END:
-                    position.x = (int32_t) ((float) getWindowSize().x - (float) linesSizes[lineNumber].x * fontHeightRatio);
+                    position.x = (int32_t) ((float) TRT_getWindowSize().x - (float) linesSizes[lineNumber].x * fontHeightRatio);
                     break;
                 default:
                 case TEXT_ALIGN_NONE:
@@ -274,7 +274,7 @@ void drawText(char *text, Vec2 position, uint32_t height, uint32_t color, TextAl
                 if (fontBackgroundColor != -1 && (r | g | b) == fontBackgroundColor)
                     continue;
 
-                setWindowPixel(position.x + actualX + offsetWidthFromStart, position.y + actualY, color);
+                TRT_setWindowPixel(position.x + actualX + offsetWidthFromStart, position.y + actualY, color);
             }
         }
 
@@ -284,6 +284,6 @@ void drawText(char *text, Vec2 position, uint32_t height, uint32_t color, TextAl
     free(linesSizes);
 }
 
-void setFontBackgroundColor(uint32_t color) {
+void TRT_setFontBackgroundColor(uint32_t color) {
     fontBackgroundColor = color;
 }

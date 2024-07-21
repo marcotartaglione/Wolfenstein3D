@@ -4,7 +4,7 @@
 
 #include "TRT_Engine.h"
 
-Image* getImage(char* path) {
+Image* TRT_getImage(char* path) {
     Image *image = malloc(sizeof(Image));
 
     stbi_set_flip_vertically_on_load(1);

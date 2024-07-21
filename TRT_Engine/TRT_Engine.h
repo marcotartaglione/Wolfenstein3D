@@ -25,28 +25,45 @@ typedef struct Vec3 {
     int32_t z;
 } Vec3;
 
+void TRT_message(char *text);
+
 //
 // Window management
 //
-void setupWindow(HINSTANCE hInstance, char* className);
-void startWindow(char* title, Vec2 size, Vec2 position);
-void runWindow(void (*loop)(), void (*close)());
-void clearFrame();
+void TRT_setupWindow(HINSTANCE hInstance, char* className);
+void TRT_startWindow(char* title, Vec2 size, Vec2 position);
+void TRT_runWindow(uint8_t targetFPS, void (*loop)(), void (*close)());
+void TRT_clearFrame();
 
-void setWindowUpScaling(uint32_t upScaling);
-void setWindowPixel(uint32_t x, uint32_t y, uint32_t color);
-Vec2 getWindowSize();
+void TRT_setWindowUpScaling(uint32_t upScaling);
+void TRT_setWindowPixel(uint32_t x, uint32_t y, uint32_t color);
+
+uint32_t TRT_getWindowPixel(uint32_t x, uint32_t y);
+Vec2 TRT_getWindowSize();
+
+long long TRT_getTime();
+
+//
+// Input management
+//
+typedef enum Click {
+    CLICK_LEFT,
+    CLICK_RIGHT
+} Click;
+
+void TRT_setKeyCallback(void (*keyCallbackFunction)(uint32_t));
+void TRT_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, uint32_t));
 
 //
 // Image management
 //
-Image* getImage(char* path);
+Image* TRT_getImage(char* path);
 
 //
 // Font management
 //
 #define MAX_SYMBOLS 256
-void loadSymbols(char* directory);
+void TRT_loadSymbols(char* directory);
 
 #define FONT_SPACE_MIN_WIDTH    (10)
 #define FONT_LINE_OFFSET_MIN    (3)
@@ -61,9 +78,9 @@ typedef enum {
     TEXT_ALIGN_CENTER
 } TextAlignment;
 
-void drawText(char* text, Vec2 position, uint32_t height, uint32_t color, TextAlignment horizontalAlignment, TextAlignment verticalAlignment);
+void TRT_drawText(char* text, Vec2 position, uint32_t height, uint32_t color, TextAlignment horizontalAlignment, TextAlignment verticalAlignment);
 
-void setFontBackgroundColor(uint32_t color);
+void TRT_setFontBackgroundColor(uint32_t color);
 
 //
 // Math
