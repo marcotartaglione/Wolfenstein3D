@@ -48,10 +48,16 @@ Image* getImage(char* path);
 #define MAX_SYMBOLS 256
 void loadSymbols(char* directory);
 
+#define FONT_SPACE_MIN_WIDTH    (10)
+#define FONT_LINE_OFFSET_MIN    (3)
+#define FONT_LETTER_SPACING     (1)
+
+#define FONT_MAX_LINES          (10)
+
 typedef enum {
     TEXT_ALIGN_NONE,
-    TEXT_ALIGN_LEFT,
-    TEXT_ALIGN_RIGHT,
+    TEXT_ALIGN_START,
+    TEXT_ALIGN_END,
     TEXT_ALIGN_CENTER
 } TextAlignment;
 
