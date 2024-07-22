@@ -276,7 +276,24 @@ void TRT_setWindowPixel(uint32_t x, uint32_t y, uint32_t color) {
 }
 
 void TRT_fillScreenWithColor(uint32_t color) {
-    memset(frame.pixels, color, frame.width * frame.height * sizeof(uint32_t));
+    Vec2 windowSize = TRT_getWindowSize();
+
+    for (int i = 0; i < windowSize.x; ++i) {
+        for (int j = 0; j < windowSize.y; ++j) {
+            TRT_setWindowPixel(i, j, color);
+        }
+    }
+}
+
+void TRT_drawRectangle(Vec2 position, Vec2 size, uint32_t color) {
+    TRT_interpretateSize(&size, false);
+    TRT_interpretatePosition(&position, size);
+
+    for (int x = 0; x < size.x; ++x) {
+        for (int y = 0; y < size.y; ++y) {
+            TRT_setWindowPixel(position.x + x, position.y + y, color);
+        }
+    }
 }
 
 uint32_t TRT_getWindowPixel(uint32_t x, uint32_t y) {
