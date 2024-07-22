@@ -275,6 +275,10 @@ void TRT_setWindowPixel(uint32_t x, uint32_t y, uint32_t color) {
     }
 }
 
+void TRT_fillScreenWithColor(uint32_t color) {
+    memset(frame.pixels, color, frame.width * frame.height * sizeof(uint32_t));
+}
+
 uint32_t TRT_getWindowPixel(uint32_t x, uint32_t y) {
     return frame.pixels[y * windowUpScaling * frame.width + x * windowUpScaling];
 }

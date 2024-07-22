@@ -46,6 +46,7 @@ void TRT_setWindowUpScaling(uint32_t upScaling);
 
 void TRT_setWindowPixel(uint32_t x, uint32_t y, uint32_t color);
 
+void TRT_fillScreenWithColor(uint32_t color);
 
 typedef enum {
     TEXT_ALIGN_NONE,
