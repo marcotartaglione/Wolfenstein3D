@@ -263,6 +263,41 @@ void TRT_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, uint32_
     mouseCallback = mouseCallbackFunction;
 }
 
+bool TRT_windowFade(uint32_t fadeSpeedMilliseconds) {
+    Vec2 windowSize = TRT_getWindowSize();
+
+    float totalFrames = (fadeSpeedMilliseconds / 1000.0f) * windowTargetFps;
+    static float currentFrame = 0;
+
+    uint32_t fadeDecrement = totalFrames > 0 ? 255 / totalFrames : 255;
+
+    if (fadeDecrement == 0) fadeDecrement = 1;
+
+    for (uint32_t x = 0; x < windowSize.x; ++x) {
+        for (uint32_t y = 0; y < windowSize.y; ++y) {
+            uint32_t color = TRT_getWindowPixel(x, y);
+            uint32_t r = (color & 0xFF0000) >> 16;
+            uint32_t g = (color & 0x00FF00) >> 8;
+            uint32_t b = (color & 0x0000FF);
+
+            r = r > fadeDecrement ? r - fadeDecrement : 0;
+            g = g > fadeDecrement ? g - fadeDecrement : 0;
+            b = b > fadeDecrement ? b - fadeDecrement : 0;
+
+            TRT_setWindowPixel(x, y, (r << 16) | (g << 8) | b);
+        }
+    }
+
+    currentFrame++;
+
+    if (currentFrame >= totalFrames) {
+        currentFrame = 0;
+        return true;
+    }
+
+    return false;
+}
+
 Vec2 TRT_getWindowSize() {
     return (Vec2) {frame.width / windowUpScaling, frame.height / windowUpScaling};
 }

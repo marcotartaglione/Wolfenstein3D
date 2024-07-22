@@ -38,6 +38,8 @@ void TRT_clearFrame();
 void TRT_setWindowUpScaling(uint32_t upScaling);
 void TRT_setWindowPixel(uint32_t x, uint32_t y, uint32_t color);
 
+bool TRT_windowFade(uint32_t fadeSpeedMilliseconds);
+
 uint32_t TRT_getWindowPixel(uint32_t x, uint32_t y);
 Vec2 TRT_getWindowSize();
 
