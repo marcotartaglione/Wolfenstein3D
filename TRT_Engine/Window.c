@@ -14,6 +14,9 @@ static struct Frame {
     uint32_t *pixels;
 } frame;
 
+static Fade currentFade = FADE_IN;
+static int32_t fadeValue = 0;
+
 //
 // External functions
 //
@@ -39,6 +42,24 @@ static LRESULT CALLBACK WindowProcessMessage(HWND hwnd, UINT message, WPARAM wPa
         }
 
         case WM_PAINT: {
+            for (int x = 0; x < frame.width * frame.height; ++x) {
+                uint8_t r = (frame.pixels[x] & 0xFF0000) >> 16;
+                uint8_t g = (frame.pixels[x] & 0x00FF00) >>  8;
+                uint8_t b = (frame.pixels[x] & 0x0000FF) >>  0;
+
+                if (currentFade == FADE_IN) {
+                    r = r > fadeValue ? r - fadeValue : 0;
+                    g = g > fadeValue ? g - fadeValue : 0;
+                    b = b > fadeValue ? b - fadeValue : 0;
+                } else {
+                    r = fadeValue < r ? fadeValue : r;
+                    g = fadeValue < g ? fadeValue : g;
+                    b = fadeValue < b ? fadeValue : b;
+                }
+
+                frame.pixels[x] = (r << 16) | (g << 8) | b;
+            }
+
             PAINTSTRUCT paint;
             HDC device_context;
             device_context = BeginPaint(hwnd, &paint);
@@ -97,7 +118,7 @@ static LRESULT CALLBACK WindowProcessMessage(HWND hwnd, UINT message, WPARAM wPa
     return 0;
 }
 
-static void setupWindowClass(HINSTANCE hInstance, char* className) {
+static void setupWindowClass(HINSTANCE hInstance, char *className) {
     windowClass.lpfnWndProc = WindowProcessMessage;
     windowClass.hInstance = hInstance;
     windowClass.lpszClassName = className;
@@ -120,7 +141,7 @@ static void setupFrame() {
     frameDeviceContext = CreateCompatibleDC(0);
 }
 
-void TRT_setupWindow(HINSTANCE hInstance, char* className) {
+void TRT_setupWindow(HINSTANCE hInstance, char *className) {
     setupWindowClass(hInstance, className);
     setupFrame();
 }
@@ -157,7 +178,7 @@ static void interpretatePosition(Vec2 *position, Vec2 size) {
         position->y = screenHeight / ABS(position->y) - size.y / 2;
 }
 
-void TRT_startWindow(char* title, Vec2 size, Vec2 position) {
+void TRT_startWindow(char *title, Vec2 size, Vec2 position) {
     interpretateSize(&size);
     interpretatePosition(&position, size);
 
@@ -177,7 +198,7 @@ void TRT_startWindow(char* title, Vec2 size, Vec2 position) {
     );
 
     if (windowHandle == NULL) {
-        MessageBox(NULL, "Window Creation Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
+        TRT_message("TRT_startWindow: Window Creation Failed!");
         exit(-1);
     }
 }
@@ -263,39 +284,30 @@ void TRT_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, uint32_
     mouseCallback = mouseCallbackFunction;
 }
 
-bool TRT_windowFade(uint32_t fadeSpeedMilliseconds) {
-    Vec2 windowSize = TRT_getWindowSize();
-
+Fade TRT_windowFade(uint32_t fadeSpeedMilliseconds) {
     float totalFrames = (fadeSpeedMilliseconds / 1000.0f) * windowTargetFps;
-    static float currentFrame = 0;
+    static uint32_t currentFrame = 0;
 
     uint32_t fadeDecrement = totalFrames > 0 ? 255 / totalFrames : 255;
 
-    if (fadeDecrement == 0) fadeDecrement = 1;
+    if (fadeDecrement == 0)
+        fadeDecrement = 1;
 
-    for (uint32_t x = 0; x < windowSize.x; ++x) {
-        for (uint32_t y = 0; y < windowSize.y; ++y) {
-            uint32_t color = TRT_getWindowPixel(x, y);
-            uint32_t r = (color & 0xFF0000) >> 16;
-            uint32_t g = (color & 0x00FF00) >> 8;
-            uint32_t b = (color & 0x0000FF);
-
-            r = r > fadeDecrement ? r - fadeDecrement : 0;
-            g = g > fadeDecrement ? g - fadeDecrement : 0;
-            b = b > fadeDecrement ? b - fadeDecrement : 0;
-
-            TRT_setWindowPixel(x, y, (r << 16) | (g << 8) | b);
-        }
-    }
-
+    fadeValue += fadeDecrement;
     currentFrame++;
 
-    if (currentFrame >= totalFrames) {
+    if (currentFrame >= (uint32_t)(totalFrames * 2)) {
+        fadeValue = 0;
         currentFrame = 0;
-        return true;
+        currentFade = FADE_IN;
+
+        return FADE_OVER;
+    } else if (currentFrame == (uint32_t)totalFrames) {
+        fadeValue = 0;
+        currentFade = FADE_OUT;
     }
 
-    return false;
+    return currentFade;
 }
 
 Vec2 TRT_getWindowSize() {
