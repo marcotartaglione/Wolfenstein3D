@@ -190,8 +190,8 @@ float getFontHeightRatio(Vec2 lines[], uint32_t nLines, uint32_t height) {
     return heightRatio;
 }
 
-void TRT_drawText(char *text, Vec2 position, uint32_t height, uint32_t color, TextAlignment horizontalAlignment,
-                  TextAlignment verticalAlignment) {
+void TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, TextAlignment horizontalAlignment,
+                        TextAlignment verticalAlignment) {
     uint32_t lastSymbolWidth = -1;
     uint32_t offsetWidthFromStart = 0;
 

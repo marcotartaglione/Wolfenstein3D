@@ -151,7 +151,7 @@ static void redraw() {
     UpdateWindow(windowHandle);
 }
 
-static void interpretateSize(Vec2 *size) {
+void TRT_interpretateSize(Vec2 *size, bool considerUpScaling) {
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
@@ -160,11 +160,14 @@ static void interpretateSize(Vec2 *size) {
     if (size->y < 0)
         size->y = screenHeight / ABS(size->y);
 
+    if (!considerUpScaling)
+        return;
+
     size->x *= windowUpScaling;
     size->y *= windowUpScaling;
 }
 
-static void interpretatePosition(Vec2 *position, Vec2 size) {
+void TRT_interpretatePosition(Vec2 *position, Vec2 size) {
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
@@ -179,8 +182,8 @@ static void interpretatePosition(Vec2 *position, Vec2 size) {
 }
 
 void TRT_startWindow(char *title, Vec2 size, Vec2 position) {
-    interpretateSize(&size);
-    interpretatePosition(&position, size);
+    TRT_interpretateSize(&size, true);
+    TRT_interpretatePosition(&position, size);
 
     windowHandle = CreateWindowEx(
             0,
