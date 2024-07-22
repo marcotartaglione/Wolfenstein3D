@@ -258,12 +258,15 @@ void TRT_drawText(char *text, Vec2 position, uint32_t height, uint32_t color, Te
         if (symbol == NULL)
             continue;
 
-        lastSymbolWidth = (uint32_t) ((float) symbol->width * fontHeightRatio);
+        float letterHeightRatio = (float) height / (float) symbol->height;
+
+        lastSymbolWidth = (uint32_t) ((float) symbol->width * letterHeightRatio);
+        uint8_t letterYOffest = (text[i] == 'y' || text[i] == 'g') ? 4 * letterHeightRatio : 0;
 
         for (uint32_t textureX = 0; textureX < symbol->width; textureX++) {
             for (uint32_t textureY = 0; textureY < symbol->height; textureY++) {
-                uint32_t actualX = (uint32_t) ((float) textureX * fontHeightRatio);
-                uint32_t actualY = (uint32_t) ((float) textureY * fontHeightRatio);
+                uint32_t actualX = (uint32_t) ((float) textureX * letterHeightRatio);
+                uint32_t actualY = (uint32_t) ((float) textureY * letterHeightRatio);
 
                 uint32_t textureIndex = (textureY * symbol->width + textureX) * 3;
 
@@ -274,7 +277,7 @@ void TRT_drawText(char *text, Vec2 position, uint32_t height, uint32_t color, Te
                 if (fontBackgroundColor != -1 && (r | g | b) == fontBackgroundColor)
                     continue;
 
-                TRT_setWindowPixel(position.x + actualX + offsetWidthFromStart, position.y + actualY, color);
+                TRT_setWindowPixel(position.x + actualX + offsetWidthFromStart, position.y + actualY - letterYOffest, color);
             }
         }
 
