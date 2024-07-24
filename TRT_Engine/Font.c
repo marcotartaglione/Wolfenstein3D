@@ -143,34 +143,47 @@ void TRT_loadSymbols(char *directory) {
     }
 }
 
+struct LineData {
+    uint32_t width;
+    uint32_t height;
+    uint32_t nLetters;
+    uint32_t nSpaces;
+};
+
 //
 // First element of the array is the total size, the rest are the sizes of each line in order
 //
-Vec2 *textSize(char *text, uint32_t *nLines) {
-    Vec2 *result = calloc(FONT_MAX_LINES, sizeof(Vec2));
+struct LineData *textSize(char *text, uint32_t *nLines) {
+    struct LineData *result = calloc(FONT_MAX_LINES, sizeof(struct LineData));
     uint32_t currentLine = 1;
 
     for (uint32_t i = 0; i < strlen(text); ++i) {
         if (text[i] == '\n') {
-            result[0].x = MAX(result[0].x, result[currentLine].x);
-            result[0].y += result[currentLine].y + FONT_LINE_OFFSET_MIN;
+            result[0].width = MAX(result[0].width, result[currentLine].width);
+            result[0].height += result[currentLine].height;
+            result[0].nLetters = MAX(result[0].nLetters, result[currentLine].nLetters);
+            result[0].nSpaces = MAX(result[0].nSpaces, result[currentLine].nSpaces);
 
             currentLine++;
             continue;
         }
 
         if (text[i] == ' ' || text[i] == '\t') {
-            result[currentLine].x += FONT_SPACE_MIN_WIDTH;
+            result[currentLine].nSpaces++;
             continue;
         }
 
         Image *symbol = symbols[symbolIndex(text[i])];
-        result[currentLine].x += symbol->width + FONT_LETTER_SPACING;
-        result[currentLine].y = MAX(result[currentLine].y, symbol->height);
+
+        result[currentLine].width += symbol->width;
+        result[currentLine].height = MAX(result[currentLine].height, symbol->height);
+        result[currentLine].nLetters++;
     }
 
-    result[0].x = MAX(result[0].x, result[currentLine].x);
-    result[0].y += result[currentLine].y + FONT_LINE_OFFSET_MIN;
+    result[0].width = MAX(result[0].width, result[currentLine].width);
+    result[0].height += result[currentLine].height;
+    result[0].nLetters = MAX(result[0].nLetters, result[currentLine].nLetters);
+    result[0].nSpaces = MAX(result[0].nSpaces, result[currentLine].nSpaces);
 
     *nLines = currentLine;
     return result;
@@ -179,10 +192,10 @@ Vec2 *textSize(char *text, uint32_t *nLines) {
 //
 // Calculates the font height ratio based on all the lines. The first element of the array is the total size, the rest are the sizes of each line in order
 //
-float getFontHeightRatio(Vec2 lines[], uint32_t nLines, uint32_t height) {
+float getBiggestElementFontHeightRatio(struct LineData lines[], uint32_t nLines, uint32_t height) {
     float heightRatio = -1;
     for (int i = 1; i <= nLines; ++i) {
-        float currentRatio = (float) height / (float) lines[i].y;
+        float currentRatio = (float) height / (float) lines[i].height;
         if (heightRatio == -1 || currentRatio < heightRatio)
             heightRatio = currentRatio;
     }
@@ -190,101 +203,132 @@ float getFontHeightRatio(Vec2 lines[], uint32_t nLines, uint32_t height) {
     return heightRatio;
 }
 
-void TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, TextAlignment horizontalAlignment,
-                        TextAlignment verticalAlignment) {
-    uint32_t lastSymbolWidth = -1;
-    uint32_t offsetWidthFromStart = 0;
+void
+TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, ElementAlignment horizontalAlignment,
+                   ElementAlignment verticalAlignment, TextAlignment textAlignment) {
+    uint32_t nLines;
+    struct LineData *elementSize = textSize(text, &nLines);
+    Vec2 windowSize = TRT_getWindowSize();
 
-    uint32_t lineNumber = 1;
+    float biggestElementFontHeightRatio = getBiggestElementFontHeightRatio(elementSize, nLines, height);
 
-    uint32_t totalLines;
-    Vec2 *linesSizes = textSize(text, &totalLines);
-    float fontHeightRatio = getFontHeightRatio(linesSizes, totalLines, height);
+    elementSize[0].width = (uint32_t) ((float) elementSize[0].width * biggestElementFontHeightRatio +
+                                       elementSize[0].nSpaces * FONT_SPACE_WIDTH +
+                                       (elementSize[0].nLetters - 1) * FONT_LETTER_SPACING);
+
+    elementSize[0].height = (uint32_t) ((float) elementSize[0].height * biggestElementFontHeightRatio +
+                                        (nLines - 1) * FONT_LINE_OFFSET_MIN);
 
     switch (verticalAlignment) {
-        case TEXT_ALIGN_START:
-            position.y = 0;
+        case ELEMENT_ALIGN_START:
+            position.y = (int32_t) elementSize[0].height;
             break;
-        case TEXT_ALIGN_CENTER:
-            position.y = (int32_t) ((float) TRT_getWindowSize().y / 2 + (float) linesSizes[0].y * fontHeightRatio / 2);
+        case ELEMENT_ALIGN_CENTER:
+            position.y = (int32_t) ((float) windowSize.y + (float) elementSize[0].height) / 2;
             break;
-        case TEXT_ALIGN_END:
-            position.y = (int32_t) ((float) TRT_getWindowSize().y + (float) linesSizes[0].y * fontHeightRatio);
+        case ELEMENT_ALIGN_END:
+            position.y = (int32_t) ((float) windowSize.y - (float) elementSize[0].height);
             break;
         default:
-        case TEXT_ALIGN_NONE:
+        case ELEMENT_ALIGN_NONE:
             break;
     }
 
-    for (uint32_t i = 0; i < strlen(text); ++i) {
-        if (lineNumber > FONT_MAX_LINES)
+    switch (horizontalAlignment) {
+        case ELEMENT_ALIGN_START:
+            position.x = 0;
             break;
+        case ELEMENT_ALIGN_CENTER:
+            position.x =
+                    (int32_t) ((float) windowSize.x - (float) elementSize[0].width) / 2;
+            break;
+        case ELEMENT_ALIGN_END:
+            position.x = (int32_t) ((float) windowSize.x - (float) elementSize[0].width);
+            break;
+        default:
+        case ELEMENT_ALIGN_NONE:
+            break;
+    }
 
-        if (i == 0 || text[i - 1] == '\n') {
-            switch (horizontalAlignment) {
-                case TEXT_ALIGN_START:
-                    position.x = 0;
+    uint32_t currentLine = 0;
+    uint32_t xOffsetFromLeft = 0;
+
+    for (uint32_t currentLetterIndex = 0; currentLetterIndex < strlen(text); ++currentLetterIndex) {
+        char letter = text[currentLetterIndex];
+
+        if (currentLetterIndex == 0 || letter == '\n') {
+            currentLine++;
+
+            position.y -= (int32_t) (height + FONT_LINE_OFFSET_MIN);
+
+            switch (textAlignment) {
+                case TEXT_ALIGN_LEFT:
+                    xOffsetFromLeft = 0;
                     break;
                 case TEXT_ALIGN_CENTER:
-                    position.x = (int32_t) ((float) TRT_getWindowSize().x / 2 - (float) linesSizes[lineNumber].x * fontHeightRatio / 2);
+                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width * biggestElementFontHeightRatio - elementSize[currentLine].nSpaces * FONT_SPACE_WIDTH - (elementSize[currentLine].nLetters - 1) * FONT_LETTER_SPACING) / 2;
                     break;
-                case TEXT_ALIGN_END:
-                    position.x = (int32_t) ((float) TRT_getWindowSize().x - (float) linesSizes[lineNumber].x * fontHeightRatio);
+                case TEXT_ALIGN_RIGHT:
+                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width * biggestElementFontHeightRatio - elementSize[currentLine].nSpaces * FONT_SPACE_WIDTH - (elementSize[currentLine].nLetters - 1) * FONT_LETTER_SPACING);
                     break;
                 default:
-                case TEXT_ALIGN_NONE:
                     break;
             }
-        }
 
-        if (text[i] == '\n') {
-            lineNumber++;
-            lastSymbolWidth = -1;
-            offsetWidthFromStart = 0;
-            position.y -= (int32_t) (height + FONT_LINE_OFFSET_MIN);
-            continue;
-        } else if (text[i] == ' ') {
-            if (lastSymbolWidth == -1)
+            if (letter == '\n')
                 continue;
-
-            position.x += (int32_t) (MAX(FONT_SPACE_MIN_WIDTH, (int32_t) lastSymbolWidth) * fontHeightRatio);
-            continue;
-        } else {
-            offsetWidthFromStart += FONT_LETTER_SPACING;
         }
 
-        Image *symbol = symbols[symbolIndex(text[i])];
+        if (letter == ' ') {
+            xOffsetFromLeft += FONT_SPACE_WIDTH;
+            continue;
+        }
 
+        Image *symbol = symbols[symbolIndex(letter)];
         if (symbol == NULL)
             continue;
 
         float letterHeightRatio = (float) height / (float) symbol->height;
 
-        lastSymbolWidth = (uint32_t) ((float) symbol->width * letterHeightRatio);
-        uint8_t letterYOffest = (text[i] == 'y' || text[i] == 'g') ? 4 * letterHeightRatio : 0;
+        uint32_t yOffsetFromTop;
 
-        for (uint32_t textureX = 0; textureX < symbol->width; textureX++) {
-            for (uint32_t textureY = 0; textureY < symbol->height; textureY++) {
-                uint32_t actualX = (uint32_t) ((float) textureX * letterHeightRatio);
-                uint32_t actualY = (uint32_t) ((float) textureY * letterHeightRatio);
+        switch (letter) {
+            case 'g':
+            case 'j':
+            case 'p':
+            case 'q':
+            case 'y':
+                yOffsetFromTop = 4 * letterHeightRatio;
+                break;
+            default:
+                yOffsetFromTop = 0;
+                break;
+        }
 
-                uint32_t textureIndex = (textureY * symbol->width + textureX) * 3;
+        for (uint32_t x = 0; x < symbol->width; ++x) {
+            for (uint32_t y = 0; y < symbol->height; ++y) {
+                uint32_t actualX = (uint32_t) ((float) x * letterHeightRatio);
+                uint32_t actualY = (uint32_t) ((float) y * letterHeightRatio);
+
+                uint32_t textureIndex = (y * symbol->width + x) * 3;
 
                 uint32_t r = symbol->data[textureIndex + 0] << 16;
                 uint32_t g = symbol->data[textureIndex + 1] << 8;
                 uint32_t b = symbol->data[textureIndex + 2];
 
-                if (fontBackgroundColor != -1 && (r | g | b) == fontBackgroundColor)
+                if (fontBackgroundColor != -1 && (r | g | b) == fontBackgroundColor) {
                     continue;
+                }
 
-                TRT_setWindowPixel(position.x + actualX + offsetWidthFromStart, position.y + actualY - letterYOffest, color);
+                TRT_setWindowPixel(position.x + actualX + xOffsetFromLeft, position.y + actualY - yOffsetFromTop,
+                                   color);
             }
         }
 
-        offsetWidthFromStart += lastSymbolWidth;
+        xOffsetFromLeft += symbol->width * letterHeightRatio + FONT_LETTER_SPACING;
     }
 
-    free(linesSizes);
+    free(elementSize);
 }
 
 void TRT_setFontBackgroundColor(uint32_t color) {

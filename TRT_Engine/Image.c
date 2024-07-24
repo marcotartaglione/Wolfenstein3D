@@ -21,7 +21,7 @@ Image *TRT_getImage(char *path) {
 
 void TRT_windowDrawImage(Image *image, Vec2 position, Vec2 size) {
     TRT_interpretateSize(&size, false);
-    TRT_interpretatePosition(&position, size);
+    TRT_interpretatePosition(&position, size, false);
 
     float xRatio = (float) size.x / (float) image->width;
     float yRatio = (float) size.y / (float) image->height;

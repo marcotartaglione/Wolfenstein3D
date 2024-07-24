@@ -167,23 +167,35 @@ void TRT_interpretateSize(Vec2 *size, bool considerUpScaling) {
     size->y *= windowUpScaling;
 }
 
-void TRT_interpretatePosition(Vec2 *position, Vec2 size) {
-    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+void TRT_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen) {
+    uint32_t screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    uint32_t screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+    Vec2 windowSize = TRT_getWindowSize();
+
+    uint32_t width, height;
+
+    if (toScreen) {
+        width = screenWidth;
+        height = screenHeight;
+    } else {
+        width = windowSize.x;
+        height = windowSize.y;
+    }
 
     if (position->x == -1)
-        position->x = screenWidth / 2 - size.x / 2;
+        position->x = width / 2 - size.x / 2;
     if (position->y == -1)
-        position->y = screenHeight / 2 - size.y / 2;
+        position->y = height / 2 - size.y / 2;
     if (position->x < -1)
-        position->x = screenWidth / ABS(position->x) - size.x / 2;
+        position->x = width / ABS(position->x) - size.x / 2;
     if (position->y < -1)
-        position->y = screenHeight / ABS(position->y) - size.y / 2;
+        position->y = height / ABS(position->y) - size.y / 2;
 }
 
 void TRT_startWindow(char *title, Vec2 size, Vec2 position) {
     TRT_interpretateSize(&size, true);
-    TRT_interpretatePosition(&position, size);
+    TRT_interpretatePosition(&position, size, true);
 
     windowHandle = CreateWindowEx(
             0,
@@ -285,9 +297,9 @@ void TRT_fillScreenWithColor(uint32_t color) {
     }
 }
 
-void TRT_drawRectangle(Vec2 position, Vec2 size, uint32_t color) {
+void TRT_windowDrawRectangle(Vec2 position, Vec2 size, uint32_t color) {
     TRT_interpretateSize(&size, false);
-    TRT_interpretatePosition(&position, size);
+    TRT_interpretatePosition(&position, size, false);
 
     for (int x = 0; x < size.x; ++x) {
         for (int y = 0; y < size.y; ++y) {

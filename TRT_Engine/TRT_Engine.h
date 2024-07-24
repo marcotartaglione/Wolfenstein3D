@@ -34,7 +34,11 @@ void TRT_setupWindow(HINSTANCE hInstance, char *className);
 
 void TRT_interpretateSize(Vec2 *size, bool considerUpScaling);
 
-void TRT_interpretatePosition(Vec2 *position, Vec2 size);
+//
+// toScreen = true: reference to monitor size
+// toScreen = false: reference to window size
+//
+void TRT_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen);
 
 void TRT_startWindow(char *title, Vec2 size, Vec2 position);
 
@@ -48,17 +52,22 @@ void TRT_setWindowPixel(uint32_t x, uint32_t y, uint32_t color);
 
 void TRT_fillScreenWithColor(uint32_t color);
 
-void TRT_drawRectangle(Vec2 position, Vec2 size, uint32_t color);
+void TRT_windowDrawRectangle(Vec2 position, Vec2 size, uint32_t color);
 
 typedef enum {
-    TEXT_ALIGN_NONE,
-    TEXT_ALIGN_START,
-    TEXT_ALIGN_END,
+    ELEMENT_ALIGN_NONE,
+    ELEMENT_ALIGN_START,
+    ELEMENT_ALIGN_END,
+    ELEMENT_ALIGN_CENTER
+} ElementAlignment;
+
+typedef enum {
+    TEXT_ALIGN_LEFT,
+    TEXT_ALIGN_RIGHT,
     TEXT_ALIGN_CENTER
 } TextAlignment;
 
-void TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, TextAlignment horizontalAlignment,
-                        TextAlignment verticalAlignment);
+void TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, ElementAlignment horizontalAlignment, ElementAlignment verticalAlignment, TextAlignment textAlignment);
 
 void TRT_setFontBackgroundColor(uint32_t color);
 
@@ -102,7 +111,7 @@ Image *TRT_getImage(char *path);
 
 void TRT_loadSymbols(char *directory);
 
-#define FONT_SPACE_MIN_WIDTH    (10)
+#define FONT_SPACE_WIDTH        (10)
 #define FONT_LINE_OFFSET_MIN    (3)
 #define FONT_LETTER_SPACING     (1)
 
