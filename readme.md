@@ -22,7 +22,7 @@ The game is not yet finished and is not playable. The game is still in developme
 ## How to compile
 To compile the game, you must have the Cmake installed on your computer. After that, you can run the following commands on the root directory of the project:
 
-```make```
+```cmake CMakeLists.txt```
 
 The command above will generate the executable file of the game. To run the game, you can use the following command:
 
