@@ -15,9 +15,9 @@
 #define HEADER_LINE_BACKGROUND_COLOR    (0x000000)
 
 #define FONT_HEIGHT             (10)
-#define FONT_SPACE_WIDTH        (10)
+#define FONT_SPACE_WIDTH        (7)
 #define FONT_LINE_OFFSET        (3)
-#define FONT_LETTER_SPACING     (3)
+#define FONT_LETTER_SPACING     (1)
 
 static void drawHeaderLine() {
     Vec2 windowSize = TRT_window_getSize();

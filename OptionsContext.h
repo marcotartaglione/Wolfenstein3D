@@ -37,7 +37,7 @@ static Image *quitBackground;
 
 #define QUIT_MESSAGE_COUNT 7
 static char *quitStrings[] = {
-        "Dost thou wish to leave with such hasty abandon?",
+        "Dost thou wish to leave\nwith such hasty abandon?",
         "You are at an intersection.\nA sign says, \"Press Y to quit\".",
         "Press N if you are brave.\nPress Y to cower in shame.",
         "For guns and glory, press N.\nFor work and worry, press Y.",
