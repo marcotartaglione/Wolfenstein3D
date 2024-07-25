@@ -143,19 +143,11 @@ void TRT_text_loadFont(char *directory) {
     }
 }
 
-struct LineData {
-    uint32_t width;
-    uint32_t height;
-    uint32_t nLetters;
-    uint32_t nSpaces;
-};
-
-//
-// First element of the array is the total size, the rest are the sizes of each line in order
-//
-struct LineData *textSize(char *text, uint32_t *nLines) {
+LineData *TRT_text_size(char *text, uint32_t *nLines, uint32_t textHeight) {
     struct LineData *result = calloc(FONT_MAX_LINES, sizeof(struct LineData));
     uint32_t currentLine = 1;
+
+    result[0].lineFontHeightRatio = 3.402823466e+38F; // FLOAT_MAX_VALUE
 
     for (uint32_t i = 0; i < strlen(text); ++i) {
         if (text[i] == '\n') {
@@ -166,6 +158,7 @@ struct LineData *textSize(char *text, uint32_t *nLines) {
             }
 
             result[0].height += result[currentLine].height;
+            result[0].lineFontHeightRatio = MAX(result[0].lineFontHeightRatio, result[currentLine].lineFontHeightRatio);
 
             currentLine++;
             continue;
@@ -181,6 +174,7 @@ struct LineData *textSize(char *text, uint32_t *nLines) {
         result[currentLine].width += symbol->width;
         result[currentLine].height = MAX(result[currentLine].height, symbol->height);
         result[currentLine].nLetters++;
+        result[currentLine].lineFontHeightRatio = (float) textHeight / (float) symbol->height;
     }
 
     if (result[0].width + result[0].nLetters + result[0].nSpaces < result[currentLine].width + result[currentLine].nLetters + result[currentLine].nSpaces) {
@@ -190,40 +184,27 @@ struct LineData *textSize(char *text, uint32_t *nLines) {
     }
 
     result[0].height += result[currentLine].height;
+    result[0].lineFontHeightRatio = MIN(result[0].lineFontHeightRatio, result[currentLine].lineFontHeightRatio);
+
+    for (uint32_t i = 1; i <= currentLine; ++i) {
+        result[i].width = (uint32_t) ((float) result[i].width * result[0].lineFontHeightRatio);
+        result[i].height = (uint32_t) ((float) result[i].height * result[0].lineFontHeightRatio);
+    }
+
+    result[0].width = (uint32_t) ((float) result[0].width * result[0].lineFontHeightRatio);
+    result[0].height = (uint32_t) ((float) result[0].height * result[0].lineFontHeightRatio);
 
     *nLines = currentLine;
     return result;
 }
 
-//
-// Calculates the font height ratio based on all the lines. The first element of the array is the total size, the rest are the sizes of each line in order
-//
-float getBiggestElementFontHeightRatio(struct LineData lines[], uint32_t nLines, uint32_t height) {
-    float heightRatio = -1;
-    for (int i = 1; i <= nLines; ++i) {
-        float currentRatio = (float) height / (float) lines[i].height;
-        if (heightRatio == -1 || currentRatio < heightRatio)
-            heightRatio = currentRatio;
-    }
-
-    return heightRatio;
-}
-
-void
-TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, ElementAlignment horizontalAlignment,
-              ElementAlignment verticalAlignment, TextAlignment textAlignment) {
+void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, ElementAlignment horizontalAlignment, ElementAlignment verticalAlignment, TextAlignment textAlignment) {
     uint32_t nLines;
-    struct LineData *elementSize = textSize(text, &nLines);
+    struct LineData *elementSize = TRT_text_size(text, &nLines, height);
     Vec2 windowSize = TRT_window_getSize();
 
-    float biggestElementFontHeightRatio = getBiggestElementFontHeightRatio(elementSize, nLines, height);
-
-    elementSize[0].width = (uint32_t) ((float) elementSize[0].width * biggestElementFontHeightRatio +
-                                       elementSize[0].nSpaces * spaceWidth +
-                                       (elementSize[0].nLetters - 1) * letterSpacing);
-
-    elementSize[0].height = (uint32_t) ((float) elementSize[0].height * biggestElementFontHeightRatio +
-                                        (nLines - 1) * lineOffset);
+    elementSize[0].width = (uint32_t) ((float) elementSize[0].width + elementSize[0].nSpaces * spaceWidth + (elementSize[0].nLetters - 1) * letterSpacing);
+    elementSize[0].height = (uint32_t) ((float) elementSize[0].height + (nLines - 1) * lineOffset);
 
     switch (verticalAlignment) {
         case ELEMENT_ALIGN_START:
@@ -272,10 +253,14 @@ TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, Elemen
                     xOffsetFromLeft = 0;
                     break;
                 case TEXT_ALIGN_CENTER:
-                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width * biggestElementFontHeightRatio - elementSize[currentLine].nSpaces * spaceWidth - (elementSize[currentLine].nLetters - 1) * letterSpacing) / 2;
+                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width -
+                                       elementSize[currentLine].nSpaces * spaceWidth -
+                                       (elementSize[currentLine].nLetters - 1) * letterSpacing) / 2;
                     break;
                 case TEXT_ALIGN_RIGHT:
-                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width * biggestElementFontHeightRatio - elementSize[currentLine].nSpaces * spaceWidth - (elementSize[currentLine].nLetters - 1) * letterSpacing);
+                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width -
+                                       elementSize[currentLine].nSpaces * spaceWidth -
+                                       (elementSize[currentLine].nLetters - 1) * letterSpacing);
                     break;
                 default:
                     break;
@@ -331,7 +316,7 @@ TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, Elemen
             }
         }
 
-        xOffsetFromLeft += symbol->width * biggestElementFontHeightRatio + letterSpacing;
+        xOffsetFromLeft += symbol->width * elementSize[0].lineFontHeightRatio + letterSpacing;
     }
 
     free(elementSize);

@@ -102,6 +102,19 @@ void TRT_text_setBackgroundColor(uint32_t color);
 
 void TRT_text_loadFont(char *directory);
 
+typedef struct LineData {
+    uint32_t width;
+    uint32_t height;
+    uint32_t nLetters;
+    uint32_t nSpaces;
+    float lineFontHeightRatio;
+} LineData;
+
+//
+// First element of the array is the total size, the rest are the sizes of each line in order
+//
+LineData *TRT_text_size(char *text, uint32_t *nLines, uint32_t textHeight);
+
 typedef enum {
     ELEMENT_ALIGN_NONE,
     ELEMENT_ALIGN_START,
