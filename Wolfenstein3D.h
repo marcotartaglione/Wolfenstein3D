@@ -15,9 +15,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 void loop();
 void close();
 
+void activateCurrentContext();
+void deactivateCurrentContext();
+
 //
 // Game contexts
 //
 extern WolfensteinContext mainMenuContext;
+extern WolfensteinContext optionsContext;
+
+uint8_t currentContext = 0;
+WolfensteinContext contexts[256];
 
 #endif //WOLFENSTEIN3D_WOLFENSTEIN_H

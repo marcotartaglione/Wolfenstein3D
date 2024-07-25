@@ -9,7 +9,7 @@
 
 typedef struct WolfensteinContext {
     void (*init)();
-    void (*loop)();
+    bool (*loop)();
     void (*keyboardCallback)(uint32_t);
     void (*mouseCallback)(Click, uint32_t, uint32_t);
     void (*close)();
