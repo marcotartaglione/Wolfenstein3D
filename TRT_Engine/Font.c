@@ -2,7 +2,7 @@
 
 static uint32_t fontBackgroundColor = 0;
 
-static Image *symbols[MAX_SYMBOLS];
+static Image *symbols[FONT_MAX_SYMBOLS];
 char *allSymbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{};':,.<>?/|\\\"";
 static uint32_t allSymbolsLen = 0;
 
@@ -128,9 +128,9 @@ char *symbolToFilename(char symbol) {
     return filename;
 }
 
-void TRT_loadSymbols(char *directory) {
+void TRT_text_loadFont(char *directory) {
     if (!allSymbolsLen)
-        allSymbolsLen = MIN(MAX_SYMBOLS, strlen(allSymbols));
+        allSymbolsLen = MIN(FONT_MAX_SYMBOLS, strlen(allSymbols));
 
     for (int i = 0; i < allSymbolsLen; ++i) {
         char path[512];
@@ -138,7 +138,7 @@ void TRT_loadSymbols(char *directory) {
 
         sprintf(path, "%s%s", directory, filename);
 
-        symbols[i] = TRT_getImage(path);
+        symbols[i] = TRT_image_get(path);
         free(filename);
     }
 }
@@ -210,24 +210,20 @@ float getBiggestElementFontHeightRatio(struct LineData lines[], uint32_t nLines,
 }
 
 void
-TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, ElementAlignment horizontalAlignment,
-                   ElementAlignment verticalAlignment, TextAlignment textAlignment) {
+TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, ElementAlignment horizontalAlignment,
+              ElementAlignment verticalAlignment, TextAlignment textAlignment) {
     uint32_t nLines;
     struct LineData *elementSize = textSize(text, &nLines);
-    Vec2 windowSize = TRT_getWindowSize();
+    Vec2 windowSize = TRT_window_getSize();
 
     float biggestElementFontHeightRatio = getBiggestElementFontHeightRatio(elementSize, nLines, height);
 
-//    elementSize[0].width = (uint32_t) ((float) elementSize[0].width * biggestElementFontHeightRatio +
-//                                       elementSize[0].nSpaces * FONT_SPACE_WIDTH +
-//                                       (elementSize[0].nLetters - 1) * FONT_LETTER_SPACING);
-
-    elementSize[0].width *= biggestElementFontHeightRatio;
-    elementSize[0].width += elementSize[0].nSpaces * FONT_SPACE_WIDTH;
-    elementSize[0].width += (elementSize[0].nLetters - 1) * FONT_LETTER_SPACING;
+    elementSize[0].width = (uint32_t) ((float) elementSize[0].width * biggestElementFontHeightRatio +
+                                       elementSize[0].nSpaces * spaceWidth +
+                                       (elementSize[0].nLetters - 1) * letterSpacing);
 
     elementSize[0].height = (uint32_t) ((float) elementSize[0].height * biggestElementFontHeightRatio +
-                                        (nLines - 1) * FONT_LINE_OFFSET_MIN);
+                                        (nLines - 1) * lineOffset);
 
     switch (verticalAlignment) {
         case ELEMENT_ALIGN_START:
@@ -269,17 +265,17 @@ TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, E
         if (currentLetterIndex == 0 || letter == '\n') {
             currentLine++;
 
-            position.y -= (int32_t) (height + FONT_LINE_OFFSET_MIN);
+            position.y -= (int32_t) (height + lineOffset);
 
             switch (textAlignment) {
                 case TEXT_ALIGN_LEFT:
                     xOffsetFromLeft = 0;
                     break;
                 case TEXT_ALIGN_CENTER:
-                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width * biggestElementFontHeightRatio - elementSize[currentLine].nSpaces * FONT_SPACE_WIDTH - (elementSize[currentLine].nLetters - 1) * FONT_LETTER_SPACING) / 2;
+                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width * biggestElementFontHeightRatio - elementSize[currentLine].nSpaces * spaceWidth - (elementSize[currentLine].nLetters - 1) * letterSpacing) / 2;
                     break;
                 case TEXT_ALIGN_RIGHT:
-                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width * biggestElementFontHeightRatio - elementSize[currentLine].nSpaces * FONT_SPACE_WIDTH - (elementSize[currentLine].nLetters - 1) * FONT_LETTER_SPACING);
+                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width * biggestElementFontHeightRatio - elementSize[currentLine].nSpaces * spaceWidth - (elementSize[currentLine].nLetters - 1) * letterSpacing);
                     break;
                 default:
                     break;
@@ -290,7 +286,7 @@ TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, E
         }
 
         if (letter == ' ') {
-            xOffsetFromLeft += FONT_SPACE_WIDTH;
+            xOffsetFromLeft += spaceWidth;
             continue;
         }
 
@@ -330,17 +326,29 @@ TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, E
                     continue;
                 }
 
-                TRT_setWindowPixel(position.x + actualX + xOffsetFromLeft, position.y + actualY - yOffsetFromTop,
-                                   color);
+                TRT_window_setPixel(position.x + actualX + xOffsetFromLeft, position.y + actualY - yOffsetFromTop,
+                                    color);
             }
         }
 
-        xOffsetFromLeft += symbol->width * biggestElementFontHeightRatio + FONT_LETTER_SPACING;
+        xOffsetFromLeft += symbol->width * biggestElementFontHeightRatio + letterSpacing;
     }
 
     free(elementSize);
 }
 
-void TRT_setFontBackgroundColor(uint32_t color) {
+void TRT_text_setBackgroundColor(uint32_t color) {
     fontBackgroundColor = color;
+}
+
+void TRT_text_setSpaceWidth(uint32_t width) {
+    spaceWidth = width;
+}
+
+void TRT_text_setLineOffset(uint32_t offset) {
+    lineOffset = offset;
+}
+
+void TRT_text_setLetterSpacing(uint32_t spacing) {
+    letterSpacing = spacing;
 }

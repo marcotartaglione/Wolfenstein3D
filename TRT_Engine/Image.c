@@ -4,7 +4,7 @@
 
 #include "TRT_Engine.h"
 
-Image *TRT_getImage(char *path) {
+Image *TRT_image_get(char *path) {
     Image *image = malloc(sizeof(Image));
 
     stbi_set_flip_vertically_on_load(1);
@@ -19,9 +19,9 @@ Image *TRT_getImage(char *path) {
     return image;
 }
 
-void TRT_windowDrawImage(Image *image, Vec2 position, Vec2 size) {
-    TRT_interpretateSize(&size, false);
-    TRT_interpretatePosition(&position, size, false);
+void TRT_image_draw(Image *image, Vec2 position, Vec2 size) {
+    TRT_window_interpretateSize(&size, false);
+    TRT_window_interpretatePosition(&position, size, false);
 
     float xRatio = (float) size.x / (float) image->width;
     float yRatio = (float) size.y / (float) image->height;
@@ -34,7 +34,7 @@ void TRT_windowDrawImage(Image *image, Vec2 position, Vec2 size) {
             uint32_t g = image->data[textureIndex + 1] << 8;
             uint32_t b = image->data[textureIndex + 2];
 
-            TRT_setWindowPixel(position.x + x, position.y + y, r | g | b);
+            TRT_window_setPixel(position.x + x, position.y + y, r | g | b);
         }
     }
 }

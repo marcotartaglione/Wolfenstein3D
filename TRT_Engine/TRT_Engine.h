@@ -30,29 +30,77 @@ void TRT_message(char *text);
 //
 // Window management
 //
-void TRT_setupWindow(HINSTANCE hInstance, char *className);
-
-void TRT_interpretateSize(Vec2 *size, bool considerUpScaling);
+void TRT_window_setup(HINSTANCE hInstance, char *className);
+void TRT_window_start(char *title, Vec2 size, Vec2 position);
+void TRT_window_run(uint8_t targetFPS, void (*loop)(), void (*close)());
+void TRT_window_clear();
 
 //
 // toScreen = true: reference to monitor size
 // toScreen = false: reference to window size
 //
-void TRT_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen);
+void TRT_window_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen);
+void TRT_window_interpretateSize(Vec2 *size, bool considerUpScaling);
 
-void TRT_startWindow(char *title, Vec2 size, Vec2 position);
+void TRT_window_setPixel(uint32_t x, uint32_t y, uint32_t color);
+uint32_t TRT_window_getPixel(uint32_t x, uint32_t y);
 
-void TRT_runWindow(uint8_t targetFPS, void (*loop)(), void (*close)());
+Vec2 TRT_window_getSize();
 
-void TRT_clearFrame();
+void TRT_window_setUpscaling(uint32_t upScaling);
+void TRT_window_fill(uint32_t color);
+void TRT_window_DrawRectangle(Vec2 position, Vec2 size, uint32_t color);
 
-void TRT_setWindowUpScaling(uint32_t upScaling);
+//
+// Animation management
+//
+typedef enum FADE {
+    FADE_IN,
+    FADE_OUT,
+    FADE_OVER
+} Fade;
 
-void TRT_setWindowPixel(uint32_t x, uint32_t y, uint32_t color);
+Fade TRT_animation_fade(uint32_t fadeSpeedMilliseconds);
 
-void TRT_fillScreenWithColor(uint32_t color);
+//
+// Time management
+//
+long long TRT_time_get();
 
-void TRT_windowDrawRectangle(Vec2 position, Vec2 size, uint32_t color);
+//
+// Input management
+//
+typedef enum Click {
+    CLICK_LEFT,
+    CLICK_RIGHT
+} Click;
+
+void TRT_input_setKeyCallback(void (*keyCallbackFunction)(uint32_t));
+void TRT_input_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, uint32_t));
+
+//
+// Image management
+//
+Image *TRT_image_get(char *path);
+
+void TRT_image_draw(Image *image, Vec2 position, Vec2 size);
+
+//
+// Font management
+//
+#define FONT_MAX_SYMBOLS    (256)
+#define FONT_MAX_LINES      (10)
+
+static uint32_t spaceWidth = 0;
+static uint32_t lineOffset = 0;
+static uint32_t letterSpacing = 0;
+
+void TRT_text_setSpaceWidth(uint32_t width);
+void TRT_text_setLineOffset(uint32_t offset);
+void TRT_text_setLetterSpacing(uint32_t spacing);
+void TRT_text_setBackgroundColor(uint32_t color);
+
+void TRT_text_loadFont(char *directory);
 
 typedef enum {
     ELEMENT_ALIGN_NONE,
@@ -67,57 +115,7 @@ typedef enum {
     TEXT_ALIGN_CENTER
 } TextAlignment;
 
-void TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, ElementAlignment horizontalAlignment, ElementAlignment verticalAlignment, TextAlignment textAlignment);
-
-void TRT_setFontBackgroundColor(uint32_t color);
-
-void TRT_windowDrawImage(Image *image, Vec2 position, Vec2 size);
-
-typedef enum FADE {
-    FADE_IN,
-    FADE_OUT,
-    FADE_OVER
-} Fade;
-
-Fade TRT_windowFade(uint32_t fadeSpeedMilliseconds);
-
-uint32_t TRT_getWindowPixel(uint32_t x, uint32_t y);
-
-Vec2 TRT_getWindowSize();
-
-long long TRT_getTime();
-
-//
-// Input management
-//
-typedef enum Click {
-    CLICK_LEFT,
-    CLICK_RIGHT
-} Click;
-
-void TRT_setKeyCallback(void (*keyCallbackFunction)(uint32_t));
-
-void TRT_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, uint32_t));
-
-//
-// Image management
-//
-Image *TRT_getImage(char *path);
-
-//
-// Font management
-//
-#define MAX_SYMBOLS 256
-
-void TRT_loadSymbols(char *directory);
-
-#define FONT_SPACE_WIDTH        (10)
-#define FONT_LINE_OFFSET_MIN    (3)
-#define FONT_LETTER_SPACING     (3)
-
-#define FONT_MAX_LINES          (10)
-
-
+void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, ElementAlignment horizontalAlignment, ElementAlignment verticalAlignment, TextAlignment textAlignment);
 
 //
 // Math

@@ -141,7 +141,7 @@ static void setupFrame() {
     frameDeviceContext = CreateCompatibleDC(0);
 }
 
-void TRT_setupWindow(HINSTANCE hInstance, char *className) {
+void TRT_window_setup(HINSTANCE hInstance, char *className) {
     setupWindowClass(hInstance, className);
     setupFrame();
 }
@@ -151,7 +151,7 @@ static void redraw() {
     UpdateWindow(windowHandle);
 }
 
-void TRT_interpretateSize(Vec2 *size, bool considerUpScaling) {
+void TRT_window_interpretateSize(Vec2 *size, bool considerUpScaling) {
     int screenWidth = GetSystemMetrics(SM_CXSCREEN);
     int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
@@ -167,11 +167,11 @@ void TRT_interpretateSize(Vec2 *size, bool considerUpScaling) {
     size->y *= windowUpScaling;
 }
 
-void TRT_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen) {
+void TRT_window_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen) {
     uint32_t screenWidth = GetSystemMetrics(SM_CXSCREEN);
     uint32_t screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-    Vec2 windowSize = TRT_getWindowSize();
+    Vec2 windowSize = TRT_window_getSize();
 
     uint32_t width, height;
 
@@ -193,9 +193,9 @@ void TRT_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen) {
         position->y = height / ABS(position->y) - size.y / 2;
 }
 
-void TRT_startWindow(char *title, Vec2 size, Vec2 position) {
-    TRT_interpretateSize(&size, true);
-    TRT_interpretatePosition(&position, size, true);
+void TRT_window_start(char *title, Vec2 size, Vec2 position) {
+    TRT_window_interpretateSize(&size, true);
+    TRT_window_interpretatePosition(&position, size, true);
 
     windowHandle = CreateWindowEx(
             0,
@@ -213,7 +213,7 @@ void TRT_startWindow(char *title, Vec2 size, Vec2 position) {
     );
 
     if (windowHandle == NULL) {
-        TRT_message("TRT_startWindow: Window Creation Failed!");
+        TRT_message("TRT_window_start: Window Creation Failed!");
         exit(-1);
     }
 }
@@ -240,7 +240,7 @@ static void waitForNextFrame() {
     }
 }
 
-void TRT_runWindow(uint8_t targetFPS, void (*loop)(), void (*close)()) {
+void TRT_window_run(uint8_t targetFPS, void (*loop)(), void (*close)()) {
     windowTargetFps = targetFPS;
 
     initTimer();
@@ -258,22 +258,22 @@ void TRT_runWindow(uint8_t targetFPS, void (*loop)(), void (*close)()) {
 
         waitForNextFrame();
     }
-    TRT_clearFrame();
+    TRT_window_clear();
     close();
 }
 
-void TRT_clearFrame() {
+void TRT_window_clear() {
     memset(frame.pixels, 0, frame.width * frame.height * sizeof(uint32_t));
 }
 
-void TRT_setWindowUpScaling(uint32_t upScaling) {
+void TRT_window_setUpscaling(uint32_t upScaling) {
     if (upScaling == 0)
         exit(-1);
 
     windowUpScaling = upScaling;
 }
 
-void TRT_setWindowPixel(uint32_t x, uint32_t y, uint32_t color) {
+void TRT_window_setPixel(uint32_t x, uint32_t y, uint32_t color) {
     if (x >= frame.width / windowUpScaling || y >= frame.height / windowUpScaling)
         return;
 
@@ -287,40 +287,40 @@ void TRT_setWindowPixel(uint32_t x, uint32_t y, uint32_t color) {
     }
 }
 
-void TRT_fillScreenWithColor(uint32_t color) {
-    Vec2 windowSize = TRT_getWindowSize();
+void TRT_window_fill(uint32_t color) {
+    Vec2 windowSize = TRT_window_getSize();
 
     for (int i = 0; i < windowSize.x; ++i) {
         for (int j = 0; j < windowSize.y; ++j) {
-            TRT_setWindowPixel(i, j, color);
+            TRT_window_setPixel(i, j, color);
         }
     }
 }
 
-void TRT_windowDrawRectangle(Vec2 position, Vec2 size, uint32_t color) {
-    TRT_interpretateSize(&size, false);
-    TRT_interpretatePosition(&position, size, false);
+void TRT_window_DrawRectangle(Vec2 position, Vec2 size, uint32_t color) {
+    TRT_window_interpretateSize(&size, false);
+    TRT_window_interpretatePosition(&position, size, false);
 
     for (int x = 0; x < size.x; ++x) {
         for (int y = 0; y < size.y; ++y) {
-            TRT_setWindowPixel(position.x + x, position.y + y, color);
+            TRT_window_setPixel(position.x + x, position.y + y, color);
         }
     }
 }
 
-uint32_t TRT_getWindowPixel(uint32_t x, uint32_t y) {
+uint32_t TRT_window_getPixel(uint32_t x, uint32_t y) {
     return frame.pixels[y * windowUpScaling * frame.width + x * windowUpScaling];
 }
 
-void TRT_setKeyCallback(void (*keyCallbackFunction)(uint32_t)) {
+void TRT_input_setKeyCallback(void (*keyCallbackFunction)(uint32_t)) {
     keyCallback = keyCallbackFunction;
 }
 
-void TRT_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, uint32_t)) {
+void TRT_input_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, uint32_t)) {
     mouseCallback = mouseCallbackFunction;
 }
 
-Fade TRT_windowFade(uint32_t fadeSpeedMilliseconds) {
+Fade TRT_animation_fade(uint32_t fadeSpeedMilliseconds) {
     float totalFrames = (fadeSpeedMilliseconds / 1000.0f) * windowTargetFps;
     static uint32_t currentFrame = 0;
 
@@ -346,11 +346,11 @@ Fade TRT_windowFade(uint32_t fadeSpeedMilliseconds) {
     return currentFade;
 }
 
-Vec2 TRT_getWindowSize() {
+Vec2 TRT_window_getSize() {
     return (Vec2) {frame.width / windowUpScaling, frame.height / windowUpScaling};
 }
 
-long long TRT_getTime() {
+long long TRT_time_get() {
     LARGE_INTEGER frequency, start;
 
     QueryPerformanceFrequency(&frequency);
