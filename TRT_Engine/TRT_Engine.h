@@ -113,7 +113,7 @@ void TRT_loadSymbols(char *directory);
 
 #define FONT_SPACE_WIDTH        (10)
 #define FONT_LINE_OFFSET_MIN    (3)
-#define FONT_LETTER_SPACING     (1)
+#define FONT_LETTER_SPACING     (3)
 
 #define FONT_MAX_LINES          (10)
 

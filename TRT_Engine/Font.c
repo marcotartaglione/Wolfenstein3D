@@ -159,10 +159,13 @@ struct LineData *textSize(char *text, uint32_t *nLines) {
 
     for (uint32_t i = 0; i < strlen(text); ++i) {
         if (text[i] == '\n') {
-            result[0].width = MAX(result[0].width, result[currentLine].width);
+            if (result[0].width + result[0].nLetters + result[0].nSpaces < result[currentLine].width + result[currentLine].nLetters + result[currentLine].nSpaces) {
+                result[0].width = result[currentLine].width;
+                result[0].nLetters = result[currentLine].nLetters;
+                result[0].nSpaces = result[currentLine].nSpaces;
+            }
+
             result[0].height += result[currentLine].height;
-            result[0].nLetters = MAX(result[0].nLetters, result[currentLine].nLetters);
-            result[0].nSpaces = MAX(result[0].nSpaces, result[currentLine].nSpaces);
 
             currentLine++;
             continue;
@@ -180,10 +183,13 @@ struct LineData *textSize(char *text, uint32_t *nLines) {
         result[currentLine].nLetters++;
     }
 
-    result[0].width = MAX(result[0].width, result[currentLine].width);
+    if (result[0].width + result[0].nLetters + result[0].nSpaces < result[currentLine].width + result[currentLine].nLetters + result[currentLine].nSpaces) {
+        result[0].width = result[currentLine].width;
+        result[0].nLetters = result[currentLine].nLetters;
+        result[0].nSpaces = result[currentLine].nSpaces;
+    }
+
     result[0].height += result[currentLine].height;
-    result[0].nLetters = MAX(result[0].nLetters, result[currentLine].nLetters);
-    result[0].nSpaces = MAX(result[0].nSpaces, result[currentLine].nSpaces);
 
     *nLines = currentLine;
     return result;
@@ -212,9 +218,13 @@ TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, E
 
     float biggestElementFontHeightRatio = getBiggestElementFontHeightRatio(elementSize, nLines, height);
 
-    elementSize[0].width = (uint32_t) ((float) elementSize[0].width * biggestElementFontHeightRatio +
-                                       elementSize[0].nSpaces * FONT_SPACE_WIDTH +
-                                       (elementSize[0].nLetters - 1) * FONT_LETTER_SPACING);
+//    elementSize[0].width = (uint32_t) ((float) elementSize[0].width * biggestElementFontHeightRatio +
+//                                       elementSize[0].nSpaces * FONT_SPACE_WIDTH +
+//                                       (elementSize[0].nLetters - 1) * FONT_LETTER_SPACING);
+
+    elementSize[0].width *= biggestElementFontHeightRatio;
+    elementSize[0].width += elementSize[0].nSpaces * FONT_SPACE_WIDTH;
+    elementSize[0].width += (elementSize[0].nLetters - 1) * FONT_LETTER_SPACING;
 
     elementSize[0].height = (uint32_t) ((float) elementSize[0].height * biggestElementFontHeightRatio +
                                         (nLines - 1) * FONT_LINE_OFFSET_MIN);
@@ -325,7 +335,7 @@ TRT_windowDrawText(char *text, Vec2 position, uint32_t height, uint32_t color, E
             }
         }
 
-        xOffsetFromLeft += symbol->width * letterHeightRatio + FONT_LETTER_SPACING;
+        xOffsetFromLeft += symbol->width * biggestElementFontHeightRatio + FONT_LETTER_SPACING;
     }
 
     free(elementSize);
