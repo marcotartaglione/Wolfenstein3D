@@ -14,6 +14,14 @@ static struct Frame {
     uint32_t *pixels;
 } frame;
 
+static LARGE_INTEGER frequency;
+static LARGE_INTEGER lastTime;
+static LARGE_INTEGER currentTime;
+
+static uint8_t windowTargetFps;
+
+static bool fade = false;
+static uint32_t fadeTime = 1000;
 static Fade currentFade = FADE_IN;
 static int32_t fadeValue = 0;
 
@@ -30,10 +38,9 @@ static BITMAPINFO frameBitmapInfo;          // pixel format details
 static HBITMAP frameBitmap = 0;              // bitmap info + array data
 static HDC frameDeviceContext = 0;          // pointer to bitmap handle
 
-void TRT_message(char *text) {
-    MessageBoxA(NULL, text, text, MB_OK);
-}
-
+//
+// Internal functions
+//
 static LRESULT CALLBACK WindowProcessMessage(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch (message) {
         case WM_DESTROY: {
@@ -141,14 +148,105 @@ static void setupFrame() {
     frameDeviceContext = CreateCompatibleDC(0);
 }
 
+static void redraw() {
+    InvalidateRect(windowHandle, NULL, FALSE);
+    UpdateWindow(windowHandle);
+}
+
+static void initTimer() {
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&lastTime);
+}
+
+static void waitForNextFrame() {
+    while (true) {
+        QueryPerformanceCounter(&currentTime);
+        LONGLONG elapsedTime = currentTime.QuadPart - lastTime.QuadPart;
+        if ((elapsedTime * 1000 / frequency.QuadPart) >= windowTargetFps) {
+            lastTime = currentTime;
+            break;
+        }
+    }
+}
+
+//
+// External functions
+//
+void TRT_message(char *text) {
+    MessageBoxA(NULL, text, text, MB_OK);
+}
+
+//
+// Window management
+//
 void TRT_window_setup(HINSTANCE hInstance, char *className) {
     setupWindowClass(hInstance, className);
     setupFrame();
 }
 
-static void redraw() {
-    InvalidateRect(windowHandle, NULL, FALSE);
-    UpdateWindow(windowHandle);
+void TRT_window_start(char *title, Vec2 size, Vec2 position) {
+    TRT_window_interpretateSize(&size, true);
+    TRT_window_interpretatePosition(&position, size, true);
+
+    windowHandle = CreateWindowEx(
+            0,
+            windowClass.lpszClassName,
+            title,
+            WS_POPUP | WS_VISIBLE,
+            position.x,
+            position.y,
+            size.x,
+            size.y,
+            NULL,
+            NULL,
+            windowClass.hInstance,
+            NULL
+    );
+
+    if (windowHandle == NULL) {
+        TRT_message("TRT_window_start: Window Creation Failed!");
+        exit(-1);
+    }
+}
+
+void TRT_window_run(uint8_t targetFPS, void (*loop)(), void (*close)()) {
+    windowTargetFps = targetFPS;
+
+    initTimer();
+
+    MSG msg;
+    while (TRUE) {
+        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            if (msg.message == WM_QUIT) break;
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+
+        loop();
+
+        if (fade) {
+            switch (TRT_animation_fade(fadeTime)) {
+                case FADE_IN:
+                    break;
+                case FADE_OUT:
+                    redraw();
+                    break;
+                case FADE_OVER:
+                    fade = false;
+                    break;
+            }
+        }
+
+        redraw();
+
+        waitForNextFrame();
+    }
+    TRT_window_clear();
+    close();
+}
+
+void TRT_window_clear() {
+    memset(frame.pixels, 0, frame.width * frame.height * sizeof(uint32_t));
 }
 
 void TRT_window_interpretateSize(Vec2 *size, bool considerUpScaling) {
@@ -216,86 +314,6 @@ void TRT_window_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen) {
     }
 }
 
-void TRT_window_start(char *title, Vec2 size, Vec2 position) {
-    TRT_window_interpretateSize(&size, true);
-    TRT_window_interpretatePosition(&position, size, true);
-
-    windowHandle = CreateWindowEx(
-            0,
-            windowClass.lpszClassName,
-            title,
-            WS_POPUP | WS_VISIBLE,
-            position.x,
-            position.y,
-            size.x,
-            size.y,
-            NULL,
-            NULL,
-            windowClass.hInstance,
-            NULL
-    );
-
-    if (windowHandle == NULL) {
-        TRT_message("TRT_window_start: Window Creation Failed!");
-        exit(-1);
-    }
-}
-
-static LARGE_INTEGER frequency;
-static LARGE_INTEGER lastTime;
-static LARGE_INTEGER currentTime;
-
-static uint8_t windowTargetFps;
-
-static void initTimer() {
-    QueryPerformanceFrequency(&frequency);
-    QueryPerformanceCounter(&lastTime);
-}
-
-static void waitForNextFrame() {
-    while (true) {
-        QueryPerformanceCounter(&currentTime);
-        LONGLONG elapsedTime = currentTime.QuadPart - lastTime.QuadPart;
-        if ((elapsedTime * 1000 / frequency.QuadPart) >= windowTargetFps) {
-            lastTime = currentTime;
-            break;
-        }
-    }
-}
-
-void TRT_window_run(uint8_t targetFPS, void (*loop)(), void (*close)()) {
-    windowTargetFps = targetFPS;
-
-    initTimer();
-
-    MSG msg;
-    while (TRUE) {
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-            if (msg.message == WM_QUIT) break;
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-
-        loop();
-        redraw();
-
-        waitForNextFrame();
-    }
-    TRT_window_clear();
-    close();
-}
-
-void TRT_window_clear() {
-    memset(frame.pixels, 0, frame.width * frame.height * sizeof(uint32_t));
-}
-
-void TRT_window_setUpscaling(uint32_t upScaling) {
-    if (upScaling == 0)
-        exit(-1);
-
-    windowUpScaling = upScaling;
-}
-
 void TRT_window_setPixel(uint32_t x, uint32_t y, uint32_t color) {
     if (x >= frame.width / windowUpScaling || y >= frame.height / windowUpScaling)
         return;
@@ -308,6 +326,21 @@ void TRT_window_setPixel(uint32_t x, uint32_t y, uint32_t color) {
             frame.pixels[(y * windowUpScaling + i) * frame.width + x * windowUpScaling + j] = color;
         }
     }
+}
+
+uint32_t TRT_window_getPixel(uint32_t x, uint32_t y) {
+    return frame.pixels[y * windowUpScaling * frame.width + x * windowUpScaling];
+}
+
+Vec2 TRT_window_getSize() {
+    return (Vec2) {frame.width / windowUpScaling, frame.height / windowUpScaling};
+}
+
+void TRT_window_setUpscaling(uint32_t upScaling) {
+    if (upScaling == 0)
+        exit(-1);
+
+    windowUpScaling = upScaling;
 }
 
 void TRT_window_fill(uint32_t color) {
@@ -331,10 +364,9 @@ void TRT_window_DrawRectangle(Vec2 position, Vec2 size, uint32_t color) {
     }
 }
 
-uint32_t TRT_window_getPixel(uint32_t x, uint32_t y) {
-    return frame.pixels[y * windowUpScaling * frame.width + x * windowUpScaling];
-}
-
+//
+// Input management
+//
 void TRT_input_setKeyCallback(void (*keyCallbackFunction)(uint32_t)) {
     keyCallback = keyCallbackFunction;
 }
@@ -343,6 +375,9 @@ void TRT_input_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, u
     mouseCallback = mouseCallbackFunction;
 }
 
+//
+// Animation management
+//
 Fade TRT_animation_fade(uint32_t fadeSpeedMilliseconds) {
     float totalFrames = (fadeSpeedMilliseconds / 1000.0f) * windowTargetFps;
     static uint32_t currentFrame = 0;
@@ -369,8 +404,19 @@ Fade TRT_animation_fade(uint32_t fadeSpeedMilliseconds) {
     return currentFade;
 }
 
-Vec2 TRT_window_getSize() {
-    return (Vec2) {frame.width / windowUpScaling, frame.height / windowUpScaling};
+void TRT_animation_setFadeTime(uint32_t time) {
+    fadeTime = time;
+}
+
+void TRT_animation_startFade() {
+    fade = true;
+}
+
+bool TRT_animation_isFading() {
+    if(!fade)
+        return false;
+
+    return currentFade == FADE_IN;
 }
 
 long long TRT_time_get() {

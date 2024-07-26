@@ -61,6 +61,9 @@ typedef enum FADE {
 } Fade;
 
 Fade TRT_animation_fade(uint32_t fadeSpeedMilliseconds);
+void TRT_animation_setFadeTime(uint32_t time);
+void TRT_animation_startFade();
+bool TRT_animation_isFading();
 
 //
 // Time management
