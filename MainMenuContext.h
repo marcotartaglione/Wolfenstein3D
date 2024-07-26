@@ -8,12 +8,14 @@
 #include "TRT_Engine.h"
 #include "Context.h"
 
-#define MAIN_MENU_FADE_SPEED                (500)
 #define ATTENTION_SCREEN_TITLE_FONT_COLOR   (0xFBF82B)
-#define MAIN_MENU_OPEN_IMAGE       ("assets/main_menu/open_screen.png")
-#define MAIN_MENU_FONT_COLOR       (0xBCBCBC)
+#define MAIN_MENU_OPEN_IMAGE                ("assets/hud/mainmenu/open.png")
+#define MAIN_MENU_RATING_IMAGE              ("assets/hud/mainmenu/rating.png")
+#define MAIN_MENU_FONT_COLOR                (0xBCBCBC)
 
 static Image *openScreen;
+static Image *ratingScreen;
+
 static bool close = false;
 
 //
@@ -39,9 +41,9 @@ WolfensteinContext mainMenuContext = {
 //
 // Renderers
 //
-static void renderTest();
-
 static void renderAttentionScreen();
+
+static void renderRatingScreen();
 
 static void renderTitleScreen();
 
@@ -50,6 +52,6 @@ static void renderTitleScreen();
 //
 static uint32_t currentRenderer = 0;
 static uint32_t renderersCount = 3;
-static void (*renderers[])() = {renderTest, renderAttentionScreen, renderTitleScreen,};
+static void (*renderers[])() = {renderAttentionScreen, renderRatingScreen, renderTitleScreen,};
 
 #endif //WOLFENSTEIN3D_MAINMENUCONTEXT_H

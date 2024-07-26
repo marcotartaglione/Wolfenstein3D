@@ -16,31 +16,48 @@ void optionsContextInit() {
         exit(EXIT_FAILURE);
     }
 
-    quitBackground = TRT_image_get(OPTIONS_QUIT_BACKGROUND_IMAGE);
+    quitBackground = TRT_image_get(OPTIONS_QUIT_IMAGE);
     if (quitBackground == NULL) {
+        exit(EXIT_FAILURE);
+    }
+
+    controls = TRT_image_get(OPTIONS_CONTROLS_IMAGE);
+    if (controls == NULL) {
+        exit(EXIT_FAILURE);
+    }
+
+    background = TRT_image_get(OPTIONS_BACKGROUND_IMAGE);
+    if (background == NULL) {
         exit(EXIT_FAILURE);
     }
 }
 
 bool optionsContextLoop() {
+    if (TRT_animation_isFading())
+        return false;
+
     drawHeaderLine();
 
     TRT_image_draw(options,
                    (Vec2) {-1, TRT_window_getSize().y - OPTIONS_SCREEN_IMAGE_Y_OFFSET - 42},
                    (Vec2) {145, 42});
 
-    TRT_window_DrawRectangle((Vec2) {-1, OPTIONS_SCREEN_IMAGE_Y_OFFSET * 2},
-                             (Vec2) {175, 135},
-                             OPTIONS_SECONDARY_COLOR);
+    TRT_image_draw(background,
+                   (Vec2) {ELEMENT_ALIGN_CENTER, OPTIONS_SCREEN_IMAGE_Y_OFFSET * 2},
+                   (Vec2) {175, 135});
+
+    TRT_image_draw(controls,
+                   (Vec2) {ELEMENT_ALIGN_CENTER, 0},
+                   (Vec2) {102, 7});
 
     TRT_text_draw("New Game\nSound\nControl\nLoad Game\nSave Game\nChange View\nRead This\nView Scores\nQuit",
-                  (Vec2) {110, 144},
+                  (Vec2) {ELEMENT_ALIGN_CENTER, 135},
                   FONT_HEIGHT,
                   OPTIONS_FONT_COLOR,
-                  ELEMENT_ALIGN_NONE, ELEMENT_ALIGN_NONE, TEXT_ALIGN_LEFT);
+                  TEXT_ALIGN_LEFT);
 
     TRT_image_draw(gun,
-                   (Vec2) {82, 131 - (FONT_HEIGHT + FONT_LINE_OFFSET) * currentSelectedOption},
+                   (Vec2) {82, 125 - (FONT_HEIGHT + FONT_LINE_OFFSET) * currentSelectedOption},
                    (Vec2) {19, 11});
 
     if (showQuitMessage)
@@ -97,15 +114,16 @@ void optionsContextMouseCallback(Click click, uint32_t x, uint32_t y) {
 }
 
 void drawQuitMessage() {
-    Vec2 windowSize = TRT_window_getSize();
+    uint32_t nLines;
+    Vec2 textSize = TRT_text_size(quitStrings[currentQuitMessage], &nLines, FONT_HEIGHT, FONT_SPACE_WIDTH, FONT_LETTER_SPACING, FONT_LINE_OFFSET)[0];
 
     TRT_image_draw(quitBackground,
-                   (Vec2) {-1, -1},
-                   (Vec2) {windowSize.x / 2, windowSize.y / 3});
+                   (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
+                   (Vec2) {textSize.x + 20, textSize.y + 20});
 
     TRT_text_draw(quitStrings[currentQuitMessage],
-                  (Vec2) {0, 0},
+                  (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
                   FONT_HEIGHT,
                   OPTIONS_FONT_COLOR,
-                  ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER, TEXT_ALIGN_CENTER);
+                  TEXT_ALIGN_CENTER);
 }

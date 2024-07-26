@@ -11,22 +11,26 @@ static void renderAttentionScreen() {
     drawHeaderLine();
 
     TRT_text_draw("Attention",
-                  (Vec2) {0, windowSize.y - HEADER_LINE_BACKGROUND_HEIGHT + FONT_HEIGHT},
+                  (Vec2) {ELEMENT_ALIGN_CENTER, windowSize.y - HEADER_LINE_Y_OFFSET - (HEADER_LINE_BACKGROUND_HEIGHT - FONT_HEIGHT) / 2},
                   FONT_HEIGHT,
                   ATTENTION_SCREEN_TITLE_FONT_COLOR,
-                  ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_NONE, TEXT_ALIGN_CENTER);
+                  TEXT_ALIGN_CENTER);
 
     TRT_text_draw("This game is NOT original\nFeel free to distribute it\n(With credits)\n\nM. Tartaglione",
-                  (Vec2) {0, 0},
+                  (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
                   FONT_HEIGHT,
                   MAIN_MENU_FONT_COLOR,
-                  ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER, TEXT_ALIGN_CENTER);
+                  TEXT_ALIGN_CENTER);
 
     TRT_text_draw("Press any key to continue",
-                  (Vec2) {0, FONT_HEIGHT + 5},
+                  (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_START},
                   FONT_HEIGHT,
                   MAIN_MENU_FONT_COLOR,
-                  ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_NONE, TEXT_ALIGN_CENTER);
+                  TEXT_ALIGN_CENTER);
+}
+
+static void renderRatingScreen() {
+    TRT_image_draw(ratingScreen, (Vec2) {0, 0}, TRT_window_getSize());
 }
 
 static void renderTitleScreen() {
@@ -38,30 +42,16 @@ void mainMenuContextInit() {
     if (openScreen == NULL) {
         exit(EXIT_FAILURE);
     }
+
+    ratingScreen = TRT_image_get(MAIN_MENU_RATING_IMAGE);
+    if (ratingScreen == NULL) {
+        exit(EXIT_FAILURE);
+    }
 }
 
-#include <stdlib.h>
-
-static bool fade = false;
-
 bool mainMenuContextLoop() {
-    if (close)
-        return true;
-
-    if (fade) {
-        switch (TRT_animation_fade(MAIN_MENU_FADE_SPEED)) {
-            case FADE_IN:
-                break;
-            case FADE_OUT:
-                renderers[currentRenderer]();
-                break;
-            case FADE_OVER:
-                fade = false;
-                break;
-        }
-    } else {
+    if (!TRT_animation_isFading())
         renderers[currentRenderer]();
-    }
 
     return close;
 }
@@ -72,7 +62,7 @@ void mainMenuContextClose() {
 }
 
 void mainMenuKeyboardCallback(uint32_t key) {
-    fade = true;
+    TRT_animation_startFade();
     currentRenderer++;
 
     if (currentRenderer == renderersCount)
@@ -81,14 +71,4 @@ void mainMenuKeyboardCallback(uint32_t key) {
 
 void mainMenuMouseCallback(Click click, uint32_t x, uint32_t y) {
     mainMenuKeyboardCallback('a');
-}
-
-static void renderTest() {
-    TRT_window_fill(0x000000);
-
-    TRT_text_draw("ABCDEFGHIJKLMNOPQRSTUVWXYZ\nabcdefghijklmnopqrstuvwxyz\n1234567890\n!@#$%^&*()_+",
-                  (Vec2) {10, 10},
-                  FONT_HEIGHT,
-                  MAIN_MENU_FONT_COLOR,
-                  ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER, TEXT_ALIGN_CENTER);
 }

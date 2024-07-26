@@ -8,6 +8,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
     TRT_text_setLineOffset(FONT_LINE_OFFSET);
     TRT_text_setSpaceWidth(FONT_SPACE_WIDTH);
 
+    TRT_animation_setFadeTime(FADE_TIME);
+
     TRT_window_setup(
             hInstance,
             "Wolfenstein 3D"

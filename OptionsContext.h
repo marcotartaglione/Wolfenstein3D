@@ -22,9 +22,11 @@ static void drawQuitMessage();
 WolfensteinContext optionsContext = {optionsContextInit, optionsContextLoop, optionsContextKeyboardCallback, optionsContextMouseCallback, optionsContextClose};
 
 #define OPTIONS_FONT_COLOR              (0xBCBCBC)
-#define OPTIONS_TITLE_IMAGE             ("assets/hud/options.png")
-#define OPTIONS_GUN_IMAGE               ("assets/hud/gun.png")
-#define OPTIONS_QUIT_BACKGROUND_IMAGE   ("assets/hud/quitBackground.png")
+#define OPTIONS_TITLE_IMAGE             ("assets/hud/options/title.png")
+#define OPTIONS_GUN_IMAGE               ("assets/hud/options/gun.png")
+#define OPTIONS_QUIT_IMAGE              ("assets/hud/options/quit.png")
+#define OPTIONS_BACKGROUND_IMAGE        ("assets/hud/options/background.png")
+#define OPTIONS_CONTROLS_IMAGE          ("assets/hud/options/controls.png")
 #define OPTIONS_SECONDARY_COLOR         (0x590000)
 #define OPTIONS_SCREEN_IMAGE_Y_OFFSET   (6)
 
@@ -34,6 +36,8 @@ static uint8_t maxSelectedOption = 8;
 static Image *options;
 static Image *gun;
 static Image *quitBackground;
+static Image *background;
+static Image *controls;
 
 #define QUIT_MESSAGE_COUNT 7
 static char *quitStrings[] = {
