@@ -108,7 +108,6 @@ void TRT_text_loadFont(char *directory);
 Vec2 *TRT_text_size(char *text, uint32_t *nLines, uint32_t textHeight, uint32_t spaceWidth, uint32_t letterSpacing, uint32_t lineOffset);
 
 typedef enum {
-    ELEMENT_ALIGN_NONE      = -4,
     ELEMENT_ALIGN_START     = -3,
     ELEMENT_ALIGN_END       = -2,
     ELEMENT_ALIGN_CENTER    = -1
