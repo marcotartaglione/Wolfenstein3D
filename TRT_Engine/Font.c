@@ -19,7 +19,7 @@ char *symbolToFilename(char symbol) {
     char *filename = malloc(64);
 
     if (symbol >= 'A' && symbol <= 'Z') {
-        sprintf(filename, "upper_%c.png", symbol + 32);
+        sprintf(filename, "upper_%c.png", symbol);
         return filename;
     }
     if (symbol >= 'a' && symbol <= 'z') {
@@ -143,99 +143,52 @@ void TRT_text_loadFont(char *directory) {
     }
 }
 
-LineData *TRT_text_size(char *text, uint32_t *nLines, uint32_t textHeight) {
-    struct LineData *result = calloc(FONT_MAX_LINES, sizeof(struct LineData));
+Vec2 *TRT_text_size(char *text, uint32_t *nLines, uint32_t textHeight, uint32_t spaceWidth, uint32_t letterSpacing, uint32_t lineOffset) {
+    Vec2 *result = calloc(FONT_MAX_LINES, sizeof(Vec2));
     uint32_t currentLine = 1;
 
-    result[0].lineFontHeightRatio = 3.402823466e+38F; // FLOAT_MAX_VALUE
+    uint32_t textLen = strlen(text);
 
-    for (uint32_t i = 0; i < strlen(text); ++i) {
-        if (text[i] == '\n') {
-            if (result[0].width + result[0].nLetters + result[0].nSpaces < result[currentLine].width + result[currentLine].nLetters + result[currentLine].nSpaces) {
-                result[0].width = result[currentLine].width;
-                result[0].nLetters = result[currentLine].nLetters;
-                result[0].nSpaces = result[currentLine].nSpaces;
-            }
+    for (uint32_t i = 0; i <= textLen; ++i) {
+        if (text[i] == '\n' || i == textLen) {
+            result[0].x = MAX(result[0].x, result[currentLine].x);
+            result[0].y += (int32_t)textHeight + (int32_t)lineOffset;
 
-            result[0].height += result[currentLine].height;
-            result[0].lineFontHeightRatio = MAX(result[0].lineFontHeightRatio, result[currentLine].lineFontHeightRatio);
+            if (nLines != NULL)
+                *nLines = currentLine;
 
             currentLine++;
             continue;
         }
 
         if (text[i] == ' ' || text[i] == '\t') {
-            result[currentLine].nSpaces++;
+            result[currentLine].x += (int32_t)spaceWidth;
             continue;
         }
 
-        Image *symbol = symbols[symbolIndex(text[i])];
+        Image *currentSymbol = symbols[symbolIndex(text[i])];
+        if (currentSymbol == NULL)
+            continue;
 
-        result[currentLine].width += symbol->width;
-        result[currentLine].height = MAX(result[currentLine].height, symbol->height);
-        result[currentLine].nLetters++;
-        result[currentLine].lineFontHeightRatio = (float) textHeight / (float) symbol->height;
+        float letterHeightRatio = (float) textHeight / (float) currentSymbol->height;
+        result[currentLine].x += (int32_t)((float) currentSymbol->width * letterHeightRatio) + (int32_t)letterSpacing;
+        result[currentLine].y = MAX(result[currentLine].y, currentSymbol->height * letterHeightRatio);
     }
 
-    if (result[0].width + result[0].nLetters + result[0].nSpaces < result[currentLine].width + result[currentLine].nLetters + result[currentLine].nSpaces) {
-        result[0].width = result[currentLine].width;
-        result[0].nLetters = result[currentLine].nLetters;
-        result[0].nSpaces = result[currentLine].nSpaces;
-    }
-
-    result[0].height += result[currentLine].height;
-    result[0].lineFontHeightRatio = MIN(result[0].lineFontHeightRatio, result[currentLine].lineFontHeightRatio);
-
-    for (uint32_t i = 1; i <= currentLine; ++i) {
-        result[i].width = (uint32_t) ((float) result[i].width * result[0].lineFontHeightRatio);
-        result[i].height = (uint32_t) ((float) result[i].height * result[0].lineFontHeightRatio);
-    }
-
-    result[0].width = (uint32_t) ((float) result[0].width * result[0].lineFontHeightRatio);
-    result[0].height = (uint32_t) ((float) result[0].height * result[0].lineFontHeightRatio);
-
-    *nLines = currentLine;
     return result;
 }
 
-void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, ElementAlignment horizontalAlignment, ElementAlignment verticalAlignment, TextAlignment textAlignment) {
+void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, TextAlignment textAlignment) {
     uint32_t nLines;
-    struct LineData *elementSize = TRT_text_size(text, &nLines, height);
-    Vec2 windowSize = TRT_window_getSize();
+    Vec2 *elementSize = TRT_text_size(text, &nLines, height, spaceWidth, letterSpacing, lineOffset);
 
-    elementSize[0].width = (uint32_t) ((float) elementSize[0].width + elementSize[0].nSpaces * spaceWidth + (elementSize[0].nLetters - 1) * letterSpacing);
-    elementSize[0].height = (uint32_t) ((float) elementSize[0].height + (nLines - 1) * lineOffset);
+    bool isYCentered = position.y == ELEMENT_ALIGN_CENTER;
+    TRT_window_interpretatePosition(&position,
+                                    (Vec2){elementSize[0].x, elementSize[0].y},
+                                    false);
 
-    switch (verticalAlignment) {
-        case ELEMENT_ALIGN_START:
-            position.y = (int32_t) elementSize[0].height;
-            break;
-        case ELEMENT_ALIGN_CENTER:
-            position.y = (int32_t) ((float) windowSize.y + (float) elementSize[0].height) / 2;
-            break;
-        case ELEMENT_ALIGN_END:
-            position.y = (int32_t) ((float) windowSize.y - (float) elementSize[0].height);
-            break;
-        default:
-        case ELEMENT_ALIGN_NONE:
-            break;
-    }
-
-    switch (horizontalAlignment) {
-        case ELEMENT_ALIGN_START:
-            position.x = 0;
-            break;
-        case ELEMENT_ALIGN_CENTER:
-            position.x =
-                    (int32_t) ((float) windowSize.x - (float) elementSize[0].width) / 2;
-            break;
-        case ELEMENT_ALIGN_END:
-            position.x = (int32_t) ((float) windowSize.x - (float) elementSize[0].width);
-            break;
-        default:
-        case ELEMENT_ALIGN_NONE:
-            break;
-    }
+    if (isYCentered)
+        position.y += elementSize[0].y;
 
     uint32_t currentLine = 0;
     uint32_t xOffsetFromLeft = 0;
@@ -246,28 +199,24 @@ void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, E
         if (currentLetterIndex == 0 || letter == '\n') {
             currentLine++;
 
-            position.y -= (int32_t) (height + lineOffset);
-
             switch (textAlignment) {
                 case TEXT_ALIGN_LEFT:
                     xOffsetFromLeft = 0;
                     break;
                 case TEXT_ALIGN_CENTER:
-                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width -
-                                       elementSize[currentLine].nSpaces * spaceWidth -
-                                       (elementSize[currentLine].nLetters - 1) * letterSpacing) / 2;
+                    xOffsetFromLeft = (elementSize[0].x - elementSize[currentLine].x) / 2;
                     break;
                 case TEXT_ALIGN_RIGHT:
-                    xOffsetFromLeft = (elementSize[0].width - elementSize[currentLine].width -
-                                       elementSize[currentLine].nSpaces * spaceWidth -
-                                       (elementSize[currentLine].nLetters - 1) * letterSpacing);
+                    xOffsetFromLeft = (elementSize[0].x - elementSize[currentLine].x);
                     break;
                 default:
                     break;
             }
 
-            if (letter == '\n')
+            if (letter == '\n') {
+                position.y -= (int32_t) (height + lineOffset);
                 continue;
+            }
         }
 
         if (letter == ' ') {
@@ -289,7 +238,7 @@ void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, E
             case 'p':
             case 'q':
             case 'y':
-                yOffsetFromTop = 4 * letterHeightRatio;
+                yOffsetFromTop = (uint32_t)(4.0f * letterHeightRatio);
                 break;
             default:
                 yOffsetFromTop = 0;
@@ -311,12 +260,11 @@ void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, E
                     continue;
                 }
 
-                TRT_window_setPixel(position.x + actualX + xOffsetFromLeft, position.y + actualY - yOffsetFromTop,
-                                    color);
+                TRT_window_setPixel(position.x + actualX + xOffsetFromLeft, position.y + actualY - yOffsetFromTop - height, color);
             }
         }
 
-        xOffsetFromLeft += symbol->width * elementSize[0].lineFontHeightRatio + letterSpacing;
+        xOffsetFromLeft += (uint32_t)((float)symbol->width * letterHeightRatio) + letterSpacing;
     }
 
     free(elementSize);

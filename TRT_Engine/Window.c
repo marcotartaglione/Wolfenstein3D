@@ -173,24 +173,47 @@ void TRT_window_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen) {
 
     Vec2 windowSize = TRT_window_getSize();
 
-    uint32_t width, height;
+    uint32_t totalWidth, totalHeight;
 
     if (toScreen) {
-        width = screenWidth;
-        height = screenHeight;
+        totalWidth = screenWidth;
+        totalHeight = screenHeight;
     } else {
-        width = windowSize.x;
-        height = windowSize.y;
+        totalWidth = windowSize.x;
+        totalHeight = windowSize.y;
     }
 
-    if (position->x == -1)
-        position->x = width / 2 - size.x / 2;
-    if (position->y == -1)
-        position->y = height / 2 - size.y / 2;
-    if (position->x < -1)
-        position->x = width / ABS(position->x) - size.x / 2;
-    if (position->y < -1)
-        position->y = height / ABS(position->y) - size.y / 2;
+    switch (position->x) {
+        case ELEMENT_ALIGN_CENTER:
+            position->x = (totalWidth - size.x) / 2;
+            break;
+        case ELEMENT_ALIGN_START:
+            position->x = 0;
+            break;
+        case ELEMENT_ALIGN_END:
+            position->x = totalWidth - size.x;
+            break;
+        default:
+            if (position->x < 0)
+                position->x = totalWidth / ABS(position->x) - size.x;
+            break;
+    }
+
+    switch (position->y) {
+        case ELEMENT_ALIGN_CENTER:
+            position->y = (totalHeight - size.y) / 2;
+            break;
+        case ELEMENT_ALIGN_START:
+            position->y = size.y;
+            break;
+        case ELEMENT_ALIGN_END:
+            position->y = totalHeight - size.y;
+            break;
+        default:
+            if (position->y < 0)
+                position->y = totalHeight / ABS(position->y) - size.y;
+            break;
+    }
 }
 
 void TRT_window_start(char *title, Vec2 size, Vec2 position) {

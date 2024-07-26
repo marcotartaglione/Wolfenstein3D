@@ -102,24 +102,16 @@ void TRT_text_setBackgroundColor(uint32_t color);
 
 void TRT_text_loadFont(char *directory);
 
-typedef struct LineData {
-    uint32_t width;
-    uint32_t height;
-    uint32_t nLetters;
-    uint32_t nSpaces;
-    float lineFontHeightRatio;
-} LineData;
-
 //
 // First element of the array is the total size, the rest are the sizes of each line in order
 //
-LineData *TRT_text_size(char *text, uint32_t *nLines, uint32_t textHeight);
+Vec2 *TRT_text_size(char *text, uint32_t *nLines, uint32_t textHeight, uint32_t spaceWidth, uint32_t letterSpacing, uint32_t lineOffset);
 
 typedef enum {
-    ELEMENT_ALIGN_NONE,
-    ELEMENT_ALIGN_START,
-    ELEMENT_ALIGN_END,
-    ELEMENT_ALIGN_CENTER
+    ELEMENT_ALIGN_NONE      = -4,
+    ELEMENT_ALIGN_START     = -3,
+    ELEMENT_ALIGN_END       = -2,
+    ELEMENT_ALIGN_CENTER    = -1
 } ElementAlignment;
 
 typedef enum {
@@ -128,7 +120,7 @@ typedef enum {
     TEXT_ALIGN_CENTER
 } TextAlignment;
 
-void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, ElementAlignment horizontalAlignment, ElementAlignment verticalAlignment, TextAlignment textAlignment);
+void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, TextAlignment textAlignment);
 
 //
 // Math
