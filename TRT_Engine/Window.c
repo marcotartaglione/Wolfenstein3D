@@ -18,13 +18,6 @@ static LARGE_INTEGER frequency;
 static LARGE_INTEGER lastTime;
 static LARGE_INTEGER currentTime;
 
-static uint8_t windowTargetFps;
-
-static bool fade = false;
-static uint32_t fadeTime = 1000;
-static Fade currentFade = FADE_IN;
-static int32_t fadeValue = 0;
-
 //
 // External functions
 //
@@ -125,7 +118,7 @@ static LRESULT CALLBACK WindowProcessMessage(HWND hwnd, UINT message, WPARAM wPa
     return 0;
 }
 
-static void setupWindowClass(HINSTANCE hInstance, char *className) {
+static void setupWindowClass(HINSTANCE hInstance, const char *className) {
     windowClass.lpfnWndProc = WindowProcessMessage;
     windowClass.hInstance = hInstance;
     windowClass.lpszClassName = className;
@@ -224,7 +217,7 @@ void TRT_window_run(uint8_t targetFPS, void (*loop)(), void (*close)()) {
 
         loop();
 
-        if (fade) {
+        if (isFading) {
             switch (TRT_animation_fade(fadeTime)) {
                 case FADE_IN:
                     break;
@@ -232,7 +225,7 @@ void TRT_window_run(uint8_t targetFPS, void (*loop)(), void (*close)()) {
                     redraw();
                     break;
                 case FADE_OVER:
-                    fade = false;
+                    isFading = false;
                     break;
             }
         }
@@ -261,8 +254,8 @@ void TRT_window_interpretateSize(Vec2 *size, bool considerUpScaling) {
     if (!considerUpScaling)
         return;
 
-    size->x *= windowUpScaling;
-    size->y *= windowUpScaling;
+    size->x *= (int32_t)windowUpScaling;
+    size->y *= (int32_t)windowUpScaling;
 }
 
 void TRT_window_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen) {
@@ -283,33 +276,33 @@ void TRT_window_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen) {
 
     switch (position->x) {
         case ELEMENT_ALIGN_CENTER:
-            position->x = (totalWidth - size.x) / 2;
+            position->x = (int32_t)(totalWidth - size.x) / 2;
             break;
         case ELEMENT_ALIGN_START:
             position->x = 0;
             break;
         case ELEMENT_ALIGN_END:
-            position->x = totalWidth - size.x;
+            position->x = (int32_t)totalWidth - size.x;
             break;
         default:
             if (position->x < 0)
-                position->x = totalWidth / ABS(position->x) - size.x;
+                position->x = (int32_t)totalWidth / ABS(position->x) - size.x;
             break;
     }
 
     switch (position->y) {
         case ELEMENT_ALIGN_CENTER:
-            position->y = (totalHeight - size.y) / 2;
+            position->y = (int32_t)(totalHeight - size.y) / 2;
             break;
         case ELEMENT_ALIGN_START:
             position->y = size.y;
             break;
         case ELEMENT_ALIGN_END:
-            position->y = totalHeight - size.y;
+            position->y = (int32_t)totalHeight - size.y;
             break;
         default:
             if (position->y < 0)
-                position->y = totalHeight / ABS(position->y) - size.y;
+                position->y = (int32_t)totalHeight / ABS(position->y) - size.y;
             break;
     }
 }
@@ -333,7 +326,7 @@ uint32_t TRT_window_getPixel(uint32_t x, uint32_t y) {
 }
 
 Vec2 TRT_window_getSize() {
-    return (Vec2) {frame.width / windowUpScaling, frame.height / windowUpScaling};
+    return (Vec2) {(int32_t)(frame.width / windowUpScaling), (int32_t)(frame.height / windowUpScaling)};
 }
 
 void TRT_window_setUpscaling(uint32_t upScaling) {
@@ -376,13 +369,15 @@ void TRT_input_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, u
 }
 
 //
-// Animation management
+// Created by Marco on 26/07/2024.
 //
-Fade TRT_animation_fade(uint32_t fadeSpeedMilliseconds) {
-    float totalFrames = (fadeSpeedMilliseconds / 1000.0f) * windowTargetFps;
+#include "TRT_Engine.h"
+
+fade TRT_animation_fade(uint32_t fadeSpeedMilliseconds) {
+    float totalFrames = ((float)fadeSpeedMilliseconds / 1000.0f) * (float)windowTargetFps;
     static uint32_t currentFrame = 0;
 
-    uint32_t fadeDecrement = totalFrames > 0 ? 255 / totalFrames : 255;
+    int32_t fadeDecrement = totalFrames > 0 ? (int32_t)(255.0f / totalFrames) : 255;
 
     if (fadeDecrement == 0)
         fadeDecrement = 1;
@@ -409,21 +404,15 @@ void TRT_animation_setFadeTime(uint32_t time) {
 }
 
 void TRT_animation_startFade() {
-    fade = true;
+    if (isFading)
+        return;
+
+    isFading = true;
 }
 
 bool TRT_animation_isFading() {
-    if(!fade)
+    if(!isFading)
         return false;
 
     return currentFade == FADE_IN;
-}
-
-long long TRT_time_get() {
-    LARGE_INTEGER frequency, start;
-
-    QueryPerformanceFrequency(&frequency);
-    QueryPerformanceCounter(&start);
-
-    return (start.QuadPart * 1000) / frequency.QuadPart;
 }

@@ -22,6 +22,7 @@ static void drawQuitMessage();
 WolfensteinContext optionsContext = {optionsContextInit, optionsContextLoop, optionsContextKeyboardCallback, optionsContextMouseCallback, optionsContextClose};
 
 #define OPTIONS_FONT_COLOR              (0xBCBCBC)
+#define OPTIONS_QUIT_FONT_COLOR         (0x0)
 #define OPTIONS_TITLE_IMAGE             ("assets/hud/options/title.png")
 #define OPTIONS_GUN_IMAGE               ("assets/hud/options/gun.png")
 #define OPTIONS_QUIT_IMAGE              ("assets/hud/options/quit.png")
@@ -45,7 +46,7 @@ static char *quitStrings[] = {
         "You are at an intersection.\nA sign says, \"Press Y to quit\".",
         "Press N if you are brave.\nPress Y to cower in shame.",
         "For guns and glory, press N.\nFor work and worry, press Y.",
-        "Press N to save the world.\nPress Y to abandon it in its hour of need.",
+        "Press N to save the world.\nPress Y to abandon it in\nits hour of need.",
         "Chicking out...\nalready?",
         "Heroes, press N.\nWimps, press Y."
 };

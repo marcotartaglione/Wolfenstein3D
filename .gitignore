@@ -1,6 +1,7 @@
 # Build output
 /cmake-build-debug/
 /cmake-build-release/
+/build/
 
 # IDE - CLion specific
 /.idea/

@@ -21,12 +21,6 @@ static void renderAttentionScreen() {
                   FONT_HEIGHT,
                   MAIN_MENU_FONT_COLOR,
                   TEXT_ALIGN_CENTER);
-
-    TRT_text_draw("Press any key to continue",
-                  (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_START},
-                  FONT_HEIGHT,
-                  MAIN_MENU_FONT_COLOR,
-                  TEXT_ALIGN_CENTER);
 }
 
 static void renderRatingScreen() {

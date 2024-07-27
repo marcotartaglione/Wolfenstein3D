@@ -6,7 +6,6 @@
 #define WOLFENSTEIN3D_TRT_ENGINE_H
 
 #include <stdint.h>
-#include <stdbool.h>
 #include <Windows.h>
 #include "vendor/stb/stb_image.h"
 
@@ -20,10 +19,10 @@ typedef struct Vec2 {
     int32_t x, y;
 } Vec2;
 
-typedef struct Vec3 {
-    struct Vec2;
-    int32_t z;
-} Vec3;
+typedef enum {
+    false = 0,
+    true = 1
+} bool;
 
 void TRT_message(char *text);
 
@@ -32,6 +31,9 @@ void TRT_message(char *text);
 //
 void TRT_window_setup(HINSTANCE hInstance, char *className);
 void TRT_window_start(char *title, Vec2 size, Vec2 position);
+
+static uint32_t windowTargetFps;
+
 void TRT_window_run(uint8_t targetFPS, void (*loop)(), void (*close)());
 void TRT_window_clear();
 
@@ -58,17 +60,18 @@ typedef enum FADE {
     FADE_IN,
     FADE_OUT,
     FADE_OVER
-} Fade;
+} fade;
 
-Fade TRT_animation_fade(uint32_t fadeSpeedMilliseconds);
+static bool isFading = false;
+static fade currentFade = FADE_IN;
+
+static int32_t fadeValue = 0;
+static uint32_t fadeTime = 1000;
+
+fade TRT_animation_fade(uint32_t fadeSpeedMilliseconds);
 void TRT_animation_setFadeTime(uint32_t time);
 void TRT_animation_startFade();
 bool TRT_animation_isFading();
-
-//
-// Time management
-//
-long long TRT_time_get();
 
 //
 // Input management

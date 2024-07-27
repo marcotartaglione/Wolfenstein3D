@@ -124,6 +124,6 @@ void drawQuitMessage() {
     TRT_text_draw(quitStrings[currentQuitMessage],
                   (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
                   FONT_HEIGHT,
-                  OPTIONS_FONT_COLOR,
+                  OPTIONS_QUIT_FONT_COLOR,
                   TEXT_ALIGN_CENTER);
 }
