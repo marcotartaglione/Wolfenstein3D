@@ -8,6 +8,8 @@
 #include "TRT_Engine.h"
 #include "Context.h"
 
+static bool startNewGame = false;
+
 void optionsContextInit();
 bool optionsContextLoop();
 void optionsContextClose();

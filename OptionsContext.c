@@ -63,7 +63,7 @@ bool optionsContextLoop() {
     if (showQuitMessage)
         drawQuitMessage();
 
-    return false;
+    return startNewGame;
 }
 
 void optionsContextClose() {
@@ -97,6 +97,9 @@ void optionsContextKeyboardCallback(uint32_t key) {
             break;
         case 13:
             switch (currentSelectedOption) {
+                case 0:
+                    startNewGame = true;
+                    break;
                 case 8:
                     showQuitMessage = true;
                     currentQuitMessage = rand() % QUIT_MESSAGE_COUNT;
