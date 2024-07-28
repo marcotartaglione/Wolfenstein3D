@@ -23,6 +23,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 
     contexts[0] = mainMenuContext;
     contexts[1] = optionsContext;
+    contexts[2] = gameContext;
 
     activateCurrentContext();
 

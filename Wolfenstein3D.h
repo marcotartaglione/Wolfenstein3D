@@ -23,6 +23,7 @@ void deactivateCurrentContext();
 //
 extern WolfensteinContext mainMenuContext;
 extern WolfensteinContext optionsContext;
+extern WolfensteinContext gameContext;
 
 uint8_t currentContext = 0;
 WolfensteinContext contexts[256];
