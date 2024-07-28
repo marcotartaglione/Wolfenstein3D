@@ -5,6 +5,13 @@
 #include "OptionsContext.h"
 #include "Commons.h"
 
+WolfensteinContext optionsContext = {
+        optionsContextInit,
+        optionsContextLoop,
+        optionsContextKeyboardCallback,
+        optionsContextMouseCallback,
+        optionsContextClose};
+
 void optionsContextInit() {
     options = TRT_image_get(OPTIONS_TITLE_IMAGE);
     if (options == NULL) {
@@ -36,6 +43,11 @@ bool optionsContextLoop() {
     if (TRT_animation_isFading())
         return false;
 
+    if (showChangeView) {
+        gameDrawFrame();
+        return false;
+    }
+
     drawHeaderLine();
 
     TRT_image_draw(options,
@@ -53,7 +65,7 @@ bool optionsContextLoop() {
     TRT_text_draw("New Game\nSound\nControl\nLoad Game\nSave Game\nChange View\nRead This\nView Scores\nQuit",
                   (Vec2) {ELEMENT_ALIGN_CENTER, 135},
                   FONT_HEIGHT,
-                  OPTIONS_FONT_COLOR,
+                  FONT_COLOR,
                   TEXT_ALIGN_LEFT);
 
     TRT_image_draw(gun,
@@ -81,14 +93,24 @@ void optionsContextKeyboardCallback(uint32_t key) {
     }
 
     switch (key) {
-        case 38:
+        case 37: // left arrow
+            if (!showChangeView)
+                break;
+            gameIncreaseSize();
+            break;
+        case 39: // right arrow
+            if (!showChangeView)
+                break;
+            gameReduceSize();
+            break;
+        case 38: // up arrow
             if (currentSelectedOption == 0) {
                 currentSelectedOption = maxSelectedOption;
             } else {
                 currentSelectedOption--;
             }
             break;
-        case 40:
+        case 40: // down arrow
             if (currentSelectedOption == maxSelectedOption) {
                 currentSelectedOption = 0;
             } else {
@@ -99,6 +121,9 @@ void optionsContextKeyboardCallback(uint32_t key) {
             switch (currentSelectedOption) {
                 case 0:
                     startNewGame = true;
+                    break;
+                case 5:
+                    showChangeView = true;
                     break;
                 case 8:
                     showQuitMessage = true;
@@ -118,7 +143,8 @@ void optionsContextMouseCallback(Click click, uint32_t x, uint32_t y) {
 
 void drawQuitMessage() {
     uint32_t nLines;
-    Vec2 textSize = TRT_text_size(quitStrings[currentQuitMessage], &nLines, FONT_HEIGHT, FONT_SPACE_WIDTH, FONT_LETTER_SPACING, FONT_LINE_OFFSET)[0];
+    Vec2 textSize = TRT_text_size(quitStrings[currentQuitMessage], &nLines, FONT_HEIGHT, FONT_SPACE_WIDTH,
+                                  FONT_LETTER_SPACING, FONT_LINE_OFFSET)[0];
 
     TRT_image_draw(quitBackground,
                    (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},

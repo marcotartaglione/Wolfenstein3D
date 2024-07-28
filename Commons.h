@@ -7,6 +7,7 @@
 
 #define FONT_BG_COLOR   (0xF00000)
 #define FONT_DIRECTORY  ("assets/font/")
+#define FONT_COLOR      (0xBCBCBC)
 
 #define MAIN_BACKGROUND_COLOR           (0x74180A)
 

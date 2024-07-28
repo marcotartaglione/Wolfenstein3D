@@ -21,9 +21,10 @@ static bool showQuitMessage = false;
 static int8_t currentQuitMessage = -1;
 static void drawQuitMessage();
 
-WolfensteinContext optionsContext = {optionsContextInit, optionsContextLoop, optionsContextKeyboardCallback, optionsContextMouseCallback, optionsContextClose};
+#include "GameContext.h"
 
-#define OPTIONS_FONT_COLOR              (0xBCBCBC)
+static bool showChangeView = false;
+
 #define OPTIONS_QUIT_FONT_COLOR         (0x0)
 #define OPTIONS_TITLE_IMAGE             ("assets/hud/options/title.png")
 #define OPTIONS_GUN_IMAGE               ("assets/hud/options/gun.png")
