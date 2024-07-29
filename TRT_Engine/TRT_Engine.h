@@ -90,6 +90,7 @@ void TRT_input_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, u
 Image *TRT_image_get(char *path);
 
 void TRT_image_draw(Image *image, Vec2 position, Vec2 size);
+void TRT_image_free(Image *image);
 
 //
 // Font management

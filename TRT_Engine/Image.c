@@ -38,3 +38,8 @@ void TRT_image_draw(Image *image, Vec2 position, Vec2 size) {
         }
     }
 }
+
+void TRT_image_free(Image *image) {
+    free(image->data);
+    free(image);
+}
