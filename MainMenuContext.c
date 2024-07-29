@@ -56,8 +56,8 @@ void mainMenuContextClose() {
 }
 
 void mainMenuKeyboardCallback(uint32_t key) {
-    TRT_animation_startFade();
-    currentRenderer++;
+    if(TRT_animation_startFade())
+        currentRenderer++;
 
     if (currentRenderer == renderersCount)
         close = true;
