@@ -38,9 +38,12 @@ void optionsContextInit() {
         exit(EXIT_FAILURE);
     }
 
-    episode1Thumbnail = TRT_image_get(EPISODE_1_IMAGE);
-    if (episode1Thumbnail == NULL) {
-        exit(EXIT_FAILURE);
+    for (uint8_t i = 0; i < DIFFICULTY_COUNT; ++i) {
+        char path[128];
+        snprintf(path, sizeof(path), "%s%d.png", DIFFICULTY_IMAGE_FOLDER, i + 1);
+        path[strlen(DIFFICULTY_IMAGE_FOLDER) + 5] = '\0';
+
+        difficultiesImages[i] = TRT_image_get(path);
     }
 }
 
@@ -53,7 +56,15 @@ bool optionsContextLoop() {
 }
 
 void optionsContextClose() {
+    TRT_image_free(options);
+    TRT_image_free(gun);
+    TRT_image_free(quitBackground);
+    TRT_image_free(background);
+    TRT_image_free(controls);
 
+    for (uint8_t i = 0; i < DIFFICULTY_COUNT; ++i) {
+        TRT_image_free(difficultiesImages[i]);
+    }
 }
 
 void optionsContextKeyboardCallback(uint32_t key) {
@@ -73,8 +84,12 @@ void optionsContextMouseCallback(Click click, uint32_t x, uint32_t y) {
 
 static void drawQuitMessage() {
     uint32_t nLines;
-    Vec2 textSize = TRT_text_size(quitStrings[currentQuitMessage], &nLines, FONT_HEIGHT, FONT_SPACE_WIDTH,
-                                  FONT_LETTER_SPACING, FONT_LINE_OFFSET)[0];
+    Vec2 textSize = TRT_text_size(quitStrings[currentQuitMessage],
+                                  &nLines,
+                                  FONT_HEIGHT,
+                                  FONT_SPACE_WIDTH,
+                                  FONT_LETTER_SPACING,
+                                  FONT_LINE_OFFSET)[0];
 
     TRT_image_draw(quitBackground,
                    (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
@@ -125,13 +140,28 @@ static void drawEpisodes() {
                   EPISODES_TITLE_COLOR,
                   TEXT_ALIGN_CENTER);
 
-    TRT_image_draw(episode1Thumbnail,
-                   (Vec2) {ELEMENT_ALIGN_CENTER, 50},
-                   (Vec2) {47, 24});
-
     TRT_image_draw(background,
                    (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
                    (Vec2) {309, 163});
+
+    for(uint8_t i = 0; i < EPISODES_COUNT; i++) {
+        TRT_image_draw(episodes[i]->thumbnail,
+                       (Vec2) {EPISODES_CONTENT_OFFSET_LEFT, TRT_window_getSize().y - EPISODES_CONTENT_OFFSET_TOP * (i + 1) - EPISODES_THUMBNAIL_SIZE.y - i * EPISODES_CONTENT_GAP},
+                       EPISODES_THUMBNAIL_SIZE);
+
+        char episodeText[128];
+        sprintf(episodeText, "Episode %d\n%s", i + 1, episodes[i]->title);
+
+        TRT_text_draw(episodeText,
+                      (Vec2) {98, TRT_window_getSize().y - EPISODES_CONTENT_OFFSET_TOP * (i + 1) - i * EPISODES_CONTENT_GAP},
+                      FONT_HEIGHT,
+                      FONT_COLOR,
+                      TEXT_ALIGN_LEFT);
+    }
+
+    TRT_image_draw(gun,
+                   (Vec2) {11, TRT_window_getSize().y - 23 * (currentSelectedEpisode + 1) - 12},
+                   (Vec2) {19, 11});
 
     TRT_image_draw(controls,
                    (Vec2) {ELEMENT_ALIGN_CENTER, 0},
@@ -152,6 +182,12 @@ static void drawChangeView() {
     }
 
     gameDrawFrame(startingGameSize);
+
+    TRT_text_draw("Use arrows to size\nENTER to accept\nESC to cancel",
+                  (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_START},
+                  FONT_HEIGHT,
+                  FONT_COLOR,
+                  TEXT_ALIGN_CENTER);
 }
 
 static void drawReadThis() {
@@ -160,6 +196,40 @@ static void drawReadThis() {
 
 static void drawShowScores() {
 
+}
+
+static void drawDifficiculty() {
+    Vec2 winSize = TRT_window_getSize();
+
+    TRT_window_fill(MAIN_BACKGROUND_COLOR);
+
+    TRT_text_draw("How tough are you?",
+                  (Vec2) {ELEMENT_ALIGN_CENTER, winSize.y - DIFFICULTY_TITLE_OFFSET_TOP},
+                  FONT_HEIGHT,
+                  DIFFICULTY_TITLE_COLOR,
+                  TEXT_ALIGN_CENTER);
+
+    TRT_image_draw(background,
+                   (Vec2) {ELEMENT_ALIGN_CENTER, winSize.y - DIFFICULTY_BACKGROUND_OFFSET_TOP},
+                   (Vec2) {226, 68});
+
+    TRT_text_draw("Can I play, Daddy?\nDon't hurt me.\nBring 'em on!\nI am Death incarnate!",
+                  (Vec2) {79, winSize.y - DIFFICULTY_CONTENT_OFFSET_TOP},
+                  FONT_HEIGHT,
+                  FONT_COLOR,
+                  TEXT_ALIGN_LEFT);
+
+    TRT_image_draw(gun,
+                   (Vec2) {56, winSize.y - DIFFICULTY_CONTENT_OFFSET_TOP - 11 - currentSelectedDifficulty * 13},
+                   (Vec2) {19, 11});
+
+    TRT_image_draw(difficultiesImages[currentSelectedDifficulty],
+                   (Vec2) {winSize.x - DIFFICULTY_IMAGE_OFFSET_RIGHT, winSize.y - DIFFICULTY_IMAGE_OFFSET_TOP},
+                   (Vec2) {23, 31});
+
+    TRT_image_draw(controls,
+                   (Vec2) {ELEMENT_ALIGN_CENTER, 0},
+                   (Vec2) {102, 7});
 }
 
 static void optionsKeyboardCallback(uint32_t key) {
@@ -210,13 +280,13 @@ static void episodesKeyboardCallback(uint32_t key) {
     switch (key) {
         case 38:
             if (currentSelectedEpisode == 0) {
-                currentSelectedEpisode = maxSelectedEpisode - 1;
+                currentSelectedEpisode = EPISODES_COUNT - 1;
             } else {
                 currentSelectedEpisode--;
             }
             break;
         case 40:
-            if (currentSelectedEpisode == maxSelectedEpisode - 1) {
+            if (currentSelectedEpisode == EPISODES_COUNT - 1) {
                 currentSelectedEpisode = 0;
             } else {
                 currentSelectedEpisode++;
@@ -225,7 +295,9 @@ static void episodesKeyboardCallback(uint32_t key) {
     }
 
     if (key == 13) {
-        startNewGame = true;
+        TRT_animation_startFade();
+        gameSetEpisode(currentSelectedEpisode);
+        currentRenderer = 7;
     }
 }
 
@@ -279,4 +351,28 @@ static void readThisKeyboardCallback(uint32_t key) {
 
 static void showScoresKeyboardCallback(uint32_t key) {
 
+}
+
+static void difficultyKeyboardCallback(uint32_t key) {
+    switch (key) {
+        case 38:
+            if (currentSelectedDifficulty == 0) {
+                currentSelectedDifficulty = DIFFICULTY_COUNT - 1;
+            } else {
+                currentSelectedDifficulty--;
+            }
+            break;
+        case 40:
+            if (currentSelectedDifficulty == DIFFICULTY_COUNT - 1) {
+                currentSelectedDifficulty = 0;
+            } else {
+                currentSelectedDifficulty++;
+            }
+            break;
+        case 13:
+            TRT_animation_startFade();
+            gameSetDifficulty(currentSelectedDifficulty);
+            startNewGame = true;
+            break;
+    }
 }

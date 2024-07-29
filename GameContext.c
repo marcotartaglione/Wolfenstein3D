@@ -11,15 +11,21 @@ WolfensteinContext gameContext = {
         gameContextClose};
 
 void gameContextInit() {
-
+    playerStats = TRT_image_get(GAME_HUD_PLAYER_STATS_IMAGE);
+    if (playerStats == NULL) {
+        exit(EXIT_FAILURE);
+    }
 }
 
 bool gameContextLoop() {
+    gameDrawFrame(gameSize);
+    gameDrawHUD();
+
     return false;
 }
 
 void gameContextClose() {
-
+    TRT_image_free(playerStats);
 }
 
 void gameKeyboardCallback(uint32_t key) {
@@ -33,25 +39,10 @@ void gameMouseCallback(Click click, uint32_t x, uint32_t y) {
 void gameDrawFrame(Vec2 frameSize) {
     TRT_window_fill(GAME_FRAME_BACKGROUND_COLOR);
 
-    Vec2 *size = TRT_text_size("Use arrows to size\nENTER to accept\nESC to cancel",
-                  NULL,
-                  FONT_HEIGHT,
-                  FONT_SPACE_WIDTH,
-                  FONT_LETTER_SPACING,
-                  FONT_LINE_OFFSET);
-
     uint32_t yWindow = TRT_window_getSize().y;
-    uint32_t yOffset = yWindow - size->y - frameSize.y;
+    uint32_t yOffset = yWindow - GAME_FRAME_OFFSET_FROM_BOTTOM - frameSize.y;
 
     TRT_window_DrawRectangle((Vec2) {ELEMENT_ALIGN_CENTER, yWindow - yOffset / 2 - frameSize.y}, frameSize, 0x000000);
-
-    TRT_text_draw("Use arrows to size\nENTER to accept\nESC to cancel",
-                  (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_START},
-                  FONT_HEIGHT,
-                  FONT_COLOR,
-                  TEXT_ALIGN_CENTER);
-
-    free(size);
 }
 
 Vec2 gameGetSize() {
@@ -60,4 +51,18 @@ Vec2 gameGetSize() {
 
 void gameSetSize(Vec2 size) {
     gameSize = size;
+}
+
+void gameSetEpisode(uint32_t episode) {
+    currentEpisode = episode;
+}
+
+void gameSetDifficulty(uint8_t newDifficulty) {
+    difficulty = newDifficulty;
+}
+
+static void gameDrawHUD() {
+    TRT_image_draw(playerStats,
+                   (Vec2) {0, GAME_HUD_OFFSET_BOTTOM},
+                   GAME_HUD_SIZE);
 }

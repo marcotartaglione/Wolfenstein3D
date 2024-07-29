@@ -23,8 +23,6 @@ static Vec2 startingGameSize = {0, 0};
 static int8_t currentQuitMessage = -1;
 static void drawQuitMessage();
 
-#define EPISODE_1_IMAGE ("assets/episode/1/thumbnail.png")
-
 #define GAME_SIZE_X_CHANGE_FACTOR (10)
 #define GAME_SIZE_Y_CHANGE_FACTOR (5)
 
@@ -35,6 +33,7 @@ static void drawControl();
 static void drawChangeView();
 static void drawReadThis();
 static void drawShowScores();
+static void drawDifficiculty();
 
 static uint8_t currentRenderer = 0;
 static void (*renderers[])() = {
@@ -44,7 +43,8 @@ static void (*renderers[])() = {
         drawControl,
         drawChangeView,
         drawReadThis,
-        drawShowScores
+        drawShowScores,
+        drawDifficiculty
 };
 
 static void optionsKeyboardCallback(uint32_t key);
@@ -54,6 +54,7 @@ static void controlKeyboardCallback(uint32_t key);
 static void changeViewKeyboardCallback(uint32_t key);
 static void readThisKeyboardCallback(uint32_t key);
 static void showScoresKeyboardCallback(uint32_t key);
+static void difficultyKeyboardCallback(uint32_t key);
 
 static void (*keyboardCallbacks[])(uint32_t key) = {
         optionsKeyboardCallback,
@@ -62,7 +63,8 @@ static void (*keyboardCallbacks[])(uint32_t key) = {
         controlKeyboardCallback,
         changeViewKeyboardCallback,
         readThisKeyboardCallback,
-        showScoresKeyboardCallback
+        showScoresKeyboardCallback,
+        difficultyKeyboardCallback
 };
 
 #include "GameContext.h"
@@ -80,8 +82,25 @@ static void (*keyboardCallbacks[])(uint32_t key) = {
 static uint8_t currentSelectedOption = 0;
 static uint8_t maxSelectedOption = 8;
 
+#include "Episodes.h"
+
+#define EPISODES_CONTENT_OFFSET_TOP     (23)
+#define EPISODES_CONTENT_OFFSET_LEFT    (40)
+#define EPISODES_CONTENT_GAP            (2)
+#define EPISODES_THUMBNAIL_SIZE         (Vec2) {48, 24}
+
 static uint32_t currentSelectedEpisode = 0;
-static uint32_t maxSelectedEpisode = 1;
+
+#define DIFFICULTY_TITLE_COLOR              (0xFBF82B)
+#define DIFFICULTY_TITLE_OFFSET_TOP         (68)
+#define DIFFICULTY_BACKGROUND_OFFSET_TOP    (DIFFICULTY_TITLE_OFFSET_TOP + 79 + 11)
+#define DIFFICULTY_CONTENT_OFFSET_TOP       (101)
+#define DIFFICULTY_COUNT                    (4)
+#define DIFFICULTY_IMAGE_FOLDER             ("assets/hud/difficulty/")
+#define DIFFICULTY_IMAGE_OFFSET_RIGHT       (88)
+#define DIFFICULTY_IMAGE_OFFSET_TOP         (DIFFICULTY_BACKGROUND_OFFSET_TOP - 20)
+
+static uint8_t currentSelectedDifficulty = 0;
 
 static Image *options;
 static Image *gun;
@@ -89,7 +108,7 @@ static Image *quitBackground;
 static Image *background;
 static Image *controls;
 
-static Image *episode1Thumbnail;
+static Image *difficultiesImages[DIFFICULTY_COUNT];
 
 #define QUIT_MESSAGE_COUNT 7
 static char *quitStrings[] = {
