@@ -403,11 +403,12 @@ void TRT_animation_setFadeTime(uint32_t time) {
     fadeTime = time;
 }
 
-void TRT_animation_startFade() {
+bool TRT_animation_startFade() {
     if (isFading)
-        return;
+        return false;
 
     isFading = true;
+    return isFading;
 }
 
 bool TRT_animation_isFading() {
