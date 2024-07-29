@@ -1,7 +1,6 @@
 //
 // Created by Marco on 29/07/2024.
 //
-
 #ifndef WOLFENSTEIN3D_LEVEL_H
 #define WOLFENSTEIN3D_LEVEL_H
 
@@ -15,5 +14,7 @@ typedef struct Episode {
 } Episode;
 
 Episode *Episode_get(char* path);
+
+extern Episode *episodes[20];
 
 #endif //WOLFENSTEIN3D_LEVEL_H

@@ -4,6 +4,8 @@
 
 #include "Episodes.h"
 
+Episode *episodes[20];
+
 static void readTitle(Episode* episode, FILE *fp) {
     fread(&episode->titleLength, sizeof(uint64_t), 1, fp);
     fread(episode->title, sizeof(char), episode->titleLength, fp);
