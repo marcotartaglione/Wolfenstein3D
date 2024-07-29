@@ -22,11 +22,7 @@ void deactivateCurrentContext();
 //
 // Episodes
 //
-
 void loadEpisodes();
-
-Episode *episodes[20];
-uint8_t currentEpisode = 0;
 
 //
 // Game contexts
