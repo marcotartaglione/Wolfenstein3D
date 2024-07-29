@@ -27,6 +27,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 
     activateCurrentContext();
 
+    loadEpisodes();
+
     TRT_window_run(GAME_TARGET_FPS, loop, close);
 
     return 0;
@@ -40,7 +42,9 @@ void loop() {
 }
 
 void close() {
-    contexts[currentContext].close();
+    for(uint8_t i = 0; i < EPISODES_COUNT; i++) {
+        free(episodes[i]);
+    }
 }
 
 void activateCurrentContext() {
@@ -52,4 +56,13 @@ void activateCurrentContext() {
 void deactivateCurrentContext() {
     contexts[currentContext].close();
     currentContext++;
+}
+
+void loadEpisodes() {
+    for(uint8_t i = 0; i < EPISODES_COUNT; i++) {
+        char path[256];
+        snprintf(path, sizeof(path), "%s%d", EPISODES_MAIN_FOLDER, i + 1);
+        Episode *current = Episode_get(path);
+        episodes[i] = current;
+    }
 }

@@ -22,6 +22,9 @@
 
 #define FADE_TIME               (500)
 
+#define EPISODES_MAIN_FOLDER    ("assets/episode/")
+#define EPISODES_COUNT          (1)
+
 static void drawHeaderLine() {
     Vec2 windowSize = TRT_window_getSize();
 

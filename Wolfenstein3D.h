@@ -8,6 +8,7 @@
 #include "TRT_Engine/TRT_Engine.h"
 #include "Context.h"
 #include "Commons.h"
+#include "Episodes.h"
 
 #define GAME_TARGET_FPS (30)
 
@@ -17,6 +18,15 @@ void close();
 
 void activateCurrentContext();
 void deactivateCurrentContext();
+
+//
+// Episodes
+//
+
+void loadEpisodes();
+
+Episode *episodes[20];
+uint8_t currentEpisode = 0;
 
 //
 // Game contexts
