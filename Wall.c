@@ -6,7 +6,7 @@
 
 Image *wallTextures[WALL_NUMBER];
 
-const char *wallToString(Wall wall) {
+const char *Wall_toString(Wall wall) {
     // If you are reading this, I'm sorry
     switch (wall) {
         case WALL_BLUESTONE1:

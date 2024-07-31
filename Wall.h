@@ -102,7 +102,7 @@ typedef enum {
 #define WALL_NUMBER                 (WALL_NULL)
 #define WALL_NO_DARK_VERSION        (WALL_ELEVATOR1)
 
-const char* wallToString(Wall wall);
+const char* Wall_toString(Wall wall);
 
 extern Image *wallTextures[WALL_NUMBER];
 
