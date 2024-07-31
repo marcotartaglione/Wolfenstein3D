@@ -40,6 +40,9 @@ void TRT_image_draw(Image *image, Vec2 position, Vec2 size) {
 }
 
 void TRT_image_free(Image *image) {
+    if (image == NULL)
+        return;
+
     free(image->data);
     free(image);
 }
