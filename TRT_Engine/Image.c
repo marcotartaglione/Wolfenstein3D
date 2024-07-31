@@ -20,6 +20,11 @@ Image *TRT_image_get(char *path) {
 }
 
 void TRT_image_draw(Image *image, Vec2 position, Vec2 size) {
+    if (image == NULL) {
+        TRT_error("TRT_image_draw", "Image is NULL", false);
+        return;
+    }
+
     TRT_window_interpretateSize(&size, false);
     TRT_window_interpretatePosition(&position, size, false);
 
@@ -40,8 +45,10 @@ void TRT_image_draw(Image *image, Vec2 position, Vec2 size) {
 }
 
 void TRT_image_free(Image *image) {
-    if (image == NULL)
+    if (image == NULL) {
+        TRT_error("TRT_image_free", "Image is NULL", false);
         return;
+    }
 
     free(image->data);
     free(image);
