@@ -5,6 +5,8 @@
 #ifndef WOLFENSTEIN3D_COMMONS_H
 #define WOLFENSTEIN3D_COMMONS_H
 
+#define ERROR_LOG_FILE  ("error.log")
+
 #define FONT_BG_COLOR   (0xF00000)
 #define FONT_DIRECTORY  ("assets/font/")
 #define FONT_COLOR      (0xBCBCBC)
