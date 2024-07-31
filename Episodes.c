@@ -4,7 +4,7 @@
 
 #include "Episodes.h"
 
-Episode *episodes[20];
+Episode *episodes[EPISODES_COUNT];
 
 static void readTitle(Episode* episode, FILE *fp) {
     uint64_t titleLength;

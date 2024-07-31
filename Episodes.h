@@ -23,6 +23,6 @@ void Episode_save(FILE *fp, Episode *episode);
 
 void Episode_free(Episode *episode);
 
-extern Episode *episodes[20];
+extern Episode *episodes[EPISODES_COUNT];
 
 #endif //WOLFENSTEIN3D_LEVEL_H
