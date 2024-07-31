@@ -27,6 +27,8 @@
 
 #define DIFFICULTY_COUNT        (4)
 
+#define WALL_TEXTURES_FOLDER    ("assets/textures/walls/")
+
 static void drawHeaderLine() {
     Vec2 windowSize = TRT_window_getSize();
 
