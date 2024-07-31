@@ -97,6 +97,8 @@ typedef enum {
     WALL_NULL,
 } Wall;
 
+const char* wallToString(Wall wall);
+
 #define WALL_TEXTURE_SIZE           64
 
 #define WALL_NO_DARK_VERSION        (WALL_ELEVATOR1)
