@@ -22,6 +22,7 @@ static LARGE_INTEGER currentTime;
 // External functions
 //
 void (*keyCallback)(uint32_t key) = NULL;
+
 void (*mouseCallback)(Click, uint32_t, uint32_t) = NULL;
 
 //
@@ -44,8 +45,8 @@ static LRESULT CALLBACK WindowProcessMessage(HWND hwnd, UINT message, WPARAM wPa
         case WM_PAINT: {
             for (int x = 0; x < frame.width * frame.height; ++x) {
                 uint8_t r = (frame.pixels[x] & 0xFF0000) >> 16;
-                uint8_t g = (frame.pixels[x] & 0x00FF00) >>  8;
-                uint8_t b = (frame.pixels[x] & 0x0000FF) >>  0;
+                uint8_t g = (frame.pixels[x] & 0x00FF00) >> 8;
+                uint8_t b = (frame.pixels[x] & 0x0000FF) >> 0;
 
                 if (currentFade == FADE_IN) {
                     r = r > fadeValue ? r - fadeValue : 0;
@@ -169,12 +170,42 @@ void TRT_message(char *text) {
     MessageBoxA(NULL, text, text, MB_OK);
 }
 
+void TRT_error(char *title, char *text, bool close) {
+    if (isDebug)
+        MessageBoxA(NULL, text, title, MB_OK);
+
+    char error[512];
+    snprintf(error, 512, "===== ERROR: %s =====\n%s", title, text);
+
+    if (errorLogFile == NULL) {
+        MessageBoxA(NULL, "Failed to open error log file", "Error", MB_OK);
+        if (close)
+            TRT_window_close();
+        return;
+    }
+
+    fprintf(errorLogFile, "%s\n", error);
+
+    if (close)
+        TRT_window_close();
+}
+
+void TRT_error_setLogFile(char *path) {
+    fclose(errorLogFile);
+    errno_t temp = fopen_s(&errorLogFile, path, "w");
+}
+
+void TRT_debug_set(bool debug) {
+    isDebug = debug;
+}
+
 //
 // Window management
 //
 void TRT_window_setup(HINSTANCE hInstance, char *className) {
     setupWindowClass(hInstance, className);
     setupFrame();
+    TRT_error_setLogFile("TRT_Engine_Errors.log");
 }
 
 void TRT_window_start(char *title, Vec2 size, Vec2 position) {
@@ -243,6 +274,7 @@ void TRT_window_run(uint8_t targetFPS, void (*loop)(), void (*close)()) {
 
 void TRT_window_close() {
     DestroyWindow(windowHandle);
+    fclose(errorLogFile);
 }
 
 void TRT_window_clear() {
@@ -261,8 +293,8 @@ void TRT_window_interpretateSize(Vec2 *size, bool considerUpScaling) {
     if (!considerUpScaling)
         return;
 
-    size->x *= (int32_t)windowUpScaling;
-    size->y *= (int32_t)windowUpScaling;
+    size->x *= (int32_t) windowUpScaling;
+    size->y *= (int32_t) windowUpScaling;
 }
 
 void TRT_window_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen) {
@@ -283,33 +315,33 @@ void TRT_window_interpretatePosition(Vec2 *position, Vec2 size, bool toScreen) {
 
     switch (position->x) {
         case ELEMENT_ALIGN_CENTER:
-            position->x = (int32_t)(totalWidth - size.x) / 2;
+            position->x = (int32_t) (totalWidth - size.x) / 2;
             break;
         case ELEMENT_ALIGN_START:
             position->x = 0;
             break;
         case ELEMENT_ALIGN_END:
-            position->x = (int32_t)totalWidth - size.x;
+            position->x = (int32_t) totalWidth - size.x;
             break;
         default:
             if (position->x < 0)
-                position->x = (int32_t)totalWidth / ABS(position->x) - size.x;
+                position->x = (int32_t) totalWidth / ABS(position->x) - size.x;
             break;
     }
 
     switch (position->y) {
         case ELEMENT_ALIGN_CENTER:
-            position->y = (int32_t)(totalHeight - size.y) / 2;
+            position->y = (int32_t) (totalHeight - size.y) / 2;
             break;
         case ELEMENT_ALIGN_START:
             position->y = size.y;
             break;
         case ELEMENT_ALIGN_END:
-            position->y = (int32_t)totalHeight - size.y;
+            position->y = (int32_t) totalHeight - size.y;
             break;
         default:
             if (position->y < 0)
-                position->y = (int32_t)totalHeight / ABS(position->y) - size.y;
+                position->y = (int32_t) totalHeight / ABS(position->y) - size.y;
             break;
     }
 }
@@ -333,7 +365,7 @@ uint32_t TRT_window_getPixel(uint32_t x, uint32_t y) {
 }
 
 Vec2 TRT_window_getSize() {
-    return (Vec2) {(int32_t)(frame.width / windowUpScaling), (int32_t)(frame.height / windowUpScaling)};
+    return (Vec2) {(int32_t) (frame.width / windowUpScaling), (int32_t) (frame.height / windowUpScaling)};
 }
 
 void TRT_window_setUpscaling(uint32_t upScaling) {
@@ -384,10 +416,10 @@ void TRT_input_setMouseCallback(void (*mouseCallbackFunction)(Click, uint32_t, u
 #include "TRT_Engine.h"
 
 fade TRT_animation_fade(uint32_t fadeSpeedMilliseconds) {
-    float totalFrames = ((float)fadeSpeedMilliseconds / 1000.0f) * (float)windowTargetFps;
+    float totalFrames = ((float) fadeSpeedMilliseconds / 1000.0f) * (float) windowTargetFps;
     static uint32_t currentFrame = 0;
 
-    int32_t fadeDecrement = totalFrames > 0 ? (int32_t)(255.0f / totalFrames) : 255;
+    int32_t fadeDecrement = totalFrames > 0 ? (int32_t) (255.0f / totalFrames) : 255;
 
     if (fadeDecrement == 0)
         fadeDecrement = 1;
@@ -395,13 +427,13 @@ fade TRT_animation_fade(uint32_t fadeSpeedMilliseconds) {
     fadeValue += fadeDecrement;
     currentFrame++;
 
-    if (currentFrame >= (uint32_t)(totalFrames * 2)) {
+    if (currentFrame >= (uint32_t) (totalFrames * 2)) {
         fadeValue = 0;
         currentFrame = 0;
         currentFade = FADE_IN;
 
         return FADE_OVER;
-    } else if (currentFrame == (uint32_t)totalFrames) {
+    } else if (currentFrame == (uint32_t) totalFrames) {
         fadeValue = 0;
         currentFade = FADE_OUT;
     }
@@ -422,7 +454,7 @@ bool TRT_animation_startFade() {
 }
 
 bool TRT_animation_isFading() {
-    if(!isFading)
+    if (!isFading)
         return false;
 
     return currentFade == FADE_IN;

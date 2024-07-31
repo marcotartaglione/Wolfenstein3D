@@ -26,6 +26,14 @@ typedef enum {
 
 void TRT_message(char *text);
 
+static FILE *errorLogFile;
+static bool isDebug = false;
+
+void TRT_error(char *title, char *text, bool close);
+void TRT_error_setLogFile(char *path);
+
+void TRT_debug_set(bool debug);
+
 //
 // Window management
 //
