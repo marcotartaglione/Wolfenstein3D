@@ -63,6 +63,11 @@ void Entity_free(Entity *entity) {
         TRT_error("Entity_free", "Entity is NULL", true);
     }
 
-    TRT_image_free(entity->texture);
+    if (entity->texture == NULL) {
+        TRT_error("Entity_free", "NULL value found in the entity texture. This should not happen", true);
+    } else {
+        TRT_image_free(entity->texture);
+    }
+
     free(entity);
 }

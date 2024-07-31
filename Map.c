@@ -80,6 +80,11 @@ void Map_save(FILE *fp, Map *map) {
 }
 
 void Map_free(Map *map) {
+    if (map == NULL) {
+        TRT_error("Map_free", "Map is NULL", false);
+        return;
+    }
+
     free(map->walls);
     Entity_free(map->player);
 

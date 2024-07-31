@@ -171,8 +171,10 @@ void TRT_message(char *text) {
 }
 
 void TRT_error(char *title, char *text, bool close) {
-    if (isDebug)
+    if (isDebug) {
         MessageBoxA(NULL, text, title, MB_OK);
+        __debugbreak();
+    }
 
     char error[512];
     snprintf(error, 512, "===== ERROR: %s =====\n%s", title, text);
