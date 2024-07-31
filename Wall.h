@@ -5,6 +5,8 @@
 #ifndef WOLFENSTEIN3D_WALL_H
 #define WOLFENSTEIN3D_WALL_H
 
+#include "TRT_Engine.h"
+
 typedef enum {
     //
     // Every tile has the dark version next to it
@@ -102,6 +104,6 @@ typedef enum {
 
 const char* wallToString(Wall wall);
 
-extern Wall wallTextures[WALL_NUMBER];
+extern Image *wallTextures[WALL_NUMBER];
 
 #endif //WOLFENSTEIN3D_WALL_H

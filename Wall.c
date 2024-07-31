@@ -4,7 +4,7 @@
 
 #include "Wall.h"
 
-Wall wallTextures[WALL_NUMBER];
+Image *wallTextures[WALL_NUMBER];
 
 const char *wallToString(Wall wall) {
     // If you are reading this, I'm sorry
