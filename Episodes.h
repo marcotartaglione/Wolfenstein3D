@@ -6,14 +6,22 @@
 
 #include "TRT_Engine.h"
 #include "Commons.h"
+#include "Map.h"
+
+#define EPISODE_N_FLOORS 10
 
 typedef struct Episode {
     char title[512];
-    uint64_t titleLength;
+    char thumbnailPath[512];
     Image *thumbnail;
+    Map **floors;
 } Episode;
 
-Episode *Episode_get(char* path);
+Episode *Episode_get(FILE *fp);
+
+void Episode_save(FILE *fp, Episode *episode);
+
+void Episode_free(Episode *episode);
 
 extern Episode *episodes[20];
 

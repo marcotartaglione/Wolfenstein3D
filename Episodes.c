@@ -7,44 +7,66 @@
 Episode *episodes[20];
 
 static void readTitle(Episode* episode, FILE *fp) {
-    fread(&episode->titleLength, sizeof(uint64_t), 1, fp);
-    fread(episode->title, sizeof(char), episode->titleLength, fp);
-    episode->title[episode->titleLength] = '\0';
+    uint64_t titleLength;
+    fread(&titleLength, sizeof(uint64_t), 1, fp);
+    fread(episode->title, sizeof(char), titleLength, fp);
+    episode->title[titleLength] = '\0';
 }
 
-static void readThumbnail(Episode* episode, FILE *fp, char *path) {
-    char thumbnail[512];
+static void readThumbnail(Episode* episode, FILE *fp) {
     uint64_t thumbnailLength;
 
-    char filename[512];
-
     fread(&thumbnailLength, sizeof(uint64_t), 1, fp);
-    fread(thumbnail, sizeof(char), thumbnailLength, fp);
-    thumbnail[thumbnailLength] = '\0';
+    fread(&episode->thumbnailPath, sizeof(char), thumbnailLength, fp);
+    episode->thumbnailPath[thumbnailLength] = '\0';
 
-    snprintf(filename, sizeof(filename), "%s/%s", path, thumbnail);
-    filename[thumbnailLength + strlen(path) + 1] = '\0';
-
-    episode->thumbnail = TRT_image_get(filename);
+    episode->thumbnail = TRT_image_get(episode->thumbnailPath);
 }
 
-Episode *Episode_get(char* path) {
+static void loadFloors(Episode* episode, FILE *fp) {
+    episode->floors = malloc(sizeof(Map*) * EPISODE_N_FLOORS);
+    if (episode->floors == NULL) {
+        exit(EXIT_FAILURE);
+    }
+
+    for (uint16_t i = 0; i < EPISODE_N_FLOORS; ++i) {
+        episode->floors[i] = Map_get(fp);
+    }
+}
+
+Episode *Episode_get(FILE *fp) {
     Episode *episode = malloc(sizeof(Episode));
     if (episode == NULL) {
         exit(EXIT_FAILURE);
     }
 
-    char filename[512];
-    snprintf(filename, sizeof(filename), "%s/%s", path, "level.data");
-
-    FILE *fp = fopen(filename, "r");
-    if (fp == NULL) {
-        exit(EXIT_FAILURE);
-    }
-
     readTitle(episode, fp);
-    readThumbnail(episode, fp, path);
-    fclose(fp);
+    readThumbnail(episode, fp);
+    loadFloors(episode, fp);
 
     return episode;
+}
+
+void Episode_save(FILE *fp, Episode *episode) {
+    uint64_t titleLength = strlen(episode->title);
+    fwrite(&titleLength, sizeof(uint64_t), 1, fp);
+    fwrite(episode->title, sizeof(char), titleLength, fp);
+
+    uint64_t thumbnailLength = strlen(episode->thumbnailPath);
+    fwrite(&thumbnailLength, sizeof(uint64_t), 1, fp);
+    fwrite(episode->thumbnailPath, sizeof(char), thumbnailLength, fp);
+
+    for (uint16_t i = 0; i < EPISODE_N_FLOORS; ++i) {
+        Map_save(fp, episode->floors[i]);
+    }
+}
+
+void Episode_free(Episode *episode) {
+    TRT_image_free(episode->thumbnail);
+
+    for (uint16_t i = 0; i < EPISODE_N_FLOORS; ++i) {
+        Map_free(episode->floors[i]);
+    }
+
+    free(episode);
 }
