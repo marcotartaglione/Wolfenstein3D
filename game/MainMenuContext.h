@@ -6,7 +6,7 @@
 #define WOLFENSTEIN3D_MAINMENUCONTEXT_H
 
 #include "TRT_Engine.h"
-#include "Context.h"
+#include "../Context.h"
 
 #define ATTENTION_SCREEN_TITLE_FONT_COLOR   (0xFBF82B)
 #define MAIN_MENU_OPEN_IMAGE                ("assets/hud/mainmenu/open.png")

@@ -42,7 +42,7 @@ void gameDrawFrame(Vec2 frameSize) {
     uint32_t yWindow = TRT_window_getSize().y;
     uint32_t yOffset = yWindow - GAME_FRAME_OFFSET_FROM_BOTTOM - frameSize.y;
 
-    TRT_window_DrawRectangle((Vec2) {ELEMENT_ALIGN_CENTER, yWindow - yOffset / 2 - frameSize.y}, frameSize, 0x000000);
+    TRT_window_DrawRectangle((Vec2) {ELEMENT_ALIGN_CENTER, yWindow - yOffset / 2 - frameSize.y}, frameSize, 0x000000, true);
 }
 
 Vec2 gameGetSize() {

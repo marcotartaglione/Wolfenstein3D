@@ -3,7 +3,7 @@
 //
 
 #include "OptionsContext.h"
-#include "Commons.h"
+#include "../Commons.h"
 
 WolfensteinContext optionsContext = {
         optionsContextInit,

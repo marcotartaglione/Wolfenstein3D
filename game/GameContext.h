@@ -6,8 +6,8 @@
 #define WOLFENSTEIN3D_GAMECONTEXT_H
 
 #include "TRT_Engine.h"
-#include "Context.h"
-#include "Commons.h"
+#include "../Context.h"
+#include "../Commons.h"
 
 #define GAME_SIZE_MAX_X         (304)
 #define GAME_SIZE_MAX_Y         (154)
