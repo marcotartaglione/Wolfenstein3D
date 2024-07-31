@@ -346,12 +346,15 @@ void TRT_window_fill(uint32_t color) {
     }
 }
 
-void TRT_window_DrawRectangle(Vec2 position, Vec2 size, uint32_t color) {
+void TRT_window_DrawRectangle(Vec2 position, Vec2 size, uint32_t color, bool fill) {
     TRT_window_interpretateSize(&size, false);
     TRT_window_interpretatePosition(&position, size, false);
 
     for (int x = 0; x < size.x; ++x) {
         for (int y = 0; y < size.y; ++y) {
+            if (!fill && (x != 0 && x != size.x - 1 && y != 0 && y != size.y - 1))
+                continue;
+
             TRT_window_setPixel(position.x + x, position.y + y, color);
         }
     }

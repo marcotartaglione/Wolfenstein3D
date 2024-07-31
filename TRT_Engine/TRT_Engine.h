@@ -51,7 +51,7 @@ Vec2 TRT_window_getSize();
 
 void TRT_window_setUpscaling(uint32_t upScaling);
 void TRT_window_fill(uint32_t color);
-void TRT_window_DrawRectangle(Vec2 position, Vec2 size, uint32_t color);
+void TRT_window_DrawRectangle(Vec2 position, Vec2 size, uint32_t color, bool fill);
 
 //
 // Animation management

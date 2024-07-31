@@ -167,7 +167,11 @@ Vec2 *TRT_text_size(char *text, uint32_t *nLines, uint32_t textHeight, uint32_t 
             continue;
         }
 
-        Image *currentSymbol = symbols[symbolIndex(text[i])];
+        int32_t currentSymbolIndex = symbolIndex(text[i]);
+        if (currentSymbolIndex == -1)
+            continue;
+
+        Image *currentSymbol = symbols[currentSymbolIndex];
         if (currentSymbol == NULL)
             continue;
 
@@ -233,7 +237,11 @@ void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, T
             continue;
         }
 
-        Image *symbol = symbols[symbolIndex(letter)];
+        int32_t currentSymbolIndex = symbolIndex(letter);
+        if (currentSymbolIndex == -1)
+            continue;
+
+        Image *symbol = symbols[currentSymbolIndex];
         if (symbol == NULL)
             continue;
 
