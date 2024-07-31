@@ -6,6 +6,12 @@ add_subdirectory(TRT_Engine)
 file(GLOB SOURCES *.c)
 file(GLOB HEADERS *.h)
 
+file(GLOB_RECURSE GAME_SOURCES game/*.c)
+file(GLOB_RECURSE GAME_HEADERS game/*.h)
+
+file(GLOB_RECURSE EDITOR_SOURCES editor/*.c)
+file(GLOB_RECURSE EDITOR_HEADERS editor/*.h)
+
 if(MSVC)
     set(RES_COMPILER rc)
 else()
@@ -23,7 +29,12 @@ file(GLOB RESOURCE resources/icon/icon.rc)
 
 file(GLOB STB_IMAGE TRT_Engine/vendor/stb/*)
 
-add_executable(Wolfenstein3D WIN32 ${ICON} ${SOURCES} ${HEADERS} ${STB_IMAGE} ${RESOURCE})
+add_executable(Wolfenstein3D WIN32
+        ${ICON}
+        ${SOURCES} ${HEADERS}
+        ${GAME_SOURCES} ${GAME_HEADERS}
+        ${EDITOR_SOURCES} ${EDITOR_HEADERS}
+        ${STB_IMAGE} ${RESOURCE})
 
 find_library(WINMM_LIB NAMES winmm)
 target_link_libraries(Wolfenstein3D ${WINMM_LIB} TRT_ENGINE)
