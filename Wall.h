@@ -97,11 +97,11 @@ typedef enum {
     WALL_NULL,
 } Wall;
 
+#define WALL_NUMBER                 (WALL_NULL)
+#define WALL_NO_DARK_VERSION        (WALL_ELEVATOR1)
+
 const char* wallToString(Wall wall);
 
-#define WALL_TEXTURE_SIZE           64
-
-#define WALL_NO_DARK_VERSION        (WALL_ELEVATOR1)
-#define WALL_NUMBER                 (WALL_NULL)
+extern Wall wallTextures[WALL_NUMBER];
 
 #endif //WOLFENSTEIN3D_WALL_H
