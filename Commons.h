@@ -23,7 +23,9 @@
 #define FADE_TIME               (500)
 
 #define EPISODES_MAIN_FOLDER    ("assets/episode/")
-#define EPISODES_COUNT          (1)
+#define EPISODES_COUNT          (6)
+
+#define DIFFICULTY_COUNT        (4)
 
 static void drawHeaderLine() {
     Vec2 windowSize = TRT_window_getSize();
@@ -32,11 +34,13 @@ static void drawHeaderLine() {
 
     TRT_window_DrawRectangle((Vec2) {0, windowSize.y - HEADER_LINE_Y_OFFSET - HEADER_LINE_BACKGROUND_HEIGHT},
                              (Vec2) {-1, HEADER_LINE_BACKGROUND_HEIGHT},
-                             HEADER_LINE_BACKGROUND_COLOR);
+                             HEADER_LINE_BACKGROUND_COLOR,
+                             true);
 
     TRT_window_DrawRectangle((Vec2) {0, windowSize.y - HEADER_LINE_Y_OFFSET - HEADER_LINE_BACKGROUND_HEIGHT - 2},
                              (Vec2) {-1, 1},
-                             HEADER_LINE_BACKGROUND_COLOR);
+                             HEADER_LINE_BACKGROUND_COLOR,
+                             true);
 }
 
 #endif //WOLFENSTEIN3D_COMMONS_H
