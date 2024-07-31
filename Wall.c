@@ -266,6 +266,7 @@ const char *Wall_toString(Wall wall) {
         case WALL_NULL:
             return "WALL_NULL";
         default:
+            TRT_error("Unknown wall type", "Inserted wall type is unknown", false);
             return "UNKNOWN";
     }
 }

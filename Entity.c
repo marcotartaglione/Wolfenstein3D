@@ -5,9 +5,13 @@
 #include "Entity.h"
 
 Entity *Entity_get(FILE *fp) {
+    if (fp == NULL) {
+        TRT_error("Entity_get", "File pointer is NULL", true);
+    }
+
     Entity *entity = malloc(sizeof(Entity));
     if (entity == NULL) {
-        exit(EXIT_FAILURE);
+        TRT_error("Entity_get", "Could not allocate memory for entity", true);
     }
 
     fread(&entity->position, sizeof(Vec2), 1, fp);
@@ -30,45 +34,14 @@ Entity *Entity_get(FILE *fp) {
     return entity;
 }
 
-Entity **Entity_getMultiple(char* path, uint32_t* enemiesCount) {
-    uint32_t count = 0;
-
-    FILE *fp = fopen(path, "r");
-    if (fp == NULL) {
-        exit(EXIT_FAILURE);
-    }
-
-    fread(&count, sizeof(uint32_t), 1, fp);
-
-    Entity **entities = malloc(count * sizeof(Entity*));
-    if (entities == NULL) {
-        exit(EXIT_FAILURE);
-    }
-
-    for (int i = 0; i < count; i++) {
-        entities[i] = malloc(sizeof(Entity));
-
-        fread(&entities[i]->position, sizeof(Vec2), 1, fp);
-        fread(&entities[i]->lookingAngle, sizeof(float), 1, fp);
-        fread(&entities[i]->height, sizeof(uint8_t), 1, fp);
-        fread(&entities[i]->moveSpeed, sizeof(float), 1, fp);
-        fread(&entities[i]->rotationSpeed, sizeof(float), 1, fp);
-        fread(&entities[i]->health, sizeof(float), 1, fp);
-        fread(&entities[i]->armor, sizeof(float), 1, fp);
-        fread(&entities[i]->ammo, sizeof(uint16_t), 1, fp);
-        fread(&entities[i]->points, sizeof(uint32_t), 1, fp);
-    }
-
-    fclose(fp);
-
-    if (enemiesCount != NULL) {
-        *enemiesCount = count;
-    }
-
-    return entities;
-}
-
 void *Entity_save(FILE *fp, Entity *entity) {
+    if (fp == NULL) {
+        TRT_error("Entity_save", "File pointer is NULL", true);
+    }
+    if (entity == NULL) {
+        TRT_error("Entity_save", "Entity is NULL", true);
+    }
+
     fwrite(&entity->position, sizeof(Vec2), 1, fp);
     fwrite(&entity->lookingAngle, sizeof(float), 1, fp);
 
@@ -86,16 +59,10 @@ void *Entity_save(FILE *fp, Entity *entity) {
 }
 
 void Entity_free(Entity *entity) {
-    TRT_image_free(entity->texture);
-    free(entity);
-}
-
-void Entity_freeMultiple(Entity **entities, uint32_t enemiesCount) {
-    for (int i = 0; i < enemiesCount; i++) {
-        if (entities[i] != NULL) {
-            Entity_free(entities[i]);
-        }
+    if (entity == NULL) {
+        TRT_error("Entity_free", "Entity is NULL", true);
     }
 
-    free(entities);
+    TRT_image_free(entity->texture);
+    free(entity);
 }

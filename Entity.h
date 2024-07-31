@@ -38,11 +38,9 @@ typedef struct {
 } Entity;
 
 Entity *Entity_get(FILE *fp);
-Entity **Entity_getMultiple(char* path, uint32_t *enemiesCount);
 
 void *Entity_save(FILE *fp, Entity *entity);
 
 void Entity_free(Entity *entity);
-void Entity_freeMultiple(Entity **entities, uint32_t enemiesCount);
 
 #endif //WOLFENSTEIN3D_ENTITY_H

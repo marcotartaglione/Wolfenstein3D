@@ -5,9 +5,13 @@
 #include "Map.h"
 
 Map *Map_get(FILE *fp) {
+    if (fp == NULL) {
+        TRT_error("Map_get", "File pointer is NULL", true);
+    }
+
     Map *map = malloc(sizeof(Map));
     if (map == NULL) {
-        exit(EXIT_FAILURE);
+        TRT_error("Map_get", "Malloc failed for map", true);
     }
 
     fread(&map->width, sizeof(uint16_t), 1, fp);
@@ -16,7 +20,7 @@ Map *Map_get(FILE *fp) {
     map->walls = malloc(sizeof(Wall) * map->width * map->height);
     if (map->walls == NULL) {
         free(map);
-        exit(EXIT_FAILURE);
+        TRT_error("Map_get", "Malloc failed for map walls", true);
     }
 
     fread(map->walls, sizeof(Wall), map->width * map->height, fp);
@@ -26,7 +30,7 @@ Map *Map_get(FILE *fp) {
     if (map->player == NULL) {
         free(map->walls);
         free(map);
-        exit(EXIT_FAILURE);
+        TRT_error("Map_get", "Could not retreave player data", true);
     }
 
     map->enemies = malloc(sizeof(Entity *) * map->enemiesCount);
@@ -34,7 +38,7 @@ Map *Map_get(FILE *fp) {
         Entity_free(map->player);
         free(map->walls);
         free(map);
-        exit(EXIT_FAILURE);
+        TRT_error("Map_get", "Malloc failed for map enemies", true);
     }
 
     for (uint32_t i = 0; i < map->enemiesCount; ++i) {
@@ -47,7 +51,7 @@ Map *Map_get(FILE *fp) {
             Entity_free(map->player);
             free(map->walls);
             free(map);
-            exit(EXIT_FAILURE);
+            TRT_error("Map_get", "Could not retreave map enemies", true);
         }
     }
 
@@ -55,6 +59,13 @@ Map *Map_get(FILE *fp) {
 }
 
 void Map_save(FILE *fp, Map *map) {
+    if (fp == NULL) {
+        TRT_error("Map_save", "File pointer is NULL", true);
+    }
+    if (map == NULL) {
+        TRT_error("Map_save", "Map is NULL", true);
+    }
+
     fwrite(&map->width, sizeof(uint16_t), 1, fp);
     fwrite(&map->height, sizeof(uint16_t), 1, fp);
 
@@ -71,6 +82,10 @@ void Map_save(FILE *fp, Map *map) {
 void Map_free(Map *map) {
     free(map->walls);
     Entity_free(map->player);
-    Entity_freeMultiple(map->enemies, map->enemiesCount);
+
+    for(uint32_t i = 0; i < map->enemiesCount; ++i) {
+        Entity_free(map->enemies[i]);
+    }
+
     free(map);
 }
