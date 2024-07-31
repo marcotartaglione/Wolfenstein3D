@@ -35,6 +35,8 @@ void TRT_window_start(char *title, Vec2 size, Vec2 position);
 static uint32_t windowTargetFps;
 
 void TRT_window_run(uint8_t targetFPS, void (*loop)(), void (*close)());
+void TRT_window_close();
+
 void TRT_window_clear();
 
 //

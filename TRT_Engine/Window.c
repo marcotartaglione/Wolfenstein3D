@@ -215,6 +215,9 @@ void TRT_window_run(uint8_t targetFPS, void (*loop)(), void (*close)()) {
             DispatchMessage(&msg);
         }
 
+        if (!IsWindow(windowHandle))
+            break;
+
         loop();
 
         if (isFading) {
@@ -236,6 +239,10 @@ void TRT_window_run(uint8_t targetFPS, void (*loop)(), void (*close)()) {
     }
     TRT_window_clear();
     close();
+}
+
+void TRT_window_close() {
+    DestroyWindow(windowHandle);
 }
 
 void TRT_window_clear() {
