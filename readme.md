@@ -66,11 +66,8 @@ You can also move to a specified row and column by pressing the following keys:
 
 - `Q` - Open navigation menu
 - `[1...9]` - Set current number
-- `TAB` - Multiply current number by 10
-- `SHIFT` - Divide current number by 10
-- `=` - Change from row to column and vice-versa
-- `ENTER` - Move to the specified row and column
-- `ESC` - Close the navigation menu
+- `ENTER` - Modify the column if row is currently selected or jump to coordinates if column is currently selected
+- `ESC` - Modify the row if column is currently selected or close the navigation menu
 
 When you have selected the tile you want to edit, you can change its type by pressing the following:
 
@@ -86,8 +83,8 @@ When you have selected the tile you want to edit, you can change its type by pre
 In order to change the selected wall type, you can press the following keys:
 
 - `TAB` - Open the wall type menu
-- `ARROW UP` - Move the selected wall type up
-- `ARROW DOWN` - Move the selected wall type down
+- `ARROW LEFT` - Move the selected wall type down
+- `ARROW RIGHT` - Move the selected wall type up
 - `ENTER` - Select the wall type
 - `ESC` - Close the wall type menu
 

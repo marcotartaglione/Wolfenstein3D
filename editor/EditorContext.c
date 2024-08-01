@@ -242,9 +242,6 @@ void drawTileSelector() {
 void gridKeyboardCallback(uint32_t key) {
     if (drawNavigationMenu) {
         switch (key) {
-            case 187:
-                modifingRow = !modifingRow;
-                break;
             case '0':
             case '1':
             case '2':
@@ -257,20 +254,23 @@ void gridKeyboardCallback(uint32_t key) {
             case '9': {
                 uint32_t number = key - '0';
                 if (modifingRow) {
-                    currentRow = currentRow / 10 * 10 + number;
+                    currentRow *= 10;
+                    currentRow += number;
+
+                    if (currentRow >= episodes[selectedEpisode]->floors[selectedFloor]->height) {
+                        currentRow = episodes[selectedEpisode]->floors[selectedFloor]->height - 1;
+                    }
                 } else {
-                    currentCol = currentRow / 10 * 10 + number;
+                    currentCol *= 10;
+                    currentCol += number;
+
+                    if (currentCol >= episodes[selectedEpisode]->floors[selectedFloor]->width) {
+                        currentCol = episodes[selectedEpisode]->floors[selectedFloor]->width - 1;
+                    }
                 }
                 break;
             }
-            case VK_TAB:
-                if (modifingRow) {
-                    currentRow *= 10;
-                } else {
-                    currentCol *= 10;
-                }
-                break;
-            case VK_SHIFT:
+            case VK_BACK:
                 if (modifingRow) {
                     currentRow /= 10;
                 } else {
@@ -278,13 +278,26 @@ void gridKeyboardCallback(uint32_t key) {
                 }
                 break;
             case VK_ESCAPE:
-                currentRow = 0;
-                currentCol = 0;
-                drawNavigationMenu = false;
+                if (modifingRow) {
+                    currentRow = 0;
+                    currentCol = 0;
+                    drawNavigationMenu = false;
+                } else {
+                    modifingRow = true;
+                }
                 break;
-            case 13:
-                selectedTile = currentCol * episodes[selectedEpisode]->floors[selectedFloor]->width + currentRow;
-                drawNavigationMenu = false;
+            case VK_RETURN:
+                if (modifingRow) {
+                    modifingRow = false;
+                } else {
+                    selectedTile = currentCol + episodes[selectedEpisode]->floors[selectedFloor]->width * currentRow;
+
+                    drawNavigationMenu = false;
+
+                    currentRow = 0;
+                    currentCol = 0;
+                    modifingRow = true;
+                }
                 break;
             default:
                 break;
