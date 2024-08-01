@@ -24,7 +24,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
             (Vec2) {-1, -1}
     );
 
-    isEditor = strcmp(lpCmdLine, "-editor") == 0;
+    isEditor = strcmp(lpCmdLine, "--editor") == 0;
 
     if (isEditor) {
         contexts[0] = editorMenuContext;
