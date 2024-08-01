@@ -76,7 +76,7 @@ When you have selected the tile you want to edit, you can change its type by pre
 
 - `ENTER` - Change the tile to the selected wall type
 - `P` - Player start position
-- `E` - Enemy start position
+- `WORK IN PROGRESS` - Enemy start position
 - `WORK IN PROGRESS` - Place food
 - `WORK IN PROGRESS` - Place treasure
 - `WORK IN PROGRESS` - Place weapon
