@@ -36,8 +36,7 @@ add_executable(Wolfenstein3D WIN32
         ${EDITOR_SOURCES} ${EDITOR_HEADERS}
         ${STB_IMAGE} ${RESOURCE})
 
-find_library(WINMM_LIB NAMES winmm)
-target_link_libraries(Wolfenstein3D ${WINMM_LIB} TRT_ENGINE)
+target_link_libraries(Wolfenstein3D TRT_ENGINE)
 
 set_target_properties(Wolfenstein3D PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
 
