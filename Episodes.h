@@ -8,11 +8,13 @@
 #include "Commons.h"
 #include "Map.h"
 
-#define EPISODE_N_FLOORS 10
+#define EPISODE_TITLE_LEN           (512)
+#define EPISODE_THUMBNAILPATH_LEN   (512)
+#define EPISODE_N_FLOORS            (10)
 
 typedef struct Episode {
-    char title[512];
-    char thumbnailPath[512];
+    char title[EPISODE_TITLE_LEN];
+    char thumbnailPath[EPISODE_THUMBNAILPATH_LEN];
     Image *thumbnail;
     Map **floors;
 } Episode;

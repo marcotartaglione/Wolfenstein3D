@@ -1,6 +1,6 @@
 #include "Wolfenstein3D.h"
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow) {
+int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PSTR lpCmdLine, _In_ int nCmdShow) {
     TRT_text_loadFont(FONT_DIRECTORY);
     TRT_text_setBackgroundColor(FONT_BG_COLOR);
 

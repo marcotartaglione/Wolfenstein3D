@@ -7,6 +7,8 @@
 
 #include "TRT_Engine.h"
 
+#define ENTITY_TEXTURENAME_LEN (512)
+
 typedef struct {
     //
     // Position in space
@@ -17,7 +19,7 @@ typedef struct {
     //
     // Caracteristics
     //
-    char textureName[512];
+    char textureName[ENTITY_TEXTURENAME_LEN];
 
     Image* texture;
     uint8_t height;

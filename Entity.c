@@ -22,7 +22,7 @@ Entity *Entity_get(FILE *fp) {
 
     uint64_t textureNameLength;
     fread(&textureNameLength, sizeof(uint64_t), 1, fp);
-    fread_s(entity->textureName, 512, sizeof(char), textureNameLength, fp);
+    fread_s(entity->textureName, ENTITY_TEXTURENAME_LEN, sizeof(char), textureNameLength, fp);
     entity->textureName[textureNameLength] = '\0';
 
     entity->texture = TRT_image_get(entity->textureName);

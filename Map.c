@@ -26,7 +26,7 @@ Map *Map_get(FILE *fp) {
         return NULL;
     }
 
-    fread(map->walls, sizeof(Wall), map->width * map->height, fp);
+    fread_s(map->walls, map->width * map->height, sizeof(Wall), map->width * map->height, fp);
     fread(&map->enemiesCount, sizeof(uint32_t), 1, fp);
 
     map->player = Entity_get(fp);

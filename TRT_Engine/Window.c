@@ -83,8 +83,12 @@ static LRESULT CALLBACK WindowProcessMessage(HWND hwnd, UINT message, WPARAM wPa
                 DeleteObject(frameBitmap);
 
             frameBitmap = CreateDIBSection(NULL, &frameBitmapInfo, DIB_RGB_COLORS, (void **) &frame.pixels, 0, 0);
+            if (frameBitmap == NULL || frameBitmap == 0) {
+                TRT_error("Window.c", "Failed to create DIB section", true);
+                return -1;
+            }
+            
             SelectObject(frameDeviceContext, frameBitmap);
-
             frame.width = LOWORD(lParam);
             frame.height = HIWORD(lParam);
 

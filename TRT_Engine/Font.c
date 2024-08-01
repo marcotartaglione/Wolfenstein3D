@@ -17,6 +17,10 @@ int32_t symbolIndex(char symbol) {
 
 char *symbolToFilename(char symbol) {
     char *filename = malloc(64);
+    if (filename == NULL) {
+        TRT_error("TRT_Font symbolToFilename", "Malloc has failed", true);
+        return NULL;
+    }
 
     if (symbol >= 'A' && symbol <= 'Z') {
         sprintf(filename, "upper_%c.png", symbol);
@@ -146,6 +150,11 @@ void TRT_text_loadFont(char *directory) {
 Vec2 *TRT_text_size(char *text, uint32_t *nLines, uint32_t textHeight, uint32_t spaceWidth, uint32_t letterSpacing,
                     uint32_t lineOffset) {
     Vec2 *result = calloc(FONT_MAX_LINES, sizeof(Vec2));
+    if (result == NULL) {
+        TRT_error("TRT_text_size", "Calloc has failed", true);
+        return NULL;
+    }
+
     uint32_t currentLine = 1;
 
     uint32_t textLen = strlen(text);

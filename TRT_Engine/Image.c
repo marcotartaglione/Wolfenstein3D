@@ -6,6 +6,10 @@
 
 Image *TRT_image_get(char *path) {
     Image *image = malloc(sizeof(Image));
+    if (image == NULL) {
+        TRT_error("TRT_image_get", "Malloc has failed", true);
+        return NULL;
+    }
 
     stbi_set_flip_vertically_on_load(1);
 

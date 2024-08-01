@@ -9,14 +9,14 @@ Episode *episodes[EPISODES_COUNT];
 static void readTitle(Episode* episode, FILE *fp) {
     uint64_t titleLength;
     fread(&titleLength, sizeof(uint64_t), 1, fp);
-    fread(episode->title, sizeof(char), titleLength, fp);
+    fread_s(episode->title, EPISODE_TITLE_LEN, sizeof(char), titleLength, fp);
     episode->title[titleLength] = '\0';
 }
 
 static void readThumbnail(Episode* episode, FILE *fp) {
     uint64_t thumbnailLength;
     fread(&thumbnailLength, sizeof(uint64_t), 1, fp);
-    fread(&episode->thumbnailPath, sizeof(char), thumbnailLength, fp);
+    fread_s(episode->thumbnailPath, EPISODE_THUMBNAILPATH_LEN, sizeof(char), thumbnailLength, fp);
     episode->thumbnailPath[thumbnailLength] = '\0';
     episode->thumbnail = TRT_image_get(episode->thumbnailPath);
 }

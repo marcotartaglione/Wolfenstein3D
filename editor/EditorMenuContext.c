@@ -24,13 +24,25 @@ static void createFiles() {
 
     for (int k = 0; k < EPISODES_COUNT; ++k) {
         Map **floors = malloc(sizeof(Map *) * EPISODE_N_FLOORS);
+        if (floors == NULL) {
+            TRT_error("EditorMenu createFiles", "Malloc failed for floors", true);
+            return;
+        }
 
         for (uint8_t i = 0; i < EPISODE_N_FLOORS; ++i) {
             Map *map = malloc(sizeof(Map));
+            if (map == NULL) {
+                TRT_error("EditorMenu createFiles", "Malloc failed for map", true);
+                return;
+            }
 
             map->width = 64;
             map->height = 64;
             map->walls = malloc(map->width * map->height * sizeof(Wall));
+            if (map->walls == NULL) {
+                TRT_error("EditorMenu createFiles", "Malloc failed for walls", true);
+                return;
+            }
 
             for (int j = 0; j < map->width * map->height; ++j) {
                 map->walls[j] = WALL_NULL;
@@ -39,12 +51,14 @@ static void createFiles() {
             map->enemiesCount = 10;
 
             Entity *player = malloc(sizeof(Entity));
+            if (player == NULL) {
+                TRT_error("EditorMenu createFiles", "Malloc failed for player", true);
+                return;
+            }
 
             player->position = (Vec2) {32, 32};
             player->lookingAngle = 0;
-
             strcpy(player->textureName, "assets/entities/player.png");
-
             player->texture = NULL;
             player->height = 32;
             player->moveSpeed = 0.1f;
@@ -57,15 +71,21 @@ static void createFiles() {
             map->player = player;
 
             Entity **enemies = malloc(sizeof(Entity *) * map->enemiesCount);
+            if (enemies == NULL) {
+                TRT_error("EditorMenu createFiles", "Malloc failed for enemies", true);
+                return;
+            }
 
             for (int j = 0; j < map->enemiesCount; ++j) {
                 Entity *enemy = malloc(sizeof(Entity));
+                if (enemy == NULL) {
+                    TRT_error("EditorMenu createFiles", "Malloc failed for enemy", true);
+                    return;
+                }
 
                 enemy->position = (Vec2) {32, 32};
                 enemy->lookingAngle = 0;
-
                 strcpy(enemy->textureName, "assets/entities/enemy.png");
-
                 enemy->texture = NULL;
                 enemy->height = 32;
                 enemy->moveSpeed = 0.1f;
@@ -79,7 +99,6 @@ static void createFiles() {
             }
 
             map->enemies = enemies;
-
             floors[i] = map;
         }
 
@@ -103,7 +122,6 @@ static void createFiles() {
         }
 
         Episode_save(fp, &episode);
-
         fclose(fp);
     }
 }
