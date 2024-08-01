@@ -182,10 +182,10 @@ static void drawControl() {
 
 static void drawChangeView() {
     if (startingGameSize.x == 0) {
-        startingGameSize = gameGetSize();
+        startingGameSize = Game_getSize();
     }
 
-    gameDrawFrame(startingGameSize);
+    Game_drawFrame(startingGameSize);
 
     TRT_text_draw("Use arrows to size\nENTER to accept\nESC to cancel",
                   (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_START},
@@ -300,7 +300,7 @@ static void episodesKeyboardCallback(uint32_t key) {
 
     if (key == 13) {
         TRT_animation_startFade();
-        gameSetEpisode(currentSelectedEpisode);
+        Game_setEpisode(currentSelectedEpisode);
         editormenu_currentRenderer = 7;
     }
 }
@@ -334,7 +334,7 @@ static void changeViewKeyboardCallback(uint32_t key) {
             }
             break;
         case 13:
-            gameSetSize(startingGameSize);
+            Game_setSize(startingGameSize);
             startingGameSize.x = 0;
 
             TRT_animation_startFade();
@@ -375,7 +375,7 @@ static void difficultyKeyboardCallback(uint32_t key) {
             break;
         case 13:
             TRT_animation_startFade();
-            gameSetDifficulty(currentSelectedDifficulty);
+            Game_setDifficulty(currentSelectedDifficulty);
             startNewGame = true;
             break;
     }
