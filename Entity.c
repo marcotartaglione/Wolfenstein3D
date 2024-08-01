@@ -3,15 +3,18 @@
 //
 
 #include "Entity.h"
+#include <stdio.h>
 
 Entity *Entity_get(FILE *fp) {
     if (fp == NULL) {
         TRT_error("Entity_get", "File pointer is NULL", true);
+        return NULL;
     }
 
     Entity *entity = malloc(sizeof(Entity));
     if (entity == NULL) {
         TRT_error("Entity_get", "Could not allocate memory for entity", true);
+        return NULL;
     }
 
     fread(&entity->position, sizeof(Vec2), 1, fp);
@@ -19,7 +22,8 @@ Entity *Entity_get(FILE *fp) {
 
     uint64_t textureNameLength;
     fread(&textureNameLength, sizeof(uint64_t), 1, fp);
-    fread(entity->textureName, sizeof(char), textureNameLength, fp);
+    fread_s(entity->textureName, 512, sizeof(char), textureNameLength, fp);
+    entity->textureName[textureNameLength] = '\0';
 
     entity->texture = TRT_image_get(entity->textureName);
 
@@ -34,12 +38,14 @@ Entity *Entity_get(FILE *fp) {
     return entity;
 }
 
-void *Entity_save(FILE *fp, Entity *entity) {
+void Entity_save(FILE *fp, Entity *entity) {
     if (fp == NULL) {
         TRT_error("Entity_save", "File pointer is NULL", true);
+        return;
     }
     if (entity == NULL) {
         TRT_error("Entity_save", "Entity is NULL", true);
+        return;
     }
 
     fwrite(&entity->position, sizeof(Vec2), 1, fp);
@@ -61,6 +67,7 @@ void *Entity_save(FILE *fp, Entity *entity) {
 void Entity_free(Entity *entity) {
     if (entity == NULL) {
         TRT_error("Entity_free", "Entity is NULL", true);
+        return;
     }
 
     if (entity->texture == NULL) {

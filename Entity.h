@@ -39,7 +39,7 @@ typedef struct {
 
 Entity *Entity_get(FILE *fp);
 
-void *Entity_save(FILE *fp, Entity *entity);
+void Entity_save(FILE *fp, Entity *entity);
 
 void Entity_free(Entity *entity);
 

@@ -7,11 +7,13 @@
 Map *Map_get(FILE *fp) {
     if (fp == NULL) {
         TRT_error("Map_get", "File pointer is NULL", true);
+        return NULL;
     }
 
     Map *map = malloc(sizeof(Map));
     if (map == NULL) {
         TRT_error("Map_get", "Malloc failed for map", true);
+        return NULL;
     }
 
     fread(&map->width, sizeof(uint16_t), 1, fp);
@@ -21,6 +23,7 @@ Map *Map_get(FILE *fp) {
     if (map->walls == NULL) {
         free(map);
         TRT_error("Map_get", "Malloc failed for map walls", true);
+        return NULL;
     }
 
     fread(map->walls, sizeof(Wall), map->width * map->height, fp);
@@ -31,6 +34,7 @@ Map *Map_get(FILE *fp) {
         free(map->walls);
         free(map);
         TRT_error("Map_get", "Could not retreave player data", true);
+        return NULL;
     }
 
     map->enemies = malloc(sizeof(Entity *) * map->enemiesCount);
@@ -39,6 +43,7 @@ Map *Map_get(FILE *fp) {
         free(map->walls);
         free(map);
         TRT_error("Map_get", "Malloc failed for map enemies", true);
+        return NULL;
     }
 
     for (uint32_t i = 0; i < map->enemiesCount; ++i) {
@@ -52,6 +57,7 @@ Map *Map_get(FILE *fp) {
             free(map->walls);
             free(map);
             TRT_error("Map_get", "Could not retreave map enemies", true);
+            return NULL;
         }
     }
 
@@ -61,9 +67,11 @@ Map *Map_get(FILE *fp) {
 void Map_save(FILE *fp, Map *map) {
     if (fp == NULL) {
         TRT_error("Map_save", "File pointer is NULL", true);
+        return;
     }
     if (map == NULL) {
         TRT_error("Map_save", "Map is NULL", true);
+        return;
     }
 
     fwrite(&map->width, sizeof(uint16_t), 1, fp);

@@ -7,13 +7,6 @@
 Episode *episodes[EPISODES_COUNT];
 
 static void readTitle(Episode* episode, FILE *fp) {
-    if (fp == NULL) {
-        TRT_error("readTitle", "File is NULL", true);
-    }
-    if (episode == NULL) {
-        TRT_error("readTitle", "Episode is NULL", true);
-    }
-
     uint64_t titleLength;
     fread(&titleLength, sizeof(uint64_t), 1, fp);
     fread(episode->title, sizeof(char), titleLength, fp);
@@ -21,33 +14,18 @@ static void readTitle(Episode* episode, FILE *fp) {
 }
 
 static void readThumbnail(Episode* episode, FILE *fp) {
-    if (fp == NULL) {
-        TRT_error("readThumbnail", "File is NULL", true);
-    }
-    if (episode == NULL) {
-        TRT_error("readThumbnail", "Episode is NULL", true);
-    }
-
     uint64_t thumbnailLength;
-
     fread(&thumbnailLength, sizeof(uint64_t), 1, fp);
     fread(&episode->thumbnailPath, sizeof(char), thumbnailLength, fp);
     episode->thumbnailPath[thumbnailLength] = '\0';
-
     episode->thumbnail = TRT_image_get(episode->thumbnailPath);
 }
 
 static void loadFloors(Episode* episode, FILE *fp) {
-    if (fp == NULL) {
-        TRT_error("loadFloors", "File is NULL", true);
-    }
-    if (episode == NULL) {
-        TRT_error("loadFloors", "Episode is NULL", true);
-    }
-
     episode->floors = malloc(sizeof(Map*) * EPISODE_N_FLOORS);
     if (episode->floors == NULL) {
         TRT_error("loadFloors", "Memory allocation failed", true);
+        return;
     }
 
     for (uint16_t i = 0; i < EPISODE_N_FLOORS; ++i) {
@@ -58,11 +36,13 @@ static void loadFloors(Episode* episode, FILE *fp) {
 Episode *Episode_get(FILE *fp) {
     if (fp == NULL) {
         TRT_error("Episode_get", "File is NULL", true);
+        return NULL;
     }
 
     Episode *episode = malloc(sizeof(Episode));
     if (episode == NULL) {
         TRT_error("Episode_get", "Memory allocation failed", true);
+        return NULL;
     }
 
     readTitle(episode, fp);
@@ -75,9 +55,11 @@ Episode *Episode_get(FILE *fp) {
 void Episode_save(FILE *fp, Episode *episode) {
     if (fp == NULL) {
         TRT_error("Episode_save", "File is NULL", true);
+        return;
     }
     if (episode == NULL) {
         TRT_error("Episode_save", "Episode is NULL", true);
+        return;
     }
 
     uint64_t titleLength = strlen(episode->title);
@@ -96,6 +78,7 @@ void Episode_save(FILE *fp, Episode *episode) {
 void Episode_free(Episode *episode) {
     if (episode == NULL) {
         TRT_error("Episode_free", "Episode is NULL", true);
+        return;
     }
 
     TRT_image_free(episode->thumbnail);
