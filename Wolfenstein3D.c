@@ -130,7 +130,10 @@ void loadEpisodes() {
 
         FILE *fp = fopen(path, "rb");
         if (fp == NULL) {
-            TRT_error("Wolfenstein3D.c", "Invalid episode path while loading", true);
+            char error[512];
+            snprintf(error, sizeof(error), "Invalid episode path while loading: %s", path);
+
+            TRT_error("Wolfenstein3D.c", error, true);
             continue;
         }
 
