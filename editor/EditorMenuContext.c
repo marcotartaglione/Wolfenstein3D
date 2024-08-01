@@ -96,7 +96,11 @@ static void createFiles() {
 
         FILE *fp;
         snprintf(path, 512, "assets/episode/%d/episode.data", k + 1);
-        fp = fopen(path, "wb");
+
+        if (fopen_s(&fp, path, "wb") != 0) {
+            TRT_error("EditorMenuContext.c", "Error creating episode file", true);
+            continue;
+        }
 
         Episode_save(fp, &episode);
 

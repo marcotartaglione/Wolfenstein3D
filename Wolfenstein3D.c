@@ -131,6 +131,7 @@ void loadEpisodes() {
         FILE *fp = fopen(path, "rb");
         if (fp == NULL) {
             TRT_error("Wolfenstein3D.c", "Invalid episode path while loading", true);
+            continue;
         }
 
         Episode *current = Episode_get(fp);

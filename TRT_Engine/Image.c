@@ -11,6 +11,7 @@ Image *TRT_image_get(char *path) {
 
     FILE *fp;
     if (fopen_s(&fp, path, "r") != 0) {
+        TRT_error("TRT_image_get", "File not found", false);
         return NULL;
     }
     fclose(fp);

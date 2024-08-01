@@ -18,12 +18,12 @@ static void saveEpisode() {
     char path[128];
     snprintf(path, 128, "assets/episode/%d/episode.data", selectedEpisode + 1);
 
-    int temp = fopen_s(&fp, path, "wb");
 
-    if (temp != 0) {
+    if (fopen_s(&fp, path, "wb") != 0) {
         char error[256];
         snprintf(error, 256, "%s %s", "Could not open the episode.data file. This path could be missing:", path);
         TRT_error("Save Episode", error, false);
+        return;
     }
 
     Episode_save(fp, episodes[selectedEpisode]);

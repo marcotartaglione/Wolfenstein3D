@@ -192,8 +192,9 @@ void TRT_error(char *title, char *text, bool close) {
 }
 
 void TRT_error_setLogFile(char *path) {
-    fclose(errorLogFile);
-    errno_t temp = fopen_s(&errorLogFile, path, "w");
+    if (errorLogFile != NULL)
+        fclose(errorLogFile);
+    fopen_s(&errorLogFile, path, "w");
 }
 
 void TRT_debug_set(bool debug) {
