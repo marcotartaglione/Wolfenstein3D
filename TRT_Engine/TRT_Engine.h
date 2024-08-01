@@ -141,6 +141,8 @@ void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, T
 //
 // Math
 //
+#define PI (3.14159265358979323846)
+
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 #define MAX(x, y) (x > y ? x : y)
 #define MIN(x, y) (x < y ? x : y)
