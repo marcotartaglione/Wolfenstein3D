@@ -1,6 +1,9 @@
 #include "Wolfenstein3D.h"
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PSTR lpCmdLine, _In_ int nCmdShow) {
+    loadEpisodes();
+    loadWallTextures();
+
     TRT_text_loadFont(FONT_DIRECTORY);
     TRT_text_setBackgroundColor(FONT_BG_COLOR);
 
@@ -36,14 +39,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         contexts[1] = optionsContext;
         contexts[2] = gameContext;
 
+        // FIXME - This is a temporary solution
+        currentContext = 2;
+
         contextsCount = 3;
     }
 
     if (!activateCurrentContext())
         return 0;
-
-    loadEpisodes();
-    loadWallTextures();
 
     TRT_window_run(GAME_TARGET_FPS, loop, close);
 
