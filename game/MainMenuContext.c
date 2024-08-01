@@ -43,11 +43,14 @@ void mainMenuContextInit() {
     }
 }
 
-bool mainMenuContextLoop() {
+LoopResult mainMenuContextLoop() {
     if (!TRT_animation_isFading())
-        renderers[currentRenderer]();
+        editormenu_renderers[editormenu_currentRenderer]();
 
-    return close;
+    if (close)
+        return LOOP_RESULT_NEXT;
+
+    return LOOP_RESULT_IDLE;
 }
 
 void mainMenuContextClose() {
@@ -57,9 +60,9 @@ void mainMenuContextClose() {
 
 void mainMenuKeyboardCallback(uint32_t key) {
     if(TRT_animation_startFade())
-        currentRenderer++;
+        editormenu_currentRenderer++;
 
-    if (currentRenderer == renderersCount)
+    if (editormenu_currentRenderer == editormenu_renderersCount)
         close = true;
 }
 

@@ -23,7 +23,7 @@ static bool close = false;
 //
 void mainMenuContextInit();
 
-bool mainMenuContextLoop();
+LoopResult mainMenuContextLoop();
 
 void mainMenuContextClose();
 
@@ -50,8 +50,8 @@ static void renderTitleScreen();
 //
 // Frame management
 //
-static uint32_t currentRenderer = 0;
-static uint32_t renderersCount = 3;
-static void (*renderers[])() = {renderAttentionScreen, renderRatingScreen, renderTitleScreen,};
+static uint32_t editormenu_currentRenderer = 0;
+static uint32_t editormenu_renderersCount = 3;
+static void (*editormenu_renderers[])() = {renderAttentionScreen, renderRatingScreen, renderTitleScreen,};
 
 #endif //WOLFENSTEIN3D_MAINMENUCONTEXT_H

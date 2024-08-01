@@ -11,7 +11,7 @@
 static bool startNewGame = false;
 
 void optionsContextInit();
-bool optionsContextLoop();
+LoopResult optionsContextLoop();
 void optionsContextClose();
 
 void optionsContextKeyboardCallback(uint32_t key);
@@ -35,8 +35,8 @@ static void drawReadThis();
 static void drawShowScores();
 static void drawDifficiculty();
 
-static uint8_t currentRenderer = 0;
-static void (*renderers[])() = {
+static uint8_t editormenu_currentRenderer = 0;
+static void (*editormenu_renderers[])() = {
         drawOptions,
         drawEpisodes,
         drawSound,
@@ -56,7 +56,7 @@ static void readThisKeyboardCallback(uint32_t key);
 static void showScoresKeyboardCallback(uint32_t key);
 static void difficultyKeyboardCallback(uint32_t key);
 
-static void (*keyboardCallbacks[])(uint32_t key) = {
+static void (*editormenu_keyboardCallbacks[])(uint32_t key) = {
         optionsKeyboardCallback,
         episodesKeyboardCallback,
         soundKeyboardCallback,
@@ -69,12 +69,9 @@ static void (*keyboardCallbacks[])(uint32_t key) = {
 
 #include "GameContext.h"
 
-#define OPTIONS_QUIT_FONT_COLOR         (0x0)
 #define OPTIONS_TITLE_IMAGE             ("assets/hud/options/title.png")
 #define OPTIONS_GUN_IMAGE               ("assets/hud/options/gun.png")
-#define OPTIONS_QUIT_IMAGE              ("assets/hud/options/quit.png")
 #define OPTIONS_BACKGROUND_IMAGE        ("assets/hud/options/background.png")
-#define OPTIONS_CONTROLS_IMAGE          ("assets/hud/options/controls.png")
 #define OPTIONS_SCREEN_IMAGE_Y_OFFSET   (6)
 
 #define EPISODES_TITLE_COLOR            (0xFBF82B)

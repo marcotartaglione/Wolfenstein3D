@@ -17,11 +17,11 @@ void gameContextInit() {
     }
 }
 
-bool gameContextLoop() {
+LoopResult gameContextLoop() {
     gameDrawFrame(gameSize);
     gameDrawHUD();
 
-    return false;
+    return LOOP_RESULT_IDLE;
 }
 
 void gameContextClose() {

@@ -23,12 +23,12 @@ void optionsContextInit() {
         exit(EXIT_FAILURE);
     }
 
-    quitBackground = TRT_image_get(OPTIONS_QUIT_IMAGE);
+    quitBackground = TRT_image_get(QUIT_IMAGE);
     if (quitBackground == NULL) {
         exit(EXIT_FAILURE);
     }
 
-    controls = TRT_image_get(OPTIONS_CONTROLS_IMAGE);
+    controls = TRT_image_get(CONTROLS_IMAGE);
     if (controls == NULL) {
         exit(EXIT_FAILURE);
     }
@@ -47,12 +47,16 @@ void optionsContextInit() {
     }
 }
 
-bool optionsContextLoop() {
+LoopResult optionsContextLoop() {
     if (TRT_animation_isFading())
-        return false;
+        return LOOP_RESULT_IDLE;
 
-    renderers[currentRenderer]();
-    return startNewGame;
+    editormenu_renderers[editormenu_currentRenderer]();
+
+    if (startNewGame) {
+        return LOOP_RESULT_NEXT;
+    }
+    return LOOP_RESULT_IDLE;
 }
 
 void optionsContextClose() {
@@ -68,12 +72,12 @@ void optionsContextClose() {
 }
 
 void optionsContextKeyboardCallback(uint32_t key) {
-    keyboardCallbacks[currentRenderer](key);
+    editormenu_keyboardCallbacks[editormenu_currentRenderer](key);
 
     if (key == 27) { // ESC
         TRT_animation_startFade();
         currentSelectedOption = 0;
-        currentRenderer = 0;
+        editormenu_currentRenderer = 0;
         return;
     }
 }
@@ -98,7 +102,7 @@ static void drawQuitMessage() {
     TRT_text_draw(quitStrings[currentQuitMessage],
                   (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
                   FONT_HEIGHT,
-                  OPTIONS_QUIT_FONT_COLOR,
+                  QUIT_FONT_COLOR,
                   TEXT_ALIGN_CENTER);
 }
 
@@ -259,10 +263,10 @@ static void optionsKeyboardCallback(uint32_t key) {
 
             switch (currentSelectedOption) {
                 case 0:
-                    currentRenderer = 1;
+                    editormenu_currentRenderer = 1;
                     break;
                 case 5:
-                    currentRenderer = 4;
+                    editormenu_currentRenderer = 4;
                     break;
                 case 8:
                     showQuitMessage = true;
@@ -297,7 +301,7 @@ static void episodesKeyboardCallback(uint32_t key) {
     if (key == 13) {
         TRT_animation_startFade();
         gameSetEpisode(currentSelectedEpisode);
-        currentRenderer = 7;
+        editormenu_currentRenderer = 7;
     }
 }
 
@@ -334,7 +338,7 @@ static void changeViewKeyboardCallback(uint32_t key) {
             startingGameSize.x = 0;
 
             TRT_animation_startFade();
-            currentRenderer = 0;
+            editormenu_currentRenderer = 0;
 
             break;
         case 27:

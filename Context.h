@@ -6,10 +6,11 @@
 #define WOLFENSTEIN3D_CONTEXT_H
 
 #include "TRT_Engine.h"
+#include "Commons.h"
 
 typedef struct WolfensteinContext {
     void (*init)();
-    bool (*loop)();
+    LoopResult (*loop)();
     void (*keyboardCallback)(uint32_t);
     void (*mouseCallback)(Click, uint32_t, uint32_t);
     void (*close)();

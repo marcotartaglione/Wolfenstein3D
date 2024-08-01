@@ -24,7 +24,7 @@ static uint8_t difficulty = 0;
 
 void gameContextInit();
 
-bool gameContextLoop();
+LoopResult gameContextLoop();
 
 void gameContextClose();
 

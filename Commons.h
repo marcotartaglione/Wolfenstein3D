@@ -11,6 +11,10 @@
 #define FONT_DIRECTORY  ("assets/font/")
 #define FONT_COLOR      (0xBCBCBC)
 
+#define QUIT_FONT_COLOR         (0x0)
+#define QUIT_IMAGE              ("assets/hud/options/quit.png")
+#define CONTROLS_IMAGE          ("assets/hud/options/controls.png")
+
 #define MAIN_BACKGROUND_COLOR           (0x74180A)
 
 #define HEADER_LINE_Y_OFFSET            (10)
@@ -46,5 +50,13 @@ static void drawHeaderLine() {
                              HEADER_LINE_BACKGROUND_COLOR,
                              true);
 }
+
+typedef enum {
+    LOOP_RESULT_IDLE,
+    LOOP_RESULT_NEXT,
+    LOOP_RESULT_PREVIOUS,
+    LOOP_RESULT_END,
+    LOOP_RESULT_SPECIED
+} LoopResult;
 
 #endif //WOLFENSTEIN3D_COMMONS_H
