@@ -52,6 +52,7 @@ void Entity_save(FILE *fp, Entity *entity) {
     fwrite(&entity->lookingAngle, sizeof(float), 1, fp);
 
     uint64_t len = strlen(entity->textureName);
+
     fwrite(&len, sizeof(uint64_t), 1, fp);
     fwrite(entity->textureName, sizeof(char), len, fp);
 
