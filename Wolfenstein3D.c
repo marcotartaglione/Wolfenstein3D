@@ -10,6 +10,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 
     TRT_animation_setFadeTime(FADE_TIME);
 
+    TRT_debug_set(true);
+    TRT_error_setLogFile(ERROR_LOG_FILE);
+
     TRT_window_setup(
             hInstance,
             "Wolfenstein 3D"
@@ -21,13 +24,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
             (Vec2) {-1, -1}
     );
 
-    contexts[0] = mainMenuContext;
-    contexts[1] = optionsContext;
-    contexts[2] = gameContext;
+    isEditor = strcmp(lpCmdLine, "-editor") == 0;
 
-    activateCurrentContext();
+    if (isEditor) {
+        contexts[0] = editorMenuContext;
+        contexts[1] = editorContext;
+
+        contextsCount = 2;
+    } else {
+        contexts[0] = mainMenuContext;
+        contexts[1] = optionsContext;
+        contexts[2] = gameContext;
+
+        contextsCount = 3;
+    }
+
+    if (!activateCurrentContext())
+        return 0;
 
     loadEpisodes();
+    loadWallTextures();
 
     TRT_window_run(GAME_TARGET_FPS, loop, close);
 
@@ -35,34 +51,104 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine,
 }
 
 void loop() {
-    if (contexts[currentContext].loop()) {
-        deactivateCurrentContext();
-        activateCurrentContext();
+    LoopResult loopResult = contexts[currentContext].loop();
+
+    if (loopResult >= LOOP_RESULT_SPECIED) {
+        currentContext = loopResult - LOOP_RESULT_SPECIED;
+        return;
     }
+
+    switch (loopResult) {
+        case LOOP_RESULT_IDLE:
+            return;
+        case LOOP_RESULT_NEXT:
+            if (!deactivateCurrentContext()) {
+                lastContext = currentContext;
+                currentContext++;
+                activateCurrentContext();
+                return;
+            }
+        case LOOP_RESULT_PREVIOUS:
+            deactivateCurrentContext();
+            uint8_t temp = currentContext;
+            currentContext = lastContext;
+            lastContext = temp;
+
+            activateCurrentContext();
+            return;
+        case LOOP_RESULT_END:
+            break;
+        default:
+            return;
+    }
+
+    TRT_window_close();
 }
 
 void close() {
-    for(uint8_t i = 0; i < EPISODES_COUNT; i++) {
-        free(episodes[i]);
+    for (uint8_t i = 0; i < EPISODES_COUNT; i++) {
+        if (episodes[i] == NULL) {
+            TRT_error("Wolfenstein3D.c",
+                      "NULL value found in the array of episodes during closure. This should not happen", false);
+            continue;
+        }
+
+        Episode_free(episodes[i]);
+    }
+    for (uint8_t i = 0; i < WALL_NUMBER; ++i) {
+        if (wallTextures[i] == NULL) {
+            TRT_error("Wolfenstein3D.c",
+                      "NULL value found in the array of wall textures during closure. This should not happen", false);
+            continue;
+        }
+
+        TRT_image_free(wallTextures[i]);
     }
 }
 
-void activateCurrentContext() {
+bool activateCurrentContext() {
+    if (currentContext == contextsCount) {
+        return false;
+    }
+
     contexts[currentContext].init();
     TRT_input_setKeyCallback(contexts[currentContext].keyboardCallback);
     TRT_input_setMouseCallback(contexts[currentContext].mouseCallback);
+
+    return true;
 }
 
-void deactivateCurrentContext() {
+bool deactivateCurrentContext() {
     contexts[currentContext].close();
-    currentContext++;
+    return currentContext == contextsCount - 1;
 }
 
 void loadEpisodes() {
-    for(uint8_t i = 0; i < EPISODES_COUNT; i++) {
+    for (uint8_t i = 0; i < EPISODES_COUNT; i++) {
         char path[256];
-        snprintf(path, sizeof(path), "%s%d", EPISODES_MAIN_FOLDER, i + 1);
-        Episode *current = Episode_get(path);
+        snprintf(path, sizeof(path), "%s%d/episode.data", EPISODES_MAIN_FOLDER, i + 1);
+
+        FILE *fp = fopen(path, "rb");
+        if (fp == NULL) {
+            TRT_error("Wolfenstein3D.c", "Invalid episode path while loading", true);
+        }
+
+        Episode *current = Episode_get(fp);
         episodes[i] = current;
+
+        fclose(fp);
+    }
+}
+
+void loadWallTextures() {
+    for (Wall i = 0; i < WALL_NUMBER; i++) {
+        char path[256];
+        snprintf(path, sizeof(path), "%s%s.png", WALL_TEXTURES_FOLDER, Wall_toString(i));
+
+        wallTextures[i] = TRT_image_get(path);
+
+        if (wallTextures[i] == NULL) {
+            TRT_error("Wolfenstein3D.c", "NULL value insiede loadWallTextures function", true);
+        }
     }
 }
