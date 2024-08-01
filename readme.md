@@ -20,13 +20,14 @@ The game was made using the C programming language with the support, for graphic
 The game is not yet finished and is not playable. The game is still in development and there are some features to be implemented and bugs to be fixed.
 
 ## How to compile
-To compile the game, you must have the Cmake installed on your computer. After that, you can run the following commands on the root directory of the project:
+To compile the game, you must have the Cmake installed on your computer. You can download it [here](https://cmake.org/download/). Now, to compile the game, you must run the following commands in order:
 
-```cmake CMakeLists.txt```
+- `mkdir build` - Create a build directory
+- `cd build` - Enter the build directory
+- `cmake ..` - Generate the build files
+- `cmake --build .` - Build the game
 
-The command above will generate the executable file of the game. To run the game, you can use the following command:
-
-```Wolfenstein3D.exe``` or just double-click on the executable file.
+The commands above will generate the executable file of the game in the location `build\build\Debug`. In order to execute it, you must run the `Wolfenstein3D.exe` file.
 
 ## License
 GNU General Public License v3.0
