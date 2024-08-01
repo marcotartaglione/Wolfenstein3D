@@ -157,7 +157,7 @@ static void drawChooseEpisode() {
 
     TRT_image_draw(controls,
                    (Vec2) {ELEMENT_ALIGN_CENTER, 0},
-                   (Vec2) (Vec2) {102, 7});
+                   (Vec2) {102, 7});
 
     for (uint8_t i = 0; i < EPISODES_COUNT; i++) {
         char text[128];
@@ -184,7 +184,7 @@ static void drawChooseFloor() {
 
     TRT_image_draw(controls,
                    (Vec2) {ELEMENT_ALIGN_CENTER, 0},
-                   (Vec2) (Vec2) {102, 7});
+                   (Vec2) {102, 7});
 
     char text[255];
     text[0] = '\0';
