@@ -11,7 +11,7 @@
 #include "../Episodes.h"
 #include "EditorContext.h"
 
-#define EDITOR_TITLE_PATH ("assets/hud/editor/title.png")
+#define EDITOR_TITLE_PATH ("./assets/hud/editor/title.png")
 
 static Image* title;
 static Image* controls;

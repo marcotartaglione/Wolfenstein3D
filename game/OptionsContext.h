@@ -69,9 +69,9 @@ static void (*editormenu_keyboardCallbacks[])(uint32_t key) = {
 
 #include "GameContext.h"
 
-#define OPTIONS_TITLE_IMAGE             ("assets/hud/options/title.png")
-#define OPTIONS_GUN_IMAGE               ("assets/hud/options/gun.png")
-#define OPTIONS_BACKGROUND_IMAGE        ("assets/hud/options/background.png")
+#define OPTIONS_TITLE_IMAGE             ("./assets/hud/options/title.png")
+#define OPTIONS_GUN_IMAGE               ("./assets/hud/options/gun.png")
+#define OPTIONS_BACKGROUND_IMAGE        ("./assets/hud/options/background.png")
 #define OPTIONS_SCREEN_IMAGE_Y_OFFSET   (6)
 
 #define EPISODES_TITLE_COLOR            (0xFBF82B)
@@ -92,7 +92,7 @@ static uint32_t currentSelectedEpisode = 0;
 #define DIFFICULTY_TITLE_OFFSET_TOP         (68)
 #define DIFFICULTY_BACKGROUND_OFFSET_TOP    (DIFFICULTY_TITLE_OFFSET_TOP + 79 + 11)
 #define DIFFICULTY_CONTENT_OFFSET_TOP       (101)
-#define DIFFICULTY_IMAGE_FOLDER             ("assets/hud/difficulty/")
+#define DIFFICULTY_IMAGE_FOLDER             ("./assets/hud/difficulty/")
 #define DIFFICULTY_IMAGE_OFFSET_RIGHT       (88)
 #define DIFFICULTY_IMAGE_OFFSET_TOP         (DIFFICULTY_BACKGROUND_OFFSET_TOP - 20)
 

@@ -5,15 +5,15 @@
 #ifndef WOLFENSTEIN3D_COMMONS_H
 #define WOLFENSTEIN3D_COMMONS_H
 
-#define ERROR_LOG_FILE  ("error.log")
+#define ERROR_LOG_FILE  ("./error.log")
 
 #define FONT_BG_COLOR   (0xF00000)
-#define FONT_DIRECTORY  ("assets/font/")
+#define FONT_DIRECTORY  ("./assets/font/")
 #define FONT_COLOR      (0xBCBCBC)
 
 #define QUIT_FONT_COLOR         (0x0)
-#define QUIT_IMAGE              ("assets/hud/options/quit.png")
-#define CONTROLS_IMAGE          ("assets/hud/options/controls.png")
+#define QUIT_IMAGE              ("./assets/hud/options/quit.png")
+#define CONTROLS_IMAGE          ("./assets/hud/options/controls.png")
 
 #define MAIN_BACKGROUND_COLOR           (0x74180A)
 
@@ -28,12 +28,12 @@
 
 #define FADE_TIME               (500)
 
-#define EPISODES_MAIN_FOLDER    ("assets/episode/")
+#define EPISODES_MAIN_FOLDER    ("./assets/episode/")
 #define EPISODES_COUNT          (6)
 
 #define DIFFICULTY_COUNT        (4)
 
-#define WALL_TEXTURES_FOLDER    ("assets/textures/walls/")
+#define WALL_TEXTURES_FOLDER    ("./assets/textures/walls/")
 
 static void drawHeaderLine() {
     Vec2 windowSize = TRT_window_getSize();

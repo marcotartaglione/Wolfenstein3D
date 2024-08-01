@@ -9,8 +9,8 @@
 #include "../Context.h"
 
 #define ATTENTION_SCREEN_TITLE_FONT_COLOR   (0xFBF82B)
-#define MAIN_MENU_OPEN_IMAGE                ("assets/hud/mainmenu/open.png")
-#define MAIN_MENU_RATING_IMAGE              ("assets/hud/mainmenu/rating.png")
+#define MAIN_MENU_OPEN_IMAGE                ("./assets/hud/mainmenu/open.png")
+#define MAIN_MENU_RATING_IMAGE              ("./assets/hud/mainmenu/rating.png")
 #define MAIN_MENU_FONT_COLOR                (0xBCBCBC)
 
 static Image *openScreen;

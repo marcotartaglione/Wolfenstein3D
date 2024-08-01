@@ -48,7 +48,7 @@ void gameSetDifficulty(uint8_t newDifficulty);
 
 static void gameDrawHUD();
 
-#define GAME_HUD_PLAYER_STATS_IMAGE ("assets/hud/stats/playerStats.png")
+#define GAME_HUD_PLAYER_STATS_IMAGE ("./assets/hud/stats/playerStats.png")
 #define GAME_HUD_SIZE               (Vec2) {320, 40}
 #define GAME_HUD_OFFSET_BOTTOM      (5)
 
