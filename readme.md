@@ -39,7 +39,7 @@ The project is currently in development and is not yet finished. The game is __n
 The ```Wolfenstein3D.exe``` also contains a map editor that can be used to modify the maps in the game.
 
 ### How to start the editor
-In order to start the editor, you must run the following command: ```Wolfenstein3D.exe -editor```
+In order to start the editor, you must run the following command: ```Wolfenstein3D.exe --editor```
 
 ### Choose a map and a floor
 Once the editor is started, you can choose an apisode to edit by pressing the `ARROW UP` and `ARROW DOWN` keys and then pressing `ENTER`. 
