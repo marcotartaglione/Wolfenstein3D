@@ -19,6 +19,10 @@ typedef struct Vec2 {
     int32_t x, y;
 } Vec2;
 
+typedef struct Vec2f {
+    float x, y;
+} Vec2f;
+
 typedef enum {
     false = 0,
     true = 1
