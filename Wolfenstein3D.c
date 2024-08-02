@@ -1,6 +1,9 @@
 #include "Wolfenstein3D.h"
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PSTR lpCmdLine, _In_ int nCmdShow) {
+    TRT_debug_set(true);
+    TRT_error_setLogFile(ERROR_LOG_FILE);
+
     loadEpisodes();
     loadWallTextures();
 
@@ -12,9 +15,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     TRT_text_setSpaceWidth(FONT_SPACE_WIDTH);
 
     TRT_animation_setFadeTime(FADE_TIME);
-
-    TRT_debug_set(true);
-    TRT_error_setLogFile(ERROR_LOG_FILE);
 
     TRT_window_setup(
             hInstance,
