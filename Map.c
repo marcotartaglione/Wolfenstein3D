@@ -103,7 +103,10 @@ void Map_free(Map *map) {
     free(map->walls);
     Entity_free(map->player);
 
-    for(uint32_t i = 0; i < map->enemiesCountPerDifficulty; ++i) {
+    uint32_t totalEnemies = 0;
+    for(uint8_t i = 0; i < DIFFICULTY_COUNT; i++) totalEnemies += map->enemiesCountPerDifficulty[i];
+
+    for(uint32_t i = 0; i < totalEnemies; ++i) {
         Entity_free(map->enemies[i]);
     }
 
