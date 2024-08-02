@@ -115,24 +115,24 @@ static void Game_drawPlayerView() {
 }
 
 static void Game_drawTextureColumn(int column, float hitPerc, float distance, Wall wall) {
-    int wallHeight = (int) ((float) gameSize.y / distance);
-    int offset = (wallHeight != gameSize.y) ? (int) ((gameSize.y - wallHeight) * 0.5) : 0;
+    const int32_t wallHeight = (int) ((float) gameSize.y / distance);
+    const int32_t offset = (wallHeight != gameSize.y) ? ROUND((gameSize.y - wallHeight) * 0.5) : 0;
 
-    float heightStep = (float) wallHeight / (float) wallTextures[wall]->height;
-    float widthOffset = (float) wallTextures[wall]->width * hitPerc;
+    const float heightStep = (float) wallHeight / (float) wallTextures[wall]->height;
+    const float widthOffset = (float) wallTextures[wall]->width * hitPerc;
 
-    Vec2 windowSize = TRT_window_getSize();
-    int offsetLeft = (windowSize.x - gameSize.x) / 2;
+    const Vec2 windowSize = TRT_window_getSize();
+    const int offsetLeft = (windowSize.x - gameSize.x) / 2;
 
     for (int i = -MIN(0, offset); i < gameSize.y - offset; ++i) {
-        int textureIndex = (int) ((float) i / heightStep);
+        const int textureIndex = (int) ((float) i / heightStep);
         if (textureIndex >= wallTextures[wall]->height - 2)
             break;
 
-        int textureDataIndex = ((int) widthOffset + textureIndex * wallTextures[wall]->width) * 3;
-        uint32_t r = wallTextures[wall]->data[textureDataIndex] << 16;
-        uint32_t g = wallTextures[wall]->data[textureDataIndex + 1] << 8;
-        uint32_t b = wallTextures[wall]->data[textureDataIndex + 2];
+        const int textureDataIndex = ((int) widthOffset + textureIndex * wallTextures[wall]->width) * 3;
+        const uint32_t r = wallTextures[wall]->data[textureDataIndex] << 16;
+        const uint32_t g = wallTextures[wall]->data[textureDataIndex + 1] << 8;
+        const uint32_t b = wallTextures[wall]->data[textureDataIndex + 2];
 
         TRT_window_setPixel(column + offsetLeft, i + offset + (TRT_window_getSize().y + GAME_FRAME_OFFSET_FROM_BOTTOM - gameSize.y) / 2, r | g | b);
     }
