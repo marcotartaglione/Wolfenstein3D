@@ -29,7 +29,7 @@
 #define FADE_TIME               (500)
 
 #define EPISODES_MAIN_FOLDER    ("./assets/episode/")
-#define EPISODES_COUNT          (6)
+#define EPISODES_COUNT          (1)
 
 #define DIFFICULTY_COUNT        (4)
 
