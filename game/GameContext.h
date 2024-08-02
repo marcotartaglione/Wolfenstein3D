@@ -9,6 +9,7 @@
 #include "../Context.h"
 #include "../Commons.h"
 #include "../Episodes.h"
+#include "EntityBehaviour.h"
 
 #define GAME_SIZE_MAX_X         (304)
 #define GAME_SIZE_MAX_Y         (154)

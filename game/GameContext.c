@@ -60,10 +60,16 @@ void Game_contextClose() {
 void Game_keyboardCallback(uint32_t key) {
     switch (key) {
         case VK_LEFT:
-            currentMap->player->lookingAngle -= currentMap->player->rotationSpeed;
+            EntityBehaviour_rotate(currentMap->player, ENTITY_ROTATE_LEFT);
             break;
         case VK_RIGHT:
-            currentMap->player->lookingAngle += currentMap->player->rotationSpeed;
+            EntityBehaviour_rotate(currentMap->player, ENTITY_ROTATE_RIGHT);
+            break;
+        case VK_UP:
+            EntityBehaviour_move(currentMap->player, currentMap, ENTITY_MOVE_FORWARD);
+            break;
+        case VK_DOWN:
+            EntityBehaviour_move(currentMap->player, currentMap, ENTITY_MOVE_BACKWARD);
             break;
         default:
             break;
@@ -124,9 +130,9 @@ static void Game_drawTextureColumn(int column, float hitPerc, float distance, Wa
             break;
 
         int textureDataIndex = ((int) widthOffset + textureIndex * wallTextures[wall]->width) * 3;
-        uint8_t r = wallTextures[wall]->data[textureDataIndex] << 16;
-        uint8_t g = wallTextures[wall]->data[textureDataIndex + 1] << 8;
-        uint8_t b = wallTextures[wall]->data[textureDataIndex + 2];
+        uint32_t r = wallTextures[wall]->data[textureDataIndex] << 16;
+        uint32_t g = wallTextures[wall]->data[textureDataIndex + 1] << 8;
+        uint32_t b = wallTextures[wall]->data[textureDataIndex + 2];
 
         TRT_window_setPixel(column + offsetLeft, i + offset + (TRT_window_getSize().y + GAME_FRAME_OFFSET_FROM_BOTTOM - gameSize.y) / 2, r | g | b);
     }
