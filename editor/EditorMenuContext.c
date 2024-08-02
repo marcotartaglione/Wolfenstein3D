@@ -48,7 +48,10 @@ static void createFiles() {
                 map->walls[j] = WALL_NULL;
             }
 
-            map->enemiesCount = 10;
+            map->enemiesCountPerDifficulty[0] = 8;
+            map->enemiesCountPerDifficulty[1] = 2;
+            map->enemiesCountPerDifficulty[2] = 2;
+            map->enemiesCountPerDifficulty[3] = 4;
 
             Entity *player = malloc(sizeof(Entity));
             if (player == NULL) {
@@ -56,7 +59,7 @@ static void createFiles() {
                 return;
             }
 
-            player->position = (Vec2) {32, 32};
+            player->position = (Vec2f) {0.0f, 0.0f};
             player->lookingAngle = 0;
             strcpy(player->textureName, "assets/entities/player.png");
             player->texture = NULL;
@@ -70,20 +73,23 @@ static void createFiles() {
 
             map->player = player;
 
-            Entity **enemies = malloc(sizeof(Entity *) * map->enemiesCount);
+            uint32_t totalEnemies = 0;
+            for (uint8_t i = 0; i < DIFFICULTY_COUNT; i++) totalEnemies += map->enemiesCountPerDifficulty[i];
+
+            Entity **enemies = malloc(sizeof(Entity *) * totalEnemies);
             if (enemies == NULL) {
                 TRT_error("EditorMenu createFiles", "Malloc failed for enemies", true);
                 return;
             }
 
-            for (int j = 0; j < map->enemiesCount; ++j) {
+            for (int j = 0; j < totalEnemies; ++j) {
                 Entity *enemy = malloc(sizeof(Entity));
                 if (enemy == NULL) {
                     TRT_error("EditorMenu createFiles", "Malloc failed for enemy", true);
                     return;
                 }
 
-                enemy->position = (Vec2) {32, 32};
+                enemy->position = (Vec2f) {0.0f, 0.0f};
                 enemy->lookingAngle = 0;
                 strcpy(enemy->textureName, "assets/entities/enemy.png");
                 enemy->texture = NULL;
@@ -127,7 +133,7 @@ static void createFiles() {
 }
 
 void editorMenuContextInit() {
-//    createFiles();
+    //createFiles();
 
     title = TRT_image_get(EDITOR_TITLE_PATH);
     if (title == NULL) {
