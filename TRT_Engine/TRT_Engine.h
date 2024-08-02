@@ -151,5 +151,6 @@ void TRT_text_draw(char *text, Vec2 position, uint32_t height, uint32_t color, T
 #define MAX(x, y) (x > y ? x : y)
 #define MIN(x, y) (x < y ? x : y)
 #define DECIMAL(x) (x - (int32_t)x)
+#define ROUND(x) ((int32_t)(x + 0.5f))
 
 #endif //WOLFENSTEIN3D_TRT_ENGINE_H
