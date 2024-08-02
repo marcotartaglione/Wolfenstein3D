@@ -27,7 +27,6 @@ Map *Map_get(FILE *fp) {
     }
 
     fread(map->walls, sizeof(Wall), map->width * map->height, fp);
-    fread(&map->enemiesCount, sizeof(uint32_t), 1, fp);
 
     map->player = Entity_get(fp);
     if (map->player == NULL) {
@@ -37,7 +36,12 @@ Map *Map_get(FILE *fp) {
         return NULL;
     }
 
-    map->enemies = malloc(sizeof(Entity *) * map->enemiesCount);
+    fread(map->enemiesCountPerDifficulty, sizeof(uint32_t), DIFFICULTY_COUNT, fp);
+
+    uint32_t totalEnemies = 0;
+    for (uint8_t i = 0; i < DIFFICULTY_COUNT; i++) totalEnemies += map->enemiesCountPerDifficulty[i];
+
+    map->enemies = malloc(sizeof(Entity *) * totalEnemies);
     if (map->enemies == NULL) {
         Entity_free(map->player);
         free(map->walls);
@@ -46,7 +50,7 @@ Map *Map_get(FILE *fp) {
         return NULL;
     }
 
-    for (uint32_t i = 0; i < map->enemiesCount; ++i) {
+    for (uint32_t i = 0; i < totalEnemies; ++i) {
         map->enemies[i] = Entity_get(fp);
         if (map->enemies[i] == NULL) {
             for (uint32_t j = 0; j < i; ++j) {
@@ -76,13 +80,16 @@ void Map_save(FILE *fp, Map *map) {
 
     fwrite(&map->width, sizeof(uint16_t), 1, fp);
     fwrite(&map->height, sizeof(uint16_t), 1, fp);
-
     fwrite(map->walls, sizeof(Wall), map->width * map->height, fp);
-    fwrite(&map->enemiesCount, sizeof(uint32_t), 1, fp);
 
     Entity_save(fp, map->player);
 
-    for (uint32_t i = 0; i < map->enemiesCount; ++i) {
+    fwrite(map->enemiesCountPerDifficulty, sizeof(uint32_t), DIFFICULTY_COUNT, fp);
+
+    uint32_t totalEnemies = 0;
+    for(uint8_t i = 0; i < DIFFICULTY_COUNT; i++) totalEnemies += map->enemiesCountPerDifficulty[i];
+
+    for (uint32_t i = 0; i < totalEnemies; ++i) {
         Entity_save(fp, map->enemies[i]);
     }
 }
@@ -96,7 +103,7 @@ void Map_free(Map *map) {
     free(map->walls);
     Entity_free(map->player);
 
-    for(uint32_t i = 0; i < map->enemiesCount; ++i) {
+    for(uint32_t i = 0; i < map->enemiesCountPerDifficulty; ++i) {
         Entity_free(map->enemies[i]);
     }
 

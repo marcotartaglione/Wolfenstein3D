@@ -15,8 +15,14 @@ typedef struct {
     uint16_t height;
     Wall *walls;
 
-    uint32_t enemiesCount;
     Entity *player;
+
+    uint32_t enemiesCountPerDifficulty[DIFFICULTY_COUNT];
+    // Es: enemiesCount per difficulty = { 4, 4, 7 }
+    // The first 4 enemies are associated with difficulty 0: enemies[0-3]
+    // The first 4 enimies and the next 4 enemies are associated with difficulty 1: enemies[0-7]
+    // The first 4, second 4 and last 7 enemies are for difficulty 2: enemies[0-14]
+
     Entity **enemies;
 } Map;
 
