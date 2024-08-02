@@ -17,7 +17,7 @@ Entity *Entity_get(FILE *fp) {
         return NULL;
     }
 
-    fread(&entity->position, sizeof(Vec2), 1, fp);
+    fread(&entity->position, sizeof(Vec2f), 1, fp);
     fread(&entity->lookingAngle, sizeof(float), 1, fp);
 
     uint64_t textureNameLength;
@@ -48,7 +48,7 @@ void Entity_save(FILE *fp, Entity *entity) {
         return;
     }
 
-    fwrite(&entity->position, sizeof(Vec2), 1, fp);
+    fwrite(&entity->position, sizeof(Vec2f), 1, fp);
     fwrite(&entity->lookingAngle, sizeof(float), 1, fp);
 
     uint64_t len = strlen(entity->textureName);

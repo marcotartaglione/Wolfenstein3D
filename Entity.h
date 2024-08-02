@@ -13,7 +13,7 @@ typedef struct {
     //
     // Position in space
     //
-    Vec2 position;
+    Vec2f position;
     float lookingAngle;
 
     //
