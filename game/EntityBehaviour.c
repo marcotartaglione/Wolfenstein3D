@@ -10,8 +10,10 @@ void EntityBehaviour_move(Entity* entity, Map* map, EntityBehaviour_Movement mov
     const float dY = sinf(entity->lookingAngle) * entity->moveSpeed * (movement == ENTITY_MOVE_BACKWARD ? -1 : 1);
     const float newX = entity->position.x + dX;
     const float newY = entity->position.y + dY;
+    const float checkX = newX + ENTITY_MIN_DISTANCE_FROM_WALL * SIGN(dX);
+    const float checkY = newY + ENTITY_MIN_DISTANCE_FROM_WALL * SIGN(dY);
 
-    int32_t wallIndex = (int32_t)newX + (int32_t)newY * map->width;
+    int32_t wallIndex = (int32_t)checkX + (int32_t)checkY * map->width;
     if (map->walls[wallIndex] != WALL_NULL)
         return;
 

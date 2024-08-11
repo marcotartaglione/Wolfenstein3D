@@ -9,6 +9,8 @@
 #include "../Entity.h"
 #include "../Map.h"
 
+#define ENTITY_MIN_DISTANCE_FROM_WALL (0.2f)
+
 typedef enum {
     ENTITY_ROTATE_LEFT,
     ENTITY_ROTATE_RIGHT
