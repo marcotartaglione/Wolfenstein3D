@@ -19,19 +19,23 @@
 #define GAME_FRAME_BACKGROUND_COLOR     (0x004141)
 #define GAME_FRAME_OFFSET_FROM_BOTTOM   (40)
 
-#define GAME_FOV_ANGLE                  (PI / 2)
+#define GAME_FOV_ANGLE      (PI / 2)
 
-static Vec2 gameSize = {GAME_SIZE_MAX_X, GAME_SIZE_MAX_Y};
+#define GAME_ROOF_COLOR     (0x383838)
+#define GAME_FLOOR_COLOR    (0x707070)
+
+static Vec2 GameContext_GameSize = {GAME_SIZE_MAX_X, GAME_SIZE_MAX_Y};
+static LoopResult GameContext_LoopResult = LOOP_RESULT_IDLE;
 
 void Game_setSize(Vec2 size);
 
 Vec2 Game_getSize();
 
-static uint32_t currentEpisode = 0;
-static uint32_t currentFloor = 0;
-static uint8_t difficulty = 0;
+static uint32_t GameContext_Episode = 0;
+static uint32_t GameContext_Floor = 0;
+static uint8_t GameContext_Difficulty = 0;
 
-static Map* currentMap;
+static Map* GameContext_Map;
 
 void Game_setEpisode(uint32_t episode);
 
@@ -63,6 +67,6 @@ static Wall Game_raycast(float maxDistance, float angle, float *distance, float 
 #define GAME_HUD_SIZE               (Vec2) {320, 40}
 #define GAME_HUD_OFFSET_BOTTOM      (5)
 
-static Image *playerStats;
+static Image *GameContext_PlayerStats;
 
 #endif //WOLFENSTEIN3D_GAMECONTEXT_H

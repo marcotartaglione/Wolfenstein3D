@@ -13,10 +13,10 @@
 #define MAIN_MENU_RATING_IMAGE              ("./assets/hud/mainmenu/rating.png")
 #define MAIN_MENU_FONT_COLOR                (0xBCBCBC)
 
-static Image *openScreen;
-static Image *ratingScreen;
+static Image *MainMenu_OpenScreen;
+static Image *MainMenu_RatingScreen;
 
-static bool close = false;
+static LoopResult MainMenu_LoopResult;
 
 //
 // Context functions
@@ -50,8 +50,8 @@ static void renderTitleScreen();
 //
 // Frame management
 //
-static uint32_t editormenu_currentRenderer = 0;
-static uint32_t editormenu_renderersCount = 3;
+static uint32_t MainMenu_CurrentRenderer = 0;
+static uint32_t MainMenu_RenderersCount = 3;
 static void (*editormenu_renderers[])() = {renderAttentionScreen, renderRatingScreen, renderTitleScreen,};
 
 #endif //WOLFENSTEIN3D_MAINMENUCONTEXT_H

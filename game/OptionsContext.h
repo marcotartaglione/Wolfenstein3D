@@ -8,7 +8,8 @@
 #include "TRT_Engine.h"
 #include "../Context.h"
 
-static bool startNewGame = false;
+static LoopResult OptionsContext_LoopResult = LOOP_RESULT_IDLE;
+static Vec2 OptionsContext_StartingGameSize = {0, 0};
 
 void optionsContextInit();
 LoopResult optionsContextLoop();
@@ -17,10 +18,8 @@ void optionsContextClose();
 void optionsContextKeyboardCallback(uint32_t key);
 void optionsContextMouseCallback(Click click, uint32_t x, uint32_t y);
 
-static bool showQuitMessage = false;
-static Vec2 startingGameSize = {0, 0};
-
-static int8_t currentQuitMessage = -1;
+static bool OptionsContext_ShowQuitMessage;
+static int8_t OptionsContext_CurrentQuitMessage;
 static void drawQuitMessage();
 
 #define GAME_SIZE_X_CHANGE_FACTOR (10)
@@ -35,8 +34,8 @@ static void drawReadThis();
 static void drawShowScores();
 static void drawDifficiculty();
 
-static uint8_t editormenu_currentRenderer = 0;
-static void (*editormenu_renderers[])() = {
+static uint8_t OptionsContext_CurrentRenderer = 0;
+static void (*OptionsContext_Renderers[])() = {
         drawOptions,
         drawEpisodes,
         drawSound,
@@ -56,7 +55,7 @@ static void readThisKeyboardCallback(uint32_t key);
 static void showScoresKeyboardCallback(uint32_t key);
 static void difficultyKeyboardCallback(uint32_t key);
 
-static void (*editormenu_keyboardCallbacks[])(uint32_t key) = {
+static void (*OptionsContext_KeyboardCallbacks[])(uint32_t key) = {
         optionsKeyboardCallback,
         episodesKeyboardCallback,
         soundKeyboardCallback,
@@ -76,17 +75,15 @@ static void (*editormenu_keyboardCallbacks[])(uint32_t key) = {
 
 #define EPISODES_TITLE_COLOR            (0xFBF82B)
 
-static uint8_t currentSelectedOption = 0;
-static uint8_t maxSelectedOption = 8;
-
-#include "../Episodes.h"
+static uint8_t OptionsContext_CurrentSelectedOption = 0;
+static uint8_t OptionsContext_MaxSelectedOption = 8;
 
 #define EPISODES_CONTENT_OFFSET_TOP     (23)
 #define EPISODES_CONTENT_OFFSET_LEFT    (40)
 #define EPISODES_CONTENT_GAP            (2)
 #define EPISODES_THUMBNAIL_SIZE         (Vec2) {48, 24}
 
-static uint32_t currentSelectedEpisode = 0;
+static uint32_t OptionsContext_CurrentSelectedEpisode = 0;
 
 #define DIFFICULTY_TITLE_COLOR              (0xFBF82B)
 #define DIFFICULTY_TITLE_OFFSET_TOP         (68)
@@ -96,18 +93,18 @@ static uint32_t currentSelectedEpisode = 0;
 #define DIFFICULTY_IMAGE_OFFSET_RIGHT       (88)
 #define DIFFICULTY_IMAGE_OFFSET_TOP         (DIFFICULTY_BACKGROUND_OFFSET_TOP - 20)
 
-static uint8_t currentSelectedDifficulty = 0;
+static uint8_t OptionsContext_CurrentSelectedDifficulty = 0;
 
-static Image *options;
-static Image *gun;
-static Image *quitBackground;
-static Image *background;
-static Image *controls;
+static Image *OptionsContext_Options;
+static Image *OptionsContext_Gun;
+static Image *OptionsContext_QuitBackground;
+static Image *OptionsContext_Background;
+static Image *OptionsContext_Controls;
 
-static Image *difficultiesImages[DIFFICULTY_COUNT];
+static Image *OptionsContext_DifficultiesImages[DIFFICULTY_COUNT];
 
 #define QUIT_MESSAGE_COUNT 7
-static char *quitStrings[] = {
+static char *OptionsContext_QuitStrings[] = {
         "Dost thou wish to leave\nwith such hasty abandon?",
         "You are at an intersection.\nA sign says, \"Press Y to quit\".",
         "Press N if you are brave.\nPress Y to cower in shame.",

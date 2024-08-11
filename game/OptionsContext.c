@@ -6,35 +6,43 @@
 #include "../Commons.h"
 
 WolfensteinContext optionsContext = {
-        optionsContextInit,
-        optionsContextLoop,
-        optionsContextKeyboardCallback,
-        optionsContextMouseCallback,
-        optionsContextClose};
+    optionsContextInit,
+    optionsContextLoop,
+    optionsContextKeyboardCallback,
+    optionsContextMouseCallback,
+    optionsContextClose
+};
 
 void optionsContextInit() {
-    options = TRT_image_get(OPTIONS_TITLE_IMAGE);
-    if (options == NULL) {
+    OptionsContext_LoopResult = LOOP_RESULT_IDLE;
+    OptionsContext_ShowQuitMessage = false;
+    OptionsContext_CurrentRenderer = 0;
+    OptionsContext_CurrentSelectedOption = 0;
+    OptionsContext_CurrentSelectedEpisode = 0;
+    OptionsContext_CurrentSelectedDifficulty = 0;
+
+    OptionsContext_Options = TRT_image_get(OPTIONS_TITLE_IMAGE);
+    if (OptionsContext_Options == NULL) {
         exit(EXIT_FAILURE);
     }
 
-    gun = TRT_image_get(OPTIONS_GUN_IMAGE);
-    if (gun == NULL) {
+    OptionsContext_Gun = TRT_image_get(OPTIONS_GUN_IMAGE);
+    if (OptionsContext_Gun == NULL) {
         exit(EXIT_FAILURE);
     }
 
-    quitBackground = TRT_image_get(QUIT_IMAGE);
-    if (quitBackground == NULL) {
+    OptionsContext_QuitBackground = TRT_image_get(QUIT_IMAGE);
+    if (OptionsContext_QuitBackground == NULL) {
         exit(EXIT_FAILURE);
     }
 
-    controls = TRT_image_get(CONTROLS_IMAGE);
-    if (controls == NULL) {
+    OptionsContext_Controls = TRT_image_get(CONTROLS_IMAGE);
+    if (OptionsContext_Controls == NULL) {
         exit(EXIT_FAILURE);
     }
 
-    background = TRT_image_get(OPTIONS_BACKGROUND_IMAGE);
-    if (background == NULL) {
+    OptionsContext_Background = TRT_image_get(OPTIONS_BACKGROUND_IMAGE);
+    if (OptionsContext_Background == NULL) {
         exit(EXIT_FAILURE);
     }
 
@@ -43,7 +51,7 @@ void optionsContextInit() {
         snprintf(path, sizeof(path), "%s%d.png", DIFFICULTY_IMAGE_FOLDER, i + 1);
         path[strlen(DIFFICULTY_IMAGE_FOLDER) + 5] = '\0';
 
-        difficultiesImages[i] = TRT_image_get(path);
+        OptionsContext_DifficultiesImages[i] = TRT_image_get(path);
     }
 }
 
@@ -51,56 +59,51 @@ LoopResult optionsContextLoop() {
     if (TRT_animation_isFading())
         return LOOP_RESULT_IDLE;
 
-    editormenu_renderers[editormenu_currentRenderer]();
-
-    if (startNewGame) {
-        return LOOP_RESULT_NEXT;
-    }
-    return LOOP_RESULT_IDLE;
+    OptionsContext_Renderers[OptionsContext_CurrentRenderer]();
+    return OptionsContext_LoopResult;
 }
 
 void optionsContextClose() {
-    TRT_image_free(options);
-    TRT_image_free(gun);
-    TRT_image_free(quitBackground);
-    TRT_image_free(background);
-    TRT_image_free(controls);
+    TRT_image_free(OptionsContext_Options);
+    TRT_image_free(OptionsContext_Gun);
+    TRT_image_free(OptionsContext_QuitBackground);
+    TRT_image_free(OptionsContext_Background);
+    TRT_image_free(OptionsContext_Controls);
 
     for (uint8_t i = 0; i < DIFFICULTY_COUNT; ++i) {
-        TRT_image_free(difficultiesImages[i]);
+        TRT_image_free(OptionsContext_DifficultiesImages[i]);
     }
 }
 
 void optionsContextKeyboardCallback(uint32_t key) {
-    editormenu_keyboardCallbacks[editormenu_currentRenderer](key);
+    OptionsContext_KeyboardCallbacks[OptionsContext_CurrentRenderer](key);
 
-    if (key == 27) { // ESC
+    if (key == 27) {
+        // ESC
         TRT_animation_startFade();
-        currentSelectedOption = 0;
-        editormenu_currentRenderer = 0;
-        return;
+        OptionsContext_CurrentSelectedOption = 0;
+        OptionsContext_CurrentRenderer = 0;
     }
 }
 
 void optionsContextMouseCallback(Click click, uint32_t x, uint32_t y) {
-
 }
 
 static void drawQuitMessage() {
     uint32_t nLines;
-    Vec2 textSize = TRT_text_size(quitStrings[currentQuitMessage],
+    Vec2 textSize = TRT_text_size(OptionsContext_QuitStrings[OptionsContext_CurrentQuitMessage],
                                   &nLines,
                                   FONT_HEIGHT,
                                   FONT_SPACE_WIDTH,
                                   FONT_LETTER_SPACING,
                                   FONT_LINE_OFFSET)[0];
 
-    TRT_image_draw(quitBackground,
-                   (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
-                   (Vec2) {textSize.x + 20, textSize.y + 20});
+    TRT_image_draw(OptionsContext_QuitBackground,
+                   (Vec2){ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
+                   (Vec2){textSize.x + 20, textSize.y + 20});
 
-    TRT_text_draw(quitStrings[currentQuitMessage],
-                  (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
+    TRT_text_draw(OptionsContext_QuitStrings[OptionsContext_CurrentQuitMessage],
+                  (Vec2){ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
                   FONT_HEIGHT,
                   QUIT_FONT_COLOR,
                   TEXT_ALIGN_CENTER);
@@ -109,29 +112,29 @@ static void drawQuitMessage() {
 static void drawOptions() {
     drawHeaderLine();
 
-    TRT_image_draw(options,
-                   (Vec2) {-1, TRT_window_getSize().y - OPTIONS_SCREEN_IMAGE_Y_OFFSET - 42},
-                   (Vec2) {145, 42});
+    TRT_image_draw(OptionsContext_Options,
+                   (Vec2){-1, TRT_window_getSize().y - OPTIONS_SCREEN_IMAGE_Y_OFFSET - 42},
+                   (Vec2){145, 42});
 
-    TRT_image_draw(background,
-                   (Vec2) {ELEMENT_ALIGN_CENTER, OPTIONS_SCREEN_IMAGE_Y_OFFSET * 2},
-                   (Vec2) {175, 135});
+    TRT_image_draw(OptionsContext_Background,
+                   (Vec2){ELEMENT_ALIGN_CENTER, OPTIONS_SCREEN_IMAGE_Y_OFFSET * 2},
+                   (Vec2){175, 135});
 
-    TRT_image_draw(controls,
-                   (Vec2) {ELEMENT_ALIGN_CENTER, 0},
-                   (Vec2) {102, 7});
+    TRT_image_draw(OptionsContext_Controls,
+                   (Vec2){ELEMENT_ALIGN_CENTER, 0},
+                   (Vec2){102, 7});
 
     TRT_text_draw("New Game\nSound\nControl\nLoad Game\nSave Game\nChange View\nRead This\nView Scores\nQuit",
-                  (Vec2) {ELEMENT_ALIGN_CENTER, 135},
+                  (Vec2){ELEMENT_ALIGN_CENTER, 135},
                   FONT_HEIGHT,
                   FONT_COLOR,
                   TEXT_ALIGN_LEFT);
 
-    TRT_image_draw(gun,
-                   (Vec2) {82, 125 - (FONT_HEIGHT + FONT_LINE_OFFSET) * currentSelectedOption},
-                   (Vec2) {19, 11});
+    TRT_image_draw(OptionsContext_Gun,
+                   (Vec2){82, 125 - (FONT_HEIGHT + FONT_LINE_OFFSET) * OptionsContext_CurrentSelectedOption},
+                   (Vec2){19, 11});
 
-    if (showQuitMessage)
+    if (OptionsContext_ShowQuitMessage)
         drawQuitMessage();
 }
 
@@ -139,67 +142,69 @@ static void drawEpisodes() {
     TRT_window_fill(MAIN_BACKGROUND_COLOR);
 
     TRT_text_draw("Which episode to play?",
-                  (Vec2) {ELEMENT_ALIGN_CENTER, TRT_window_getSize().y - OPTIONS_SCREEN_IMAGE_Y_OFFSET},
+                  (Vec2){ELEMENT_ALIGN_CENTER, TRT_window_getSize().y - OPTIONS_SCREEN_IMAGE_Y_OFFSET},
                   FONT_HEIGHT,
                   EPISODES_TITLE_COLOR,
                   TEXT_ALIGN_CENTER);
 
-    TRT_image_draw(background,
-                   (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
-                   (Vec2) {309, 163});
+    TRT_image_draw(OptionsContext_Background,
+                   (Vec2){ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
+                   (Vec2){309, 163});
 
-    for(uint8_t i = 0; i < EPISODES_COUNT; i++) {
+    for (uint8_t i = 0; i < EPISODES_COUNT; i++) {
         TRT_image_draw(episodes[i]->thumbnail,
-                       (Vec2) {EPISODES_CONTENT_OFFSET_LEFT, TRT_window_getSize().y - EPISODES_CONTENT_OFFSET_TOP * (i + 1) - EPISODES_THUMBNAIL_SIZE.y - i * EPISODES_CONTENT_GAP},
+                       (Vec2){
+                           EPISODES_CONTENT_OFFSET_LEFT,
+                           TRT_window_getSize().y - EPISODES_CONTENT_OFFSET_TOP * (i + 1) - EPISODES_THUMBNAIL_SIZE.y -
+                           i * EPISODES_CONTENT_GAP
+                       },
                        EPISODES_THUMBNAIL_SIZE);
 
         char episodeText[128];
-        sprintf(episodeText, "Episode %d\n%s", i + 1, episodes[i]->title);
+        snprintf(episodeText, 128, "Episode %d\n%s", i + 1, episodes[i]->title);
 
         TRT_text_draw(episodeText,
-                      (Vec2) {98, TRT_window_getSize().y - EPISODES_CONTENT_OFFSET_TOP * (i + 1) - i * EPISODES_CONTENT_GAP},
+                      (Vec2){
+                          98, TRT_window_getSize().y - EPISODES_CONTENT_OFFSET_TOP * (i + 1) - i * EPISODES_CONTENT_GAP
+                      },
                       FONT_HEIGHT,
                       FONT_COLOR,
                       TEXT_ALIGN_LEFT);
     }
 
-    TRT_image_draw(gun,
-                   (Vec2) {11, TRT_window_getSize().y - 23 * (currentSelectedEpisode + 1) - 12},
-                   (Vec2) {19, 11});
+    TRT_image_draw(OptionsContext_Gun,
+                   (Vec2){11, TRT_window_getSize().y - 23 * (OptionsContext_CurrentSelectedEpisode + 1) - 12},
+                   (Vec2){19, 11});
 
-    TRT_image_draw(controls,
-                   (Vec2) {ELEMENT_ALIGN_CENTER, 0},
-                   (Vec2) {102, 7});
+    TRT_image_draw(OptionsContext_Controls,
+                   (Vec2){ELEMENT_ALIGN_CENTER, 0},
+                   (Vec2){102, 7});
 }
 
 static void drawSound() {
-
 }
 
 static void drawControl() {
-
 }
 
 static void drawChangeView() {
-    if (startingGameSize.x == 0) {
-        startingGameSize = Game_getSize();
+    if (OptionsContext_StartingGameSize.x == 0) {
+        OptionsContext_StartingGameSize = Game_getSize();
     }
 
-    Game_drawFrame(startingGameSize);
+    Game_drawFrame(OptionsContext_StartingGameSize);
 
     TRT_text_draw("Use arrows to size\nENTER to accept\nESC to cancel",
-                  (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_START},
+                  (Vec2){ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_START},
                   FONT_HEIGHT,
                   FONT_COLOR,
                   TEXT_ALIGN_CENTER);
 }
 
 static void drawReadThis() {
-
 }
 
 static void drawShowScores() {
-
 }
 
 static void drawDifficiculty() {
@@ -208,69 +213,77 @@ static void drawDifficiculty() {
     TRT_window_fill(MAIN_BACKGROUND_COLOR);
 
     TRT_text_draw("How tough are you?",
-                  (Vec2) {ELEMENT_ALIGN_CENTER, winSize.y - DIFFICULTY_TITLE_OFFSET_TOP},
+                  (Vec2){ELEMENT_ALIGN_CENTER, winSize.y - DIFFICULTY_TITLE_OFFSET_TOP},
                   FONT_HEIGHT,
                   DIFFICULTY_TITLE_COLOR,
                   TEXT_ALIGN_CENTER);
 
-    TRT_image_draw(background,
-                   (Vec2) {ELEMENT_ALIGN_CENTER, winSize.y - DIFFICULTY_BACKGROUND_OFFSET_TOP},
-                   (Vec2) {226, 68});
+    TRT_image_draw(OptionsContext_Background,
+                   (Vec2){ELEMENT_ALIGN_CENTER, winSize.y - DIFFICULTY_BACKGROUND_OFFSET_TOP},
+                   (Vec2){226, 68});
 
     TRT_text_draw("Can I play, Daddy?\nDon't hurt me.\nBring 'em on!\nI am Death incarnate!",
-                  (Vec2) {79, winSize.y - DIFFICULTY_CONTENT_OFFSET_TOP},
+                  (Vec2){79, winSize.y - DIFFICULTY_CONTENT_OFFSET_TOP},
                   FONT_HEIGHT,
                   FONT_COLOR,
                   TEXT_ALIGN_LEFT);
 
-    TRT_image_draw(gun,
-                   (Vec2) {56, winSize.y - DIFFICULTY_CONTENT_OFFSET_TOP - 11 - currentSelectedDifficulty * 13},
-                   (Vec2) {19, 11});
+    TRT_image_draw(OptionsContext_Gun,
+                   (Vec2){
+                       56,
+                       winSize.y - DIFFICULTY_CONTENT_OFFSET_TOP - 11 - OptionsContext_CurrentSelectedDifficulty * 13
+                   },
+                   (Vec2){19, 11});
 
-    TRT_image_draw(difficultiesImages[currentSelectedDifficulty],
-                   (Vec2) {winSize.x - DIFFICULTY_IMAGE_OFFSET_RIGHT, winSize.y - DIFFICULTY_IMAGE_OFFSET_TOP},
-                   (Vec2) {23, 31});
+    TRT_image_draw(OptionsContext_DifficultiesImages[OptionsContext_CurrentSelectedDifficulty],
+                   (Vec2){winSize.x - DIFFICULTY_IMAGE_OFFSET_RIGHT, winSize.y - DIFFICULTY_IMAGE_OFFSET_TOP},
+                   (Vec2){23, 31});
 
-    TRT_image_draw(controls,
-                   (Vec2) {ELEMENT_ALIGN_CENTER, 0},
-                   (Vec2) {102, 7});
+    TRT_image_draw(OptionsContext_Controls,
+                   (Vec2){ELEMENT_ALIGN_CENTER, 0},
+                   (Vec2){102, 7});
 }
 
 static void optionsKeyboardCallback(uint32_t key) {
-    if (showQuitMessage) {
+    if (OptionsContext_ShowQuitMessage) {
         if (key == 'y' || key == 'Y') exit(EXIT_SUCCESS);
-        else showQuitMessage = false;
+        else OptionsContext_ShowQuitMessage = false;
     }
 
     switch (key) {
-        case 38: // up arrow
-            if (currentSelectedOption == 0) {
-                currentSelectedOption = maxSelectedOption;
-            } else {
-                currentSelectedOption--;
+        case VK_ESCAPE:
+            OptionsContext_LoopResult = LOOP_RESULT_PREVIOUS;
+            break;
+        case VK_UP:
+            if (OptionsContext_CurrentSelectedOption == 0) {
+                OptionsContext_CurrentSelectedOption = OptionsContext_MaxSelectedOption;
+            }
+            else {
+                OptionsContext_CurrentSelectedOption--;
             }
             break;
-        case 40: // down arrow
-            if (currentSelectedOption == maxSelectedOption) {
-                currentSelectedOption = 0;
-            } else {
-                currentSelectedOption++;
+        case VK_DOWN:
+            if (OptionsContext_CurrentSelectedOption == OptionsContext_MaxSelectedOption) {
+                OptionsContext_CurrentSelectedOption = 0;
+            }
+            else {
+                OptionsContext_CurrentSelectedOption++;
             }
             break;
-        case 13:
-            if (currentSelectedOption != 8)
+        case VK_RETURN:
+            if (OptionsContext_CurrentSelectedOption != 8)
                 TRT_animation_startFade();
 
-            switch (currentSelectedOption) {
+            switch (OptionsContext_CurrentSelectedOption) {
                 case 0:
-                    editormenu_currentRenderer = 1;
+                    OptionsContext_CurrentRenderer = 1;
                     break;
                 case 5:
-                    editormenu_currentRenderer = 4;
+                    OptionsContext_CurrentRenderer = 4;
                     break;
                 case 8:
-                    showQuitMessage = true;
-                    currentQuitMessage = rand() % QUIT_MESSAGE_COUNT;
+                    OptionsContext_ShowQuitMessage = true;
+                    OptionsContext_CurrentQuitMessage = rand() % QUIT_MESSAGE_COUNT;
                     break;
                 default:
                     break;
@@ -282,67 +295,71 @@ static void optionsKeyboardCallback(uint32_t key) {
 
 static void episodesKeyboardCallback(uint32_t key) {
     switch (key) {
-        case 38:
-            if (currentSelectedEpisode == 0) {
-                currentSelectedEpisode = EPISODES_COUNT - 1;
-            } else {
-                currentSelectedEpisode--;
+        case VK_UP:
+            if (OptionsContext_CurrentSelectedEpisode == 0) {
+                OptionsContext_CurrentSelectedEpisode = EPISODES_COUNT - 1;
+            }
+            else {
+                OptionsContext_CurrentSelectedEpisode--;
             }
             break;
-        case 40:
-            if (currentSelectedEpisode == EPISODES_COUNT - 1) {
-                currentSelectedEpisode = 0;
-            } else {
-                currentSelectedEpisode++;
+        case VK_DOWN:
+            if (OptionsContext_CurrentSelectedEpisode == EPISODES_COUNT - 1) {
+                OptionsContext_CurrentSelectedEpisode = 0;
             }
+            else {
+                OptionsContext_CurrentSelectedEpisode++;
+            }
+            break;
+        default:
             break;
     }
 
     if (key == 13) {
         TRT_animation_startFade();
-        Game_setEpisode(currentSelectedEpisode);
-        editormenu_currentRenderer = 7;
+        Game_setEpisode(OptionsContext_CurrentSelectedEpisode);
+        OptionsContext_CurrentRenderer = 7;
     }
 }
 
 static void soundKeyboardCallback(uint32_t key) {
-
 }
 
 static void controlKeyboardCallback(uint32_t key) {
-
 }
 
 static void changeViewKeyboardCallback(uint32_t key) {
     switch (key) {
         case 37: // left arrow
-            startingGameSize.x += GAME_SIZE_X_CHANGE_FACTOR;
-            startingGameSize.y += GAME_SIZE_Y_CHANGE_FACTOR;
+            OptionsContext_StartingGameSize.x += GAME_SIZE_X_CHANGE_FACTOR;
+            OptionsContext_StartingGameSize.y += GAME_SIZE_Y_CHANGE_FACTOR;
 
-            if (startingGameSize.x > GAME_SIZE_MAX_X || startingGameSize.y > GAME_SIZE_MAX_Y) {
-                startingGameSize.x = GAME_SIZE_MAX_X;
-                startingGameSize.y = GAME_SIZE_MAX_Y;
+            if (OptionsContext_StartingGameSize.x > GAME_SIZE_MAX_X || OptionsContext_StartingGameSize.y >
+                GAME_SIZE_MAX_Y) {
+                OptionsContext_StartingGameSize.x = GAME_SIZE_MAX_X;
+                OptionsContext_StartingGameSize.y = GAME_SIZE_MAX_Y;
             }
             break;
         case 39: // right arrow
-            startingGameSize.x -= GAME_SIZE_X_CHANGE_FACTOR;
-            startingGameSize.y -= GAME_SIZE_Y_CHANGE_FACTOR;
+            OptionsContext_StartingGameSize.x -= GAME_SIZE_X_CHANGE_FACTOR;
+            OptionsContext_StartingGameSize.y -= GAME_SIZE_Y_CHANGE_FACTOR;
 
-            if (startingGameSize.x < GAME_SIZE_MIN_X || startingGameSize.y < GAME_SIZE_MIN_Y) {
-                startingGameSize.y = GAME_SIZE_MIN_Y;
-                startingGameSize.x = GAME_SIZE_MIN_X;
+            if (OptionsContext_StartingGameSize.x < GAME_SIZE_MIN_X || OptionsContext_StartingGameSize.y <
+                GAME_SIZE_MIN_Y) {
+                OptionsContext_StartingGameSize.y = GAME_SIZE_MIN_Y;
+                OptionsContext_StartingGameSize.x = GAME_SIZE_MIN_X;
             }
             break;
         case 13:
-            Game_setSize(startingGameSize);
-            startingGameSize.x = 0;
+            Game_setSize(OptionsContext_StartingGameSize);
+            OptionsContext_StartingGameSize.x = 0;
 
             TRT_animation_startFade();
-            editormenu_currentRenderer = 0;
+            OptionsContext_CurrentRenderer = 0;
 
             break;
         case 27:
-            startingGameSize.x = 0;
+            OptionsContext_StartingGameSize.x = 0;
             break;
         default:
             break;
@@ -350,33 +367,35 @@ static void changeViewKeyboardCallback(uint32_t key) {
 }
 
 static void readThisKeyboardCallback(uint32_t key) {
-
 }
 
 static void showScoresKeyboardCallback(uint32_t key) {
-
 }
 
 static void difficultyKeyboardCallback(uint32_t key) {
     switch (key) {
-        case 38:
-            if (currentSelectedDifficulty == 0) {
-                currentSelectedDifficulty = DIFFICULTY_COUNT - 1;
-            } else {
-                currentSelectedDifficulty--;
+        case VK_UP:
+            if (OptionsContext_CurrentSelectedDifficulty == 0) {
+                OptionsContext_CurrentSelectedDifficulty = DIFFICULTY_COUNT - 1;
+            }
+            else {
+                OptionsContext_CurrentSelectedDifficulty--;
             }
             break;
-        case 40:
-            if (currentSelectedDifficulty == DIFFICULTY_COUNT - 1) {
-                currentSelectedDifficulty = 0;
-            } else {
-                currentSelectedDifficulty++;
+        case VK_DOWN:
+            if (OptionsContext_CurrentSelectedDifficulty == DIFFICULTY_COUNT - 1) {
+                OptionsContext_CurrentSelectedDifficulty = 0;
+            }
+            else {
+                OptionsContext_CurrentSelectedDifficulty++;
             }
             break;
-        case 13:
+        case VK_RETURN:
             TRT_animation_startFade();
-            Game_setDifficulty(currentSelectedDifficulty);
-            startNewGame = true;
+            Game_setDifficulty(OptionsContext_CurrentSelectedDifficulty);
+            OptionsContext_LoopResult = LOOP_RESULT_NEXT;
+            break;
+        default:
             break;
     }
 }

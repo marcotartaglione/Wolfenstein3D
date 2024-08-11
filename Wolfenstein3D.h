@@ -12,7 +12,7 @@
 
 #define GAME_TARGET_FPS (30)
 
-bool isEditor = false;
+static bool isEditor = false;
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PSTR lpCmdLine, _In_ int nCmdShow);
 void loop();
@@ -41,9 +41,11 @@ extern WolfensteinContext gameContext;
 extern WolfensteinContext editorMenuContext;
 extern WolfensteinContext editorContext;
 
-uint8_t currentContext = 0;
-uint8_t lastContext = 0;
-uint8_t contextsCount = 0;
+static uint8_t currentContext = 0;
+static uint8_t lastContext = 0;
+static uint8_t contextsCount = 0;
 WolfensteinContext contexts[256];
+
+uint8_t optionsContextIndex;
 
 #endif //WOLFENSTEIN3D_WOLFENSTEIN_H

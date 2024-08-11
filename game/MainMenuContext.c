@@ -3,6 +3,8 @@
 //
 
 #include "MainMenuContext.h"
+
+#include "GameContext.h"
 #include "../Commons.h"
 
 static void renderAttentionScreen() {
@@ -24,46 +26,49 @@ static void renderAttentionScreen() {
 }
 
 static void renderRatingScreen() {
-    TRT_image_draw(ratingScreen, (Vec2) {0, 0}, TRT_window_getSize());
+    TRT_image_draw(MainMenu_RatingScreen, (Vec2) {0, 0}, TRT_window_getSize());
 }
 
 static void renderTitleScreen() {
-    TRT_image_draw(openScreen, (Vec2) {0, 0}, TRT_window_getSize());
+    TRT_image_draw(MainMenu_OpenScreen, (Vec2) {0, 0}, TRT_window_getSize());
 }
 
 void mainMenuContextInit() {
-    openScreen = TRT_image_get(MAIN_MENU_OPEN_IMAGE);
-    if (openScreen == NULL) {
+    MainMenu_LoopResult = LOOP_RESULT_IDLE;
+    MainMenu_CurrentRenderer = 0;
+
+    MainMenu_OpenScreen = TRT_image_get(MAIN_MENU_OPEN_IMAGE);
+    if (MainMenu_OpenScreen == NULL) {
         exit(EXIT_FAILURE);
     }
 
-    ratingScreen = TRT_image_get(MAIN_MENU_RATING_IMAGE);
-    if (ratingScreen == NULL) {
+    MainMenu_RatingScreen = TRT_image_get(MAIN_MENU_RATING_IMAGE);
+    if (MainMenu_RatingScreen == NULL) {
         exit(EXIT_FAILURE);
     }
 }
 
 LoopResult mainMenuContextLoop() {
+    if (MainMenu_LoopResult != LOOP_RESULT_IDLE)
+        return MainMenu_LoopResult;
+
     if (!TRT_animation_isFading())
-        editormenu_renderers[editormenu_currentRenderer]();
+        editormenu_renderers[MainMenu_CurrentRenderer]();
 
-    if (close)
-        return LOOP_RESULT_NEXT;
-
-    return LOOP_RESULT_IDLE;
+    return MainMenu_LoopResult;
 }
 
 void mainMenuContextClose() {
-    free(openScreen->data);
-    free(openScreen);
+    free(MainMenu_OpenScreen->data);
+    free(MainMenu_OpenScreen);
 }
 
 void mainMenuKeyboardCallback(uint32_t key) {
     if(TRT_animation_startFade())
-        editormenu_currentRenderer++;
+        MainMenu_CurrentRenderer++;
 
-    if (editormenu_currentRenderer == editormenu_renderersCount)
-        close = true;
+    if (MainMenu_CurrentRenderer == MainMenu_RenderersCount)
+        MainMenu_LoopResult = LOOP_RESULT_NEXT;
 }
 
 void mainMenuMouseCallback(Click click, uint32_t x, uint32_t y) {

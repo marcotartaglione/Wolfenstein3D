@@ -17,14 +17,14 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     TRT_animation_setFadeTime(FADE_TIME);
 
     TRT_window_setup(
-            hInstance,
-            "Wolfenstein 3D"
+        hInstance,
+        "Wolfenstein 3D"
     );
     TRT_window_setUpscaling(3);
     TRT_window_start(
-            "Wolfenstein 3D",
-            (Vec2) {320, 200},
-            (Vec2) {-1, -1}
+        "Wolfenstein 3D",
+        (Vec2){320, 200},
+        (Vec2){-1, -1}
     );
 
     isEditor = strcmp(lpCmdLine, "--editor") == 0;
@@ -34,15 +34,17 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         contexts[1] = editorContext;
 
         contextsCount = 2;
-    } else {
+    }
+    else {
         contexts[0] = mainMenuContext;
         contexts[1] = optionsContext;
         contexts[2] = gameContext;
 
         // FIXME - This is a temporary solution
-        currentContext = 2;
+        //currentContext = 2;
 
         contextsCount = 3;
+        optionsContextIndex = 1;
     }
 
     if (!activateCurrentContext())
@@ -57,7 +59,10 @@ void loop() {
     LoopResult loopResult = contexts[currentContext].loop();
 
     if (loopResult >= LOOP_RESULT_SPECIED) {
+        deactivateCurrentContext();
+        lastContext = currentContext;
         currentContext = loopResult - LOOP_RESULT_SPECIED;
+        activateCurrentContext();
         return;
     }
 
@@ -131,7 +136,7 @@ void loadEpisodes() {
         char path[256];
         snprintf(path, sizeof(path), "%s%d/episode.data", EPISODES_MAIN_FOLDER, i + 1);
 
-        FILE *fp = fopen(path, "rb");
+        FILE* fp = fopen(path, "rb");
         if (fp == NULL) {
             char error[512];
             snprintf(error, sizeof(error), "Invalid episode path while loading: %s", path);
@@ -140,7 +145,7 @@ void loadEpisodes() {
             continue;
         }
 
-        Episode *current = Episode_get(fp);
+        Episode* current = Episode_get(fp);
         episodes[i] = current;
 
         fclose(fp);
