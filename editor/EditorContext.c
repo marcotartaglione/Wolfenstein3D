@@ -364,8 +364,8 @@ void gridKeyboardCallback(uint32_t key) {
             break;
         case 'p':
         case 'P':
-            episodes[selectedEpisode]->floors[selectedFloor]->player->position.x = selectedTile % episodes[selectedEpisode]->floors[selectedFloor]->width;
-            episodes[selectedEpisode]->floors[selectedFloor]->player->position.y = selectedTile / episodes[selectedEpisode]->floors[selectedFloor]->width;
+            episodes[selectedEpisode]->floors[selectedFloor]->player->position.x = selectedTile % episodes[selectedEpisode]->floors[selectedFloor]->width + 0.5f;
+            episodes[selectedEpisode]->floors[selectedFloor]->player->position.y = selectedTile / episodes[selectedEpisode]->floors[selectedFloor]->width + 0.5f;
             break;
         case VK_ESCAPE:
             drawExitMessage = true;
