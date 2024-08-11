@@ -103,6 +103,8 @@ typedef enum {
 #define WALL_NO_DARK_VERSION        (WALL_ELEVATOR1)
 #define DOOR_RECESS                 (0.4f)
 
+#define WALL_IS_DOOR(wall)          (wall >= WALL_DOOR1 && wall <= WALL_DOOR8)
+
 const char* Wall_toString(Wall wall);
 
 extern Image *wallTextures[WALL_NUMBER];
