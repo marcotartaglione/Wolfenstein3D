@@ -101,6 +101,7 @@ typedef enum {
 
 #define WALL_NUMBER                 (WALL_NULL)
 #define WALL_NO_DARK_VERSION        (WALL_ELEVATOR1)
+#define DOOR_RECESS                 (0.4f)
 
 const char* Wall_toString(Wall wall);
 
