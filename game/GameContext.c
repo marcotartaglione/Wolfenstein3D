@@ -35,6 +35,8 @@ void Game_setDifficulty(uint8_t newDifficulty) {
 }
 
 void Game_contextInit() {
+    GameContext_LoopResult = LOOP_RESULT_IDLE;
+
     GameContext_PlayerStats = TRT_image_get(GAME_HUD_PLAYER_STATS_IMAGE);
     if (GameContext_PlayerStats == NULL) {
         exit(EXIT_FAILURE);
@@ -95,8 +97,9 @@ void Game_mouseCallback(Click click, uint32_t x, uint32_t y) {
 
 void Game_drawFrame(Vec2 frameSize) {
     TRT_window_fill(GAME_FRAME_BACKGROUND_COLOR);
+
     TRT_window_DrawRectangle(
-        (Vec2){ELEMENT_ALIGN_CENTER, GAME_FRAME_OFFSET_FROM_BOTTOM},
+    (Vec2){ELEMENT_ALIGN_CENTER, (TRT_window_getSize().y + GAME_FRAME_OFFSET_FROM_BOTTOM - GameContext_GameSize.y) / 2},
         frameSize,
         0x000000,
         true);
@@ -139,19 +142,31 @@ static void Game_drawTextureColumn(int column, float hitPerc, float distance, Wa
     const Vec2 windowSize = TRT_window_getSize();
     const int offsetLeft = (windowSize.x - GameContext_GameSize.x) / 2;
 
-    for (int i = -MIN(0, offset); i < GameContext_GameSize.y - offset; ++i) {
-        const int textureIndex = (int)((float)i / heightStep);
-        if (textureIndex >= wallTextures[wall]->height - 2)
-            break;
+    for (int i = 0; i < GameContext_GameSize.y; ++i) {
+        uint32_t color;
 
-        const int textureDataIndex = ((int)widthOffset + textureIndex * wallTextures[wall]->width) * 3;
-        const uint32_t r = wallTextures[wall]->data[textureDataIndex] << 16;
-        const uint32_t g = wallTextures[wall]->data[textureDataIndex + 1] << 8;
-        const uint32_t b = wallTextures[wall]->data[textureDataIndex + 2];
+        if (i >= GameContext_GameSize.y - offset) {
+            color = GAME_ROOF_COLOR;
+        }
+        else if (i < offset) {
+            color = GAME_FLOOR_COLOR;
+        }
+        else {
+            const int textureIndex = (int)((float)(i - offset) / heightStep);
+            if (textureIndex >= wallTextures[wall]->height)
+                continue;
+
+            const int textureDataIndex = ((int)widthOffset + textureIndex * wallTextures[wall]->width) * 3;
+            const uint32_t r = wallTextures[wall]->data[textureDataIndex] << 16;
+            const uint32_t g = wallTextures[wall]->data[textureDataIndex + 1] << 8;
+            const uint32_t b = wallTextures[wall]->data[textureDataIndex + 2];
+
+            color = r | g | b;
+        }
 
         TRT_window_setPixel(column + offsetLeft,
-                            i + offset + (TRT_window_getSize().y + GAME_FRAME_OFFSET_FROM_BOTTOM - GameContext_GameSize.
-                                y) / 2, r | g | b);
+                            i + (TRT_window_getSize().y + GAME_FRAME_OFFSET_FROM_BOTTOM - GameContext_GameSize.
+                                y) / 2, color);
     }
 }
 
