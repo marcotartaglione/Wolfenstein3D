@@ -125,6 +125,10 @@ static void Game_drawPlayerView() {
             continue;
         }
 
+        if (wall >= WALL_DOOR1 && wall <= WALL_DOOR8) {
+            int temp = 0;
+        }
+
         Game_drawTextureColumn(column, hitPerc, distance, wall);
         currentAngle += angleDelta;
     }
@@ -216,7 +220,7 @@ static Wall Game_raycast(float maxDistance, float angle, float* distance, float*
         sideDistY = (mapY + 1 - rayPosY) * deltaDistY;
     }
 
-    Wall result;
+    Wall result = WALL_NULL;
     while (mapX >= 0 && (uint16_t)mapX < GameContext_Map->width && mapY >= 0 && (uint16_t)mapY < GameContext_Map->
         height) {
         if ((result = GameContext_Map->walls[(int)mapX + (int)mapY * GameContext_Map->width]) != WALL_NULL) {
@@ -240,8 +244,23 @@ static Wall Game_raycast(float maxDistance, float angle, float* distance, float*
                             : fabs((mapX - rayPosX + (1.0 - stepX) / 2.0) / rayDirX));
     *hitPerc = *side ? rayPosX + rayDirX * (*distance) : rayPosY + rayDirY * (*distance);
 
+    // remove fish-eye effect
     *distance = ABS(*distance) * cosf(angle - GameContext_Map->player->lookingAngle);
+
     *hitPerc = DECIMAL(*hitPerc);
+
+    // door are not on the same level as the walls
+    if (WALL_IS_DOOR(result)) {
+        *hitPerc += DOOR_RECESS * tanf(angle);
+
+        if (*hitPerc < 0 || *hitPerc > 1) {
+            *side = *side == 1 ? 0 : 1;
+            *hitPerc = cosf(angle) / DOOR_RECESS;
+            return WALL_DOORSLOT1;
+        }
+
+        *distance += *side ? DOOR_RECESS / sinf(angle) : DOOR_RECESS / cosf(angle);
+    }
 
     return result;
 }
