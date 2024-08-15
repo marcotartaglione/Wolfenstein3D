@@ -40,8 +40,8 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
         contexts[1] = optionsContext;
         contexts[2] = gameContext;
 
-        // FIXME - This is a temporary solution
-        //currentContext = 2;
+        // TODO - This is a temporary solution
+        currentContext = 2;
 
         contextsCount = 3;
         optionsContextIndex = 1;
