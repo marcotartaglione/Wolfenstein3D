@@ -8,6 +8,14 @@
 #include "TRT_Engine.h"
 #include "Commons.h"
 
+typedef enum {
+    LOOP_RESULT_IDLE,
+    LOOP_RESULT_NEXT,
+    LOOP_RESULT_PREVIOUS,
+    LOOP_RESULT_END,
+    LOOP_RESULT_SPECIED
+} LoopResult;
+
 typedef struct WolfensteinContext {
     void (*init)();
     LoopResult (*loop)();
