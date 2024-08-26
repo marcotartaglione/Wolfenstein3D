@@ -21,8 +21,8 @@ static int32_t selectedTile = 0;
 
 static uint16_t tileSize = EDITOR_MIN_TILE_SIZE;
 
-static Wall selectedWall = WALL_STONE1;
-static Wall shownWall = WALL_STONE1;
+static WallTexture selectedWall = WALL_STONE1;
+static WallTexture shownWall = WALL_STONE1;
 
 static LoopResult editor_loopResult = LOOP_RESULT_IDLE;
 

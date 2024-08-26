@@ -172,8 +172,8 @@ void drawGrid() {
                 tileY >= episodes[selectedEpisode]->floors[selectedFloor]->height)
                 continue;
 
-            Wall wall = episodes[selectedEpisode]->floors[selectedFloor]->walls[
-                    tileY * episodes[selectedEpisode]->floors[selectedFloor]->width + tileX];
+            WallTexture wall = episodes[selectedEpisode]->floors[selectedFloor]->walls[
+                    tileY * episodes[selectedEpisode]->floors[selectedFloor]->width + tileX]->wallTexture;
 
             if (wall != WALL_NULL) {
                 TRT_image_draw(wallTextures[wall],
@@ -209,7 +209,7 @@ void drawGrid() {
 void drawTileSelector() {
     TRT_window_fill(MAIN_BACKGROUND_COLOR);
 
-    TRT_text_draw("Currently selected wall:",
+    TRT_text_draw("Currently selected wallTexture:",
                   (Vec2) {ELEMENT_ALIGN_CENTER, TRT_window_getSize().y - 15},
                   FONT_HEIGHT,
                   FONT_COLOR,
@@ -231,7 +231,7 @@ void drawTileSelector() {
     }
 
 
-    snprintf(text, 128, "This wall is %d of %d", currentTile + 1, actualWallCount);
+    snprintf(text, 128, "This wallTexture is %d of %d", currentTile + 1, actualWallCount);
     TRT_text_draw(text,
                   (Vec2) {ELEMENT_ALIGN_CENTER, 15},
                   FONT_HEIGHT,
@@ -323,6 +323,7 @@ void gridKeyboardCallback(uint32_t key) {
         return;
     }
 
+    WallData *wall;
     switch (key) {
         case VK_TAB:
             shownWall = selectedWall;
@@ -357,10 +358,34 @@ void gridKeyboardCallback(uint32_t key) {
             }
             break;
         case VK_DELETE:
-            episodes[selectedEpisode]->floors[selectedFloor]->walls[selectedTile] = WALL_NULL;
+            WallData_free(episodes[selectedEpisode]->floors[selectedFloor]->walls[selectedTile]);
+
+            wall = malloc(sizeof(WallData));
+            *wall = (WallData) {
+                    .wallTexture = WALL_NULL,
+                    .isDoor = false,
+                    .isSecret = false,
+                    .isElevator = false,
+                    .openPercentage = 0.0f,
+                    .openTime = 0.0f,
+                    .openState = WALL_OPEN_STATE_CLOSED
+            };
+
+            episodes[selectedEpisode]->floors[selectedFloor]->walls[selectedTile] = wall;
             break;
-        case 13:
-            episodes[selectedEpisode]->floors[selectedFloor]->walls[selectedTile] = selectedWall;
+        case VK_RETURN:
+            wall = malloc(sizeof(WallData));
+            *wall = (WallData) {
+                    .wallTexture = selectedWall,
+                    .isDoor = false,
+                    .isSecret = false,
+                    .isElevator = false,
+                    .openPercentage = 0.0f,
+                    .openTime = 0.0f,
+                    .openState = WALL_OPEN_STATE_CLOSED
+            };
+
+            episodes[selectedEpisode]->floors[selectedFloor]->walls[selectedTile] = wall;
             break;
         case 'p':
         case 'P':
