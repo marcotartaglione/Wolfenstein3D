@@ -19,7 +19,7 @@ Map *Map_get(FILE *fp) {
     fread(&map->width, sizeof(uint16_t), 1, fp);
     fread(&map->height, sizeof(uint16_t), 1, fp);
 
-    map->walls = malloc(sizeof(WallData) * map->width * map->height);
+    map->walls = malloc(sizeof(WallData*) * map->width * map->height);
     if (map->walls == NULL) {
         free(map);
         TRT_error("Map_get", "Malloc failed for map walls", true);
