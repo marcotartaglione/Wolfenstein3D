@@ -184,8 +184,8 @@ void drawGrid() {
             uint32_t color = 0xFFFFFF;
             if (i == centerTileX && j == centerTileY) {
                 color = 0xFF0000;
-            } else if (tileX == episodes[selectedEpisode]->floors[selectedFloor]->player->position.x &&
-                       tileY == episodes[selectedEpisode]->floors[selectedFloor]->player->position.y) {
+            } else if (tileX == (int32_t) episodes[selectedEpisode]->floors[selectedFloor]->player->position.x &&
+                       tileY == (int32_t) episodes[selectedEpisode]->floors[selectedFloor]->player->position.y) {
                 color = 0x0000FF;
             }
 
