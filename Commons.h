@@ -23,19 +23,19 @@
 #define WOLFENSTEIN3D_UPSCALING     (3)
 
 #define WOLFENSTEIN3D_EDITOR_FLAG   ("--editor")
-#define WOLFENSTEIN3D_TARGET_FPS             (30)
+#define WOLFENSTEIN3D_TARGET_FPS    (30)
 //
 
 //
 // STYLE DEFINITIONS
 //
-#define MAIN_BACKGROUND_COLOR           (0x74180A)
+#define MAIN_BACKGROUND_COLOR       (0x74180A)
 
 #define FADE_TIME               (500)
 
-#define FONT_DIRECTORY              ("./assets/font/")
-#define FONT_BG_COLOR               (0xF00000)
-#define FONT_COLOR                  (0xBCBCBC)
+#define FONT_DIRECTORY          ("./assets/font/")
+#define FONT_BG_COLOR           (0xF00000)
+#define FONT_COLOR              (0xBCBCBC)
 #define FONT_HEIGHT             (10)
 #define FONT_SPACE_WIDTH        (7)
 #define FONT_LINE_OFFSET        (3)
