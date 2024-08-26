@@ -19,14 +19,16 @@ Map *Map_get(FILE *fp) {
     fread(&map->width, sizeof(uint16_t), 1, fp);
     fread(&map->height, sizeof(uint16_t), 1, fp);
 
-    map->walls = malloc(sizeof(Wall) * map->width * map->height);
+    map->walls = malloc(sizeof(WallData) * map->width * map->height);
     if (map->walls == NULL) {
         free(map);
         TRT_error("Map_get", "Malloc failed for map walls", true);
         return NULL;
     }
 
-    fread(map->walls, sizeof(Wall), map->width * map->height, fp);
+    for (uint32_t i = 0; i < map->width * map->height; ++i) {
+        map->walls[i] = WallData_get(fp);
+    }
 
     map->player = Entity_get(fp);
     if (map->player == NULL) {
@@ -80,7 +82,10 @@ void Map_save(FILE *fp, Map *map) {
 
     fwrite(&map->width, sizeof(uint16_t), 1, fp);
     fwrite(&map->height, sizeof(uint16_t), 1, fp);
-    fwrite(map->walls, sizeof(Wall), map->width * map->height, fp);
+
+    for (uint32_t i = 0; i < map->width * map->height; ++i) {
+        WallData_save(fp, map->walls[i]);
+    }
 
     Entity_save(fp, map->player);
 
@@ -98,6 +103,10 @@ void Map_free(Map *map) {
     if (map == NULL) {
         TRT_error("Map_free", "Map is NULL", false);
         return;
+    }
+
+    for (uint32_t i = 0; i < map->width * map->height; ++i) {
+        WallData_free(map->walls[i]);
     }
 
     free(map->walls);

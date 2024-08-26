@@ -13,7 +13,7 @@
 typedef struct {
     uint16_t width;
     uint16_t height;
-    Wall *walls;
+    WallData **walls;
 
     Entity *player;
 
