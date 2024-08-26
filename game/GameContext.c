@@ -119,7 +119,7 @@ static void Game_drawPlayerView() {
         float distance;
         float hitPerc;
         int side;
-        Wall wall = Game_raycast(20, currentAngle, &distance, &hitPerc, &side);
+        WallTexture wall = Game_raycast(20, currentAngle, &distance, &hitPerc, &side);
 
         if (wall == WALL_NULL) {
             continue;
@@ -134,7 +134,7 @@ static void Game_drawPlayerView() {
     }
 }
 
-static void Game_drawTextureColumn(int column, float hitPerc, float distance, Wall wall) {
+static void Game_drawTextureColumn(int column, float hitPerc, float distance, WallTexture wall) {
     const int32_t wallHeight = (int)((float)GameContext_GameSize.y / distance);
     const int32_t offset = (wallHeight != GameContext_GameSize.y)
                                ? ROUND((GameContext_GameSize.y - wallHeight) * 0.5)
@@ -174,7 +174,7 @@ static void Game_drawTextureColumn(int column, float hitPerc, float distance, Wa
     }
 }
 
-static Wall Game_raycast(float maxDistance, float angle, float* distance, float* hitPerc, int* side) {
+static WallTexture Game_raycast(float maxDistance, float angle, float* distance, float* hitPerc, int* side) {
     if (GameContext_Map == NULL) {
         TRT_error("Game_raycast", "The map is NULL, how tf?", true);
         return WALL_NULL;
@@ -190,8 +190,8 @@ static Wall Game_raycast(float maxDistance, float angle, float* distance, float*
     float rayDirX = cosf(angle);
     float rayDirY = sinf(angle);
 
-    float mapX = (int)rayPosX;
-    float mapY = (int)rayPosY;
+    int mapX = (int)rayPosX;
+    int mapY = (int)rayPosY;
 
     float sideDistX;
     float sideDistY;
@@ -199,14 +199,13 @@ static Wall Game_raycast(float maxDistance, float angle, float* distance, float*
     float deltaDistX = sqrtf(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX));
     float deltaDistY = sqrtf(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));
 
-    float stepX;
-    float stepY;
+    int stepX;
+    int stepY;
 
     if (rayDirX < 0) {
         stepX = -1;
         sideDistX = (rayPosX - mapX) * deltaDistX;
-    }
-    else {
+    } else {
         stepX = 1;
         sideDistX = (mapX + 1 - rayPosX) * deltaDistX;
     }
@@ -214,16 +213,14 @@ static Wall Game_raycast(float maxDistance, float angle, float* distance, float*
     if (rayDirY < 0) {
         stepY = -1;
         sideDistY = (rayPosY - mapY) * deltaDistY;
-    }
-    else {
+    } else {
         stepY = 1;
         sideDistY = (mapY + 1 - rayPosY) * deltaDistY;
     }
 
-    Wall result = WALL_NULL;
-    while (mapX >= 0 && (uint16_t)mapX < GameContext_Map->width && mapY >= 0 && (uint16_t)mapY < GameContext_Map->
-        height) {
-        if ((result = GameContext_Map->walls[(int)mapX + (int)mapY * GameContext_Map->width]) != WALL_NULL) {
+    WallTexture result = WALL_NULL;
+    while (mapX >= 0 && (uint16_t)mapX < GameContext_Map->width && mapY >= 0 && (uint16_t)mapY < GameContext_Map->height) {
+        if ((result = GameContext_Map->walls[mapX + mapY * GameContext_Map->width]->wallTexture) != WALL_NULL) {
             break;
         }
 
@@ -231,8 +228,7 @@ static Wall Game_raycast(float maxDistance, float angle, float* distance, float*
             sideDistX += deltaDistX;
             mapX += stepX;
             *side = 0;
-        }
-        else {
+        } else {
             sideDistY += deltaDistY;
             mapY += stepY;
             *side = 1;
@@ -240,27 +236,12 @@ static Wall Game_raycast(float maxDistance, float angle, float* distance, float*
     }
 
     *distance = (float)(*side
-                            ? fabs((mapY - rayPosY + (1.0 - stepY) / 2.0) / rayDirY)
-                            : fabs((mapX - rayPosX + (1.0 - stepX) / 2.0) / rayDirX));
+                        ? fabs((mapY - rayPosY + (1.0 - stepY) / 2.0) / rayDirY)
+                        : fabs((mapX - rayPosX + (1.0 - stepX) / 2.0) / rayDirX));
     *hitPerc = *side ? rayPosX + rayDirX * (*distance) : rayPosY + rayDirY * (*distance);
-
-    // remove fish-eye effect
-    *distance = ABS(*distance) * cosf(angle - GameContext_Map->player->lookingAngle);
-
     *hitPerc = DECIMAL(*hitPerc);
 
-    // door are not on the same level as the walls
-    if (WALL_IS_DOOR(result)) {
-        *hitPerc += DOOR_RECESS * tanf(angle);
-
-        if (*hitPerc < 0 || *hitPerc > 1) {
-            *side = *side == 1 ? 0 : 1;
-            *hitPerc = cosf(angle) / DOOR_RECESS;
-            return WALL_DOORSLOT1;
-        }
-
-        *distance += *side ? DOOR_RECESS / sinf(angle) : DOOR_RECESS / cosf(angle);
-    }
+    *distance = ABS(*distance) * cosf(angle - GameContext_Map->player->lookingAngle);
 
     return result;
 }

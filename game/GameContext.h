@@ -59,9 +59,9 @@ static void Game_drawHUD();
 
 static void Game_drawPlayerView();
 
-static void Game_drawTextureColumn(int column, float hitPerc, float distance, Wall wall);
+static void Game_drawTextureColumn(int column, float hitPerc, float distance, WallTexture wall);
 
-static Wall Game_raycast(float maxDistance, float angle, float *distance, float *hitPerc, int *side);
+static WallTexture Game_raycast(float maxDistance, float angle, float *distance, float *hitPerc, int *side);
 
 #define GAME_HUD_PLAYER_STATS_IMAGE ("./assets/hud/stats/playerStats.png")
 #define GAME_HUD_SIZE               (Vec2) {320, 40}
