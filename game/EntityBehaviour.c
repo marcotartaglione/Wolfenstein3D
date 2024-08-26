@@ -14,7 +14,7 @@ void EntityBehaviour_move(Entity* entity, Map* map, EntityBehaviour_Movement mov
     const float checkY = newY + ENTITY_MIN_DISTANCE_FROM_WALL * SIGN(dY);
 
     int32_t wallIndex = (int32_t)checkX + (int32_t)checkY * map->width;
-    if (map->walls[wallIndex] != WALL_NULL)
+    if (map->walls[wallIndex]->wallTexture != WALL_NULL)
         return;
 
     entity->position.x = newX;
