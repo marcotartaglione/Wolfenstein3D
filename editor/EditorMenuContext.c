@@ -38,14 +38,23 @@ static void createFiles() {
 
             map->width = 64;
             map->height = 64;
-            map->walls = malloc(map->width * map->height * sizeof(Wall));
+            map->walls = malloc(map->width * map->height * sizeof(WallData *));
             if (map->walls == NULL) {
                 TRT_error("EditorMenu createFiles", "Malloc failed for walls", true);
                 return;
             }
 
             for (int j = 0; j < map->width * map->height; ++j) {
-                map->walls[j] = WALL_NULL;
+                WallData *wall = malloc(sizeof(WallData));
+                *wall = (WallData) {.wallTexture = WALL_NULL,
+                        .isDoor = false,
+                        .isSecret = false,
+                        .isElevator = false,
+                        .openPercentage = 0,
+                        .openTime = 0,
+                        .openState = WALL_OPEN_STATE_CLOSED};
+
+                map->walls[j] = wall;
             }
 
             map->enemiesCountPerDifficulty[0] = 8;
@@ -251,10 +260,10 @@ static void drawExit() {
                    (Vec2) {size->x + 10, size->y + 10});
 
     TRT_text_draw(text,
-                    (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
-                    FONT_HEIGHT,
+                  (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
+                  FONT_HEIGHT,
                   QUIT_FONT_COLOR,
-                    TEXT_ALIGN_CENTER);
+                  TEXT_ALIGN_CENTER);
 }
 
 static void chooseEpisodeKeyboardCallback(uint32_t key) {
