@@ -10,8 +10,6 @@
 #include "Commons.h"
 #include "Episodes.h"
 
-#define GAME_TARGET_FPS (30)
-
 static bool isEditor = false;
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PSTR lpCmdLine, _In_ int nCmdShow);
@@ -27,7 +25,7 @@ bool activateCurrentContext();
 void loadEpisodes();
 
 //
-// Wall
+// WallTexture
 //
 void loadWallTextures();
 

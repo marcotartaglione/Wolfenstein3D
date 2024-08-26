@@ -1,7 +1,7 @@
 #include "Wolfenstein3D.h"
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ PSTR lpCmdLine, _In_ int nCmdShow) {
-    TRT_debug_set(true);
+    TRT_debug_set(WOLFENSTEIN3D_IS_DEBUG);
     TRT_error_setLogFile(ERROR_LOG_FILE);
 
     loadEpisodes();
@@ -18,17 +18,16 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
     TRT_window_setup(
         hInstance,
-        "Wolfenstein 3D"
+        WOLFENSTEIN3D_CLASS_NAME
     );
-    TRT_window_setUpscaling(3);
+    TRT_window_setUpscaling(WOLFENSTEIN3D_UPSCALING);
     TRT_window_start(
-        "Wolfenstein 3D",
-        (Vec2){320, 200},
-        (Vec2){-1, -1}
+        WOLFENSTEIN3D_TITLE,
+        WOLFENSTEIN3D_SIZE,
+        WOLFENSTEIN3D_POSITION
     );
 
-    isEditor = strcmp(lpCmdLine, "--editor") == 0;
-
+    isEditor = (strcmp(lpCmdLine, WOLFENSTEIN3D_EDITOR_FLAG) == 0);
     if (isEditor) {
         contexts[0] = editorMenuContext;
         contexts[1] = editorContext;
@@ -50,7 +49,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     if (!activateCurrentContext())
         return 0;
 
-    TRT_window_run(GAME_TARGET_FPS, loop, close);
+    TRT_window_run(WOLFENSTEIN3D_TARGET_FPS, loop, close);
 
     return 0;
 }
@@ -153,7 +152,7 @@ void loadEpisodes() {
 }
 
 void loadWallTextures() {
-    for (Wall i = 0; i < WALL_NUMBER; i++) {
+    for (WallTexture i = 0; i < WALL_NUMBER; i++) {
         char path[256];
         snprintf(path, sizeof(path), "%s%s.png", WALL_TEXTURES_FOLDER, Wall_toString(i));
 
