@@ -125,10 +125,6 @@ static void Game_drawPlayerView() {
             continue;
         }
 
-        if (wall >= WALL_DOOR1 && wall <= WALL_DOOR8) {
-            int temp = 0;
-        }
-
         Game_drawTextureColumn(column, hitPerc, distance, wall);
         currentAngle += angleDelta;
     }
