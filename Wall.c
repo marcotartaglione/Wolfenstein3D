@@ -6,7 +6,7 @@
 
 Image *wallTextures[WALL_NUMBER];
 
-const char *Wall_toString(Wall wall) {
+const char *Wall_toString(WallTexture wall) {
     // If you are reading this, I'm sorry
     switch (wall) {
         case WALL_BLUESTONE1:
@@ -266,7 +266,59 @@ const char *Wall_toString(Wall wall) {
         case WALL_NULL:
             return "WALL_NULL";
         default:
-            TRT_error("Unknown wall type", "Inserted wall type is unknown", false);
+            TRT_error("Unknown wallTexture type", "Inserted wallTexture type is unknown", false);
             return "UNKNOWN";
     }
+}
+
+WallData *WallData_get(FILE *fp) {
+    if (fp == NULL) {
+        TRT_error("WallData_get", "File pointer is NULL", true);
+        return NULL;
+    }
+
+    WallData *wall = malloc(sizeof(WallData));
+    if (wall == NULL) {
+        TRT_error("WallData_get", "Malloc failed for wall", true);
+        return NULL;
+    }
+
+    fread(&wall->wallTexture, sizeof(WallTexture), 1, fp);
+    fread(&wall->isDoor, sizeof(bool), 1, fp);
+    fread(&wall->isSecret, sizeof(bool), 1, fp);
+    fread(&wall->isElevator, sizeof(bool), 1, fp);
+    fread(&wall->openPercentage, sizeof(float), 1, fp);
+    fread(&wall->openTime, sizeof(float), 1, fp);
+    fread(&wall->openState, sizeof(WallOpenState), 1, fp);
+
+    return wall;
+}
+
+void WallData_save(FILE *fp, WallData *wall) {
+    if (fp == NULL) {
+        TRT_error("WallData_save", "File pointer is NULL", true);
+        return;
+    }
+
+    if (wall == NULL) {
+        TRT_error("WallData_save", "WallData is NULL", true);
+        return;
+    }
+
+    fwrite(&wall->wallTexture, sizeof(WallTexture), 1, fp);
+    fwrite(&wall->isDoor, sizeof(bool), 1, fp);
+    fwrite(&wall->isSecret, sizeof(bool), 1, fp);
+    fwrite(&wall->isElevator, sizeof(bool), 1, fp);
+    fwrite(&wall->openPercentage, sizeof(float), 1, fp);
+    fwrite(&wall->openTime, sizeof(float), 1, fp);
+    fwrite(&wall->openState, sizeof(WallOpenState), 1, fp);
+}
+
+void WallData_free(WallData *wall) {
+    if (wall == NULL) {
+        TRT_error("WallData_free", "WallData is NULL", false);
+        return;
+    }
+
+    free(wall);
 }

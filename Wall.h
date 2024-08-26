@@ -97,7 +97,27 @@ typedef enum {
     WALL_ELEVATOR4,
     WALL_ELEVATOR5,
     WALL_NULL,
-} Wall;
+} WallTexture;
+
+typedef enum {
+    WALL_OPEN_STATE_CLOSED,
+    WALL_OPEN_STATE_OPEN,
+    WALL_OPEN_STATE_OPENING,
+    WALL_OPEN_STATE_CLOSING,
+} WallOpenState;
+
+typedef struct {
+    WallTexture wallTexture;
+
+    bool isDoor;
+    bool isSecret;
+    bool isElevator;
+
+    float openPercentage;
+    float openTime;
+
+    WallOpenState openState;
+} WallData;
 
 #define WALL_NUMBER                 (WALL_NULL)
 #define WALL_NO_DARK_VERSION        (WALL_ELEVATOR1)
@@ -105,7 +125,13 @@ typedef enum {
 
 #define WALL_IS_DOOR(wall)          (wall >= WALL_DOOR1 && wall <= WALL_DOOR8)
 
-const char* Wall_toString(Wall wall);
+const char* Wall_toString(WallTexture wall);
+
+WallData *WallData_get(FILE *fp);
+
+void WallData_save(FILE *fp, WallData *wall);
+
+void WallData_free(WallData *wall);
 
 extern Image *wallTextures[WALL_NUMBER];
 
