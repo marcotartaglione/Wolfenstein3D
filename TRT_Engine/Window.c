@@ -391,7 +391,7 @@ void TRT_window_fill(uint32_t color) {
     }
 }
 
-void TRT_window_DrawRectangle(Vec2 position, Vec2 size, uint32_t color, bool fill) {
+void TRT_window_drawRectangle(Vec2 position, Vec2 size, uint32_t color, bool fill) {
     TRT_window_interpretateSize(&size, false);
     TRT_window_interpretatePosition(&position, size, false);
 
@@ -403,6 +403,10 @@ void TRT_window_DrawRectangle(Vec2 position, Vec2 size, uint32_t color, bool fil
             TRT_window_setPixel(position.x + x, position.y + y, color);
         }
     }
+}
+
+void TRT_window_setTitle(char *title) {
+    SetWindowText(windowHandle, title);
 }
 
 //
