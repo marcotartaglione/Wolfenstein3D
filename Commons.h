@@ -70,12 +70,12 @@ static void drawHeaderLine() {
 
     TRT_window_fill(MAIN_BACKGROUND_COLOR);
 
-    TRT_window_DrawRectangle((Vec2) {0, windowSize.y - HEADER_LINE_Y_OFFSET - HEADER_LINE_BACKGROUND_HEIGHT},
+    TRT_window_drawRectangle((Vec2) {0, windowSize.y - HEADER_LINE_Y_OFFSET - HEADER_LINE_BACKGROUND_HEIGHT},
                              (Vec2) {-1, HEADER_LINE_BACKGROUND_HEIGHT},
                              HEADER_LINE_BACKGROUND_COLOR,
                              true);
 
-    TRT_window_DrawRectangle((Vec2) {0, windowSize.y - HEADER_LINE_Y_OFFSET - HEADER_LINE_BACKGROUND_HEIGHT - 2},
+    TRT_window_drawRectangle((Vec2) {0, windowSize.y - HEADER_LINE_Y_OFFSET - HEADER_LINE_BACKGROUND_HEIGHT - 2},
                              (Vec2) {-1, 1},
                              HEADER_LINE_BACKGROUND_COLOR,
                              true);
