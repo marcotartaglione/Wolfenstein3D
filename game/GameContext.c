@@ -7,11 +7,11 @@
 #include "../Wolfenstein3D.h"
 
 WolfensteinContext gameContext = {
-    Game_contextInit,
-    Game_contextLoop,
-    Game_keyboardCallback,
-    Game_mouseCallback,
-    Game_contextClose
+        Game_contextInit,
+        Game_contextLoop,
+        Game_keyboardCallback,
+        Game_mouseCallback,
+        Game_contextClose
 };
 
 void Game_setSize(Vec2 size) {
@@ -98,16 +98,17 @@ void Game_mouseCallback(Click click, uint32_t x, uint32_t y) {
 void Game_drawFrame(Vec2 frameSize) {
     TRT_window_fill(GAME_FRAME_BACKGROUND_COLOR);
 
-    TRT_window_DrawRectangle(
-    (Vec2){ELEMENT_ALIGN_CENTER, (TRT_window_getSize().y + GAME_FRAME_OFFSET_FROM_BOTTOM - GameContext_GameSize.y) / 2},
-        frameSize,
-        0x000000,
-        true);
+    TRT_window_drawRectangle(
+            (Vec2) {ELEMENT_ALIGN_CENTER,
+                    (TRT_window_getSize().y + GAME_FRAME_OFFSET_FROM_BOTTOM - GameContext_GameSize.y) / 2},
+            frameSize,
+            0x000000,
+            true);
 }
 
 static void Game_drawHUD() {
     TRT_image_draw(GameContext_PlayerStats,
-                   (Vec2){0, GAME_HUD_OFFSET_BOTTOM},
+                   (Vec2) {0, GAME_HUD_OFFSET_BOTTOM},
                    GAME_HUD_SIZE);
 }
 
@@ -131,13 +132,13 @@ static void Game_drawPlayerView() {
 }
 
 static void Game_drawTextureColumn(int column, float hitPerc, float distance, WallTexture wall) {
-    const int32_t wallHeight = (int)((float)GameContext_GameSize.y / distance);
+    const int32_t wallHeight = (int) ((float) GameContext_GameSize.y / distance);
     const int32_t offset = (wallHeight != GameContext_GameSize.y)
-                               ? ROUND((GameContext_GameSize.y - wallHeight) * 0.5)
-                               : 0;
+                           ? ROUND((GameContext_GameSize.y - wallHeight) * 0.5)
+                           : 0;
 
-    const float heightStep = (float)wallHeight / (float)wallTextures[wall]->height;
-    const float widthOffset = (float)wallTextures[wall]->width * hitPerc;
+    const float heightStep = (float) wallHeight / (float) wallTextures[wall]->height;
+    const float widthOffset = (float) wallTextures[wall]->width * hitPerc;
 
     const Vec2 windowSize = TRT_window_getSize();
     const int offsetLeft = (windowSize.x - GameContext_GameSize.x) / 2;
@@ -147,16 +148,14 @@ static void Game_drawTextureColumn(int column, float hitPerc, float distance, Wa
 
         if (i >= GameContext_GameSize.y - offset) {
             color = GAME_ROOF_COLOR;
-        }
-        else if (i < offset) {
+        } else if (i < offset) {
             color = GAME_FLOOR_COLOR;
-        }
-        else {
-            const int textureIndex = (int)((float)(i - offset) / heightStep);
+        } else {
+            const int textureIndex = (int) ((float) (i - offset) / heightStep);
             if (textureIndex >= wallTextures[wall]->height)
                 continue;
 
-            const int textureDataIndex = ((int)widthOffset + textureIndex * wallTextures[wall]->width) * 3;
+            const int textureDataIndex = ((int) widthOffset + textureIndex * wallTextures[wall]->width) * 3;
             const uint32_t r = wallTextures[wall]->data[textureDataIndex] << 16;
             const uint32_t g = wallTextures[wall]->data[textureDataIndex + 1] << 8;
             const uint32_t b = wallTextures[wall]->data[textureDataIndex + 2];
@@ -166,11 +165,11 @@ static void Game_drawTextureColumn(int column, float hitPerc, float distance, Wa
 
         TRT_window_setPixel(column + offsetLeft,
                             i + (TRT_window_getSize().y + GAME_FRAME_OFFSET_FROM_BOTTOM - GameContext_GameSize.
-                                y) / 2, color);
+                                    y) / 2, color);
     }
 }
 
-static WallTexture Game_raycast(float maxDistance, float angle, float* distance, float* hitPerc, int* side) {
+static WallTexture Game_raycast(float maxDistance, float angle, float *distance, float *hitPerc, int *side) {
     if (GameContext_Map == NULL) {
         TRT_error("Game_raycast", "The map is NULL, how tf?", true);
         return WALL_NULL;
@@ -186,8 +185,8 @@ static WallTexture Game_raycast(float maxDistance, float angle, float* distance,
     float rayDirX = cosf(angle);
     float rayDirY = sinf(angle);
 
-    int mapX = (int)rayPosX;
-    int mapY = (int)rayPosY;
+    int mapX = (int) rayPosX;
+    int mapY = (int) rayPosY;
 
     float sideDistX;
     float sideDistY;
@@ -214,9 +213,12 @@ static WallTexture Game_raycast(float maxDistance, float angle, float* distance,
         sideDistY = (mapY + 1 - rayPosY) * deltaDistY;
     }
 
-    WallTexture result = WALL_NULL;
-    while (mapX >= 0 && (uint16_t)mapX < GameContext_Map->width && mapY >= 0 && (uint16_t)mapY < GameContext_Map->height) {
-        if ((result = GameContext_Map->walls[mapX + mapY * GameContext_Map->width]->wallTexture) != WALL_NULL) {
+    WallData *result;
+    while (mapX >= 0 && (uint16_t) mapX < GameContext_Map->width && mapY >= 0 &&
+           (uint16_t) mapY < GameContext_Map->height) {
+        result = GameContext_Map->walls[mapX + mapY * GameContext_Map->width];
+
+        if (result->wallTexture != WALL_NULL) {
             break;
         }
 
@@ -231,13 +233,46 @@ static WallTexture Game_raycast(float maxDistance, float angle, float* distance,
         }
     }
 
-    *distance = (float)(*side
-                        ? fabs((mapY - rayPosY + (1.0 - stepY) / 2.0) / rayDirY)
-                        : fabs((mapX - rayPosX + (1.0 - stepX) / 2.0) / rayDirX));
+    *distance = (float) (*side
+                         ? fabs((mapY - rayPosY + (1.0 - stepY) / 2.0) / rayDirY)
+                         : fabs((mapX - rayPosX + (1.0 - stepX) / 2.0) / rayDirX));
     *hitPerc = *side ? rayPosX + rayDirX * (*distance) : rayPosY + rayDirY * (*distance);
     *hitPerc = DECIMAL(*hitPerc);
 
+    if (result->isDoor) {
+        // the extencion of the ray projected from the player
+        float raycastExtencion = ABS(*side ?
+                                 DOOR_RECESS / rayDirY :
+                                 DOOR_RECESS / rayDirX);
+
+        // the extencion of the hit point based on the raycast extencion
+        float hitExtencion = *side ?
+                             raycastExtencion * rayDirX :
+                             raycastExtencion * rayDirY;
+        *hitPerc += hitExtencion;
+
+        if (*hitPerc < 0 || *hitPerc > 1) {
+            // door side
+            *side = !*side;
+
+            float outsideHitpoint = (*hitPerc < 1) ? *hitPerc : (1 - *hitPerc);
+
+            float distanceToHitpointFromWall = *side ?
+                                               outsideHitpoint / rayDirY :
+                                               outsideHitpoint / rayDirX;
+            *distance += raycastExtencion - ABS(distanceToHitpointFromWall);
+
+            *hitPerc = *side ?
+                       DOOR_RECESS - distanceToHitpointFromWall * rayDirX :
+                       DOOR_RECESS - distanceToHitpointFromWall * rayDirY;
+
+            return WALL_DOORSLOT1;
+        } else {
+            *distance += ABS(raycastExtencion);
+        }
+    }
+
     *distance = ABS(*distance) * cosf(angle - GameContext_Map->player->lookingAngle);
 
-    return result;
+    return result->wallTexture;
 }
