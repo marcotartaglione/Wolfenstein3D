@@ -114,14 +114,14 @@ typedef struct {
     bool isElevator;
 
     float openPercentage;
-    float openTime;
+    float openTimeSeconds;
 
     WallOpenState openState;
 } WallData;
 
 #define WALL_NUMBER                 (WALL_NULL)
 #define WALL_NO_DARK_VERSION        (WALL_ELEVATOR1)
-#define DOOR_RECESS                 (0.25f)
+#define DOOR_RECESS                 (0.5f)
 
 #define WALL_IS_DOOR(wall)          (wall >= WALL_DOOR1 && wall <= WALL_DOOR8)
 

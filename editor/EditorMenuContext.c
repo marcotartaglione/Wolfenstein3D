@@ -51,7 +51,7 @@ static void createFiles() {
                         .isSecret = false,
                         .isElevator = false,
                         .openPercentage = 0,
-                        .openTime = 0,
+                        .openTimeSeconds = 0,
                         .openState = WALL_OPEN_STATE_CLOSED};
 
                 map->walls[j] = wall;
