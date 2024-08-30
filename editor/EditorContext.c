@@ -367,7 +367,7 @@ void gridKeyboardCallback(uint32_t key) {
                     .isSecret = false,
                     .isElevator = false,
                     .openPercentage = 0.0f,
-                    .openTime = 0.0f,
+                    .openTimeSeconds = 0.0f,
                     .openState = WALL_OPEN_STATE_CLOSED
             };
 
@@ -377,11 +377,11 @@ void gridKeyboardCallback(uint32_t key) {
             wall = malloc(sizeof(WallData));
             *wall = (WallData) {
                     .wallTexture = selectedWall,
-                    .isDoor = false,
+                    .isDoor = WALL_IS_DOOR(selectedWall),
                     .isSecret = false,
                     .isElevator = false,
                     .openPercentage = 0.0f,
-                    .openTime = 0.0f,
+                    .openTimeSeconds = 1.5f,
                     .openState = WALL_OPEN_STATE_CLOSED
             };
 
