@@ -97,7 +97,7 @@ static void drawExit() {
         return;
     }
 
-    TRT_window_DrawRectangle(
+    TRT_window_drawRectangle(
             (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
             (Vec2) {size->x + 10, size->y + 10},
             MAIN_BACKGROUND_COLOR,
@@ -130,7 +130,7 @@ static void drawNavigation() {
         return;
     }
 
-    TRT_window_DrawRectangle(
+    TRT_window_drawRectangle(
             (Vec2) {ELEMENT_ALIGN_CENTER, ELEMENT_ALIGN_CENTER},
             (Vec2) {size->x + 10, size->y + 10},
             MAIN_BACKGROUND_COLOR,
@@ -189,7 +189,7 @@ void drawGrid() {
                 color = 0x0000FF;
             }
 
-            TRT_window_DrawRectangle(
+            TRT_window_drawRectangle(
                     (Vec2) {i * tileSize + xOffset, j * tileSize + yOffset},
                     (Vec2) {tileSize, tileSize},
                     color,
