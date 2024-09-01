@@ -222,7 +222,7 @@ void TRT_window_start(char *title, Vec2 size, Vec2 position) {
             0,
             windowClass.lpszClassName,
             title,
-            WS_POPUP | WS_VISIBLE,
+            windowStyle,
             position.x,
             position.y,
             size.x,
@@ -285,6 +285,14 @@ void TRT_window_close() {
 
 void TRT_window_clear() {
     memset(frame.pixels, 0, frame.width * frame.height * sizeof(uint32_t));
+}
+
+void TRT_window_addStyle(TRT_window_style style) {
+    windowStyle |= style;
+}
+
+void TRT_window_removeStyle(TRT_window_style style) {
+    windowStyle &= ~style;
 }
 
 void TRT_window_interpretateSize(Vec2 *size, bool considerUpScaling) {
