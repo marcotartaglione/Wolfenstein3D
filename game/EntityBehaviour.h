@@ -25,4 +25,11 @@ void EntityBehaviour_move(Entity* entity, Map* map, EntityBehaviour_Movement mov
 
 void EntityBehaviour_rotate(Entity* entity, EntityBehaviour_Rotation rotation);
 
+typedef struct {
+    bool success;
+    uint32_t wallIndex;
+} EntityBehaviour_InteractResult;
+
+EntityBehaviour_InteractResult EntityBehaviour_interact(Entity* entity, Map* map);
+
 #endif //ENTITYMOVEMENT_H

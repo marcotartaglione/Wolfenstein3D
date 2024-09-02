@@ -382,7 +382,9 @@ void gridKeyboardCallback(uint32_t key) {
                     .isElevator = false,
                     .openPercentage = 0.0f,
                     .openTimeSeconds = 1.5f,
-                    .openState = WALL_OPEN_STATE_CLOSED
+                    .openState = WALL_OPEN_STATE_CLOSED,
+                    .position = (Vec2) {selectedTile % episodes[selectedEpisode]->floors[selectedFloor]->width,
+                                        selectedTile / episodes[selectedEpisode]->floors[selectedFloor]->width}
             };
 
             episodes[selectedEpisode]->floors[selectedFloor]->walls[selectedTile] = wall;

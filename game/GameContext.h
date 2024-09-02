@@ -35,6 +35,9 @@ static uint32_t GameContext_Episode = 0;
 static uint32_t GameContext_Floor = 0;
 static uint8_t GameContext_Difficulty = 0;
 
+static uint8_t GameContext_UpdateMapElementsCount = 0;
+static WallData* GameContext_UpdatingMapElements[16];
+
 static Map* GameContext_Map;
 
 void Game_setEpisode(uint32_t episode);
@@ -54,6 +57,8 @@ void Game_keyboardCallback(uint32_t key);
 void Game_mouseCallback(Click click, uint32_t x, uint32_t y);
 
 void Game_drawFrame(Vec2 frameSize);
+
+static void Game_updateMapElements();
 
 static void Game_drawHUD();
 

@@ -284,11 +284,13 @@ WallData *WallData_get(FILE *fp) {
     }
 
     fread(&wall->wallTexture, sizeof(WallTexture), 1, fp);
+    fread(&wall->position, sizeof(Vec2), 1, fp);
     fread(&wall->isDoor, sizeof(bool), 1, fp);
     fread(&wall->isSecret, sizeof(bool), 1, fp);
     fread(&wall->isElevator, sizeof(bool), 1, fp);
     fread(&wall->openPercentage, sizeof(float), 1, fp);
     fread(&wall->openTimeSeconds, sizeof(float), 1, fp);
+    fread(&wall->elapsedFrames, sizeof(uint32_t), 1, fp);
     fread(&wall->openState, sizeof(WallOpenState), 1, fp);
 
     return wall;
@@ -306,11 +308,13 @@ void WallData_save(FILE *fp, WallData *wall) {
     }
 
     fwrite(&wall->wallTexture, sizeof(WallTexture), 1, fp);
+    fwrite(&wall->position, sizeof(Vec2), 1, fp);
     fwrite(&wall->isDoor, sizeof(bool), 1, fp);
     fwrite(&wall->isSecret, sizeof(bool), 1, fp);
     fwrite(&wall->isElevator, sizeof(bool), 1, fp);
     fwrite(&wall->openPercentage, sizeof(float), 1, fp);
     fwrite(&wall->openTimeSeconds, sizeof(float), 1, fp);
+    fwrite(&wall->elapsedFrames, sizeof(uint32_t), 1, fp);
     fwrite(&wall->openState, sizeof(WallOpenState), 1, fp);
 }
 

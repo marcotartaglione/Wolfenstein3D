@@ -109,12 +109,15 @@ typedef enum {
 typedef struct {
     WallTexture wallTexture;
 
+    Vec2 position;
+
     bool isDoor;
     bool isSecret;
     bool isElevator;
 
     float openPercentage;
     float openTimeSeconds;
+    uint32_t elapsedFrames;
 
     WallOpenState openState;
 } WallData;

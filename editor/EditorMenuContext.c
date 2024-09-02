@@ -46,21 +46,25 @@ static void createFiles() {
 
             for (int j = 0; j < map->width * map->height; ++j) {
                 WallData *wall = malloc(sizeof(WallData));
-                *wall = (WallData) {.wallTexture = WALL_NULL,
+                *wall = (WallData) {
+                        .wallTexture = WALL_NULL,
+                        .position = (Vec2) {0, 0},
                         .isDoor = false,
                         .isSecret = false,
                         .isElevator = false,
                         .openPercentage = 0,
                         .openTimeSeconds = 0,
-                        .openState = WALL_OPEN_STATE_CLOSED};
+                        .elapsedFrames = 0,
+                        .openState = WALL_OPEN_STATE_CLOSED
+                };
 
                 map->walls[j] = wall;
             }
 
             map->enemiesCountPerDifficulty[0] = 8;
-            map->enemiesCountPerDifficulty[1] = 2;
-            map->enemiesCountPerDifficulty[2] = 2;
-            map->enemiesCountPerDifficulty[3] = 4;
+            map->enemiesCountPerDifficulty[1] = 10;
+            map->enemiesCountPerDifficulty[2] = 12;
+            map->enemiesCountPerDifficulty[3] = 16;
 
             Entity *player = malloc(sizeof(Entity));
             if (player == NULL) {
@@ -142,7 +146,7 @@ static void createFiles() {
 }
 
 void editorMenuContextInit() {
-    //createFiles();
+//    createFiles();
 
     title = TRT_image_get(EDITOR_TITLE_PATH);
     if (title == NULL) {
