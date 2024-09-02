@@ -16,6 +16,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
     TRT_animation_setFadeTime(FADE_TIME);
 
+    TRT_window_addStyle(TRT_WINDOW_STYLE_POPUP);
     TRT_window_setup(
         hInstance,
         WOLFENSTEIN3D_CLASS_NAME
